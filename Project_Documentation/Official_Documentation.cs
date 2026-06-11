@@ -177,4 +177,131 @@ Database
 │
 └── MySQL
 
+
+REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS REASONS 
+
+DB_GranjaLaFlor
+│
+├── Controllers
+│   ├── RolesController.cs
+│   ├── UsersController.cs
+│   ├── BroilerHousesController.cs
+│   ├── BroodsController.cs
+│   ├── IncomeConcentratesController.cs
+│   ├── DailyChecksController.cs
+│   ├── WeeklyChecksController.cs
+│   ├── TemperatureController.cs
+│   └── EarlyStimulationController.cs
+│
+├── Models
+│   ├── Entities
+│   │   ├── Role.cs
+│   │   ├── User.cs
+│   │   ├── BroilerHouse.cs
+│   │   ├── Brood.cs
+│   │   ├── DcDay.cs
+│   │   ├── WcWeek.cs
+│   │   ├── ExpectedValue.cs
+│   │   ├── IncomeConcentrate.cs
+│   │   ├── DailyCheck.cs
+│   │   └── WeeklyCheck.cs
+│   │
+│   ├── ViewModels
+│   │   ├── LoginViewModel.cs
+│   │   ├── DailyCheckViewModel.cs
+│   │   ├── WeeklyCheckViewModel.cs
+│   │   └── TemperatureViewModel.cs
+│   │
+│   └── Validations
+│
+├── Data
+│   ├── Context
+│   │   └── ApplicationDbContext.cs
+│   │
+│   ├── Configurations
+│   │   ├── RoleConfiguration.cs
+│   │   ├── UserConfiguration.cs
+│   │   ├── BroodConfiguration.cs
+│   │   ├── DailyCheckConfiguration.cs
+│   │   └── WeeklyCheckConfiguration.cs
+│   │
+│ 
+│
+├── Services
+│   ├── RoleService.cs
+│   ├── UserService.cs
+│   ├── BroilerHouseService.cs
+│   ├── BroodService.cs
+│   ├── IncomeConcentrateService.cs
+│   ├── DailyCheckService.cs
+│   ├── WeeklyCheckService.cs
+│   ├── TemperatureService.cs
+│   └── EarlyStimulationService.cs
+│
+├── ExternalServices
+│   ├── Interfaces
+│   │   ├── ITemperatureApiClient.cs
+│   │   └── ISpeakerApiClient.cs
+│   │
+│   └── Implementations
+│       ├── TemperatureApiClient.cs
+│       └── SpeakerApiClient.cs
+│
+├── Helpers
+│   ├── PasswordHelper.cs
+│   └── CalculationHelper.cs
+│
+├── Views
+│   ├── Roles
+│   ├── Users
+│   ├── BroilerHouses
+│   ├── Broods
+│   ├── IncomeConcentrates
+│   ├── DailyChecks
+│   ├── WeeklyChecks
+│   ├── Temperature
+│   ├── EarlyStimulation
+│   └── Shared
+│
+├── wwwroot
+│   ├── css
+│   ├── js
+│   ├── images
+│   └── lib
+│
+├── appsettings.json
+├── appsettings.Development.json
+└── Program.cs
+
+
+Services:
+
+Microsoft explains that classes should receive their dependencies via Dependency Injection.
+
+Microsoft indicates that controllers should be kept lightweight and that heavy logic should not be placed within them.
+
+Add layers to split up responsabilities. 
+
+Based on Dependency Injection: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-10.0
+
+Best practices: https://learn.mBest Praicrosoft.com/en-us/aspnet/core/fundamentals/best-practices?view=aspnetcore-10.0
+
+Common web application architectures: https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures
+
+eShopOnWeb: https://github.com/dotnet-architecture/eShopOnWeb
+
+  Controller                           -->         RoleController
+      ↓                                                  ↓        
+   Service                             -->          RoleService
+      ↓                                                  ↓  
+ApplicationDbContext                   -->       ApplicationDbContext
+      ↓
+    MySQL                                       
+
+
+  Database Seeding: to add data into DB automatically. 
+
+
+
+
 */

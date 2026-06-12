@@ -21,7 +21,6 @@
     <Folder Include="Data\Configurations\" />
     <Folder Include="ExternalServices\Interfaces\" />
     <Folder Include="ExternalServices\Implementations\" />
-    <Folder Include="Models\Entities\" />
     <Folder Include="Models\Validations\" />
     <Folder Include="Models\ViewModels\" />
     <Folder Include="Helpers\" />

@@ -1,7 +1,22 @@
+using DB_GranjaLaFlor.Data.Context;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// use a variable to connect to DB by searching a .json file in this case having the "connectionString" called "granja_la_flor_connection". It is at the appsettings.Development.json file. Recieves the connextion string "granja_la_flor_connection". 
+var connectionString = builder.Configuration
+    .GetConnectionString("granja_la_flor_connection");
+
+// Creates and injects  "ApplicationDbContext"
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    //use MySQL as the database engine. // Automatically detect the MySQL version.
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)));
+
+
 
 var app = builder.Build();
 

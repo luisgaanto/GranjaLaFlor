@@ -302,6 +302,143 @@ ApplicationDbContext                   -->       ApplicationDbContext
   Database Seeding: to add data into DB automatically. 
 
 
-DbContext: https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/?utm_source=chatgpt.com
+DbContext: https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/?
+
+
+
+
+
+Public or Private 
+
+Principle of Least Privilege
+
+Public: When there is a need to be called by other classes, controllers, models, etc..
+
+Public: No need to be called by other parts of the project, only by the method that is belongs from. 
+
+| Elemento                         | Modificador recomendado | Motivo                                      |
+| -------------------------------- | ----------------------- | ------------------------------------------- |
+| Controllers                      | `public`                | ASP.NET Core los descubre automáticamente.  |
+| Services                         | `public`                | Son utilizados por los controladores.       |
+| DbContext                        | `public`                | EF Core y DI deben acceder a él.            |
+| Entidades (`Role`, `User`, etc.) | `public`                | EF Core realiza el mapeo.                   |
+| Propiedades de entidades         | `public`                | EF Core necesita leer y escribir valores.   |
+| `DbSet<>`                        | `public`                | Representan las tablas de la base de datos. |
+| Constructor                      | `public`                | Lo utiliza Dependency Injection.            |
+| Campos (`_context`)              | `private readonly`      | Encapsulación y seguridad.                  |
+| Métodos auxiliares               | `private`               | Solo se usan dentro de la clase.            |
+| Constantes internas              | `private const`         | Solo pertenecen a la clase.                 |
+
+
+
+| Elemento            | Modificador        |
+| ------------------- | ------------------ |
+| Controllers         | `public`           |
+| Services            | `public`           |
+| DbContext           | `public`           |
+| Entidades EF Core   | `public`           |
+| Propiedades EF Core | `public`           |
+| `DbSet<>`           | `public`           |
+| Constructor         | `public`           |
+| Campos (`_context`) | `private readonly` |
+| Métodos auxiliares  | `private`          |
+| Constantes          | `private const`    |
+
+
+Reference for public and private: 
+https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers?
+
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/accessibility-levels?
+
+
+
+SECURITY
+
+
+                 Usuarios
+                     │
+                     ▼
+             Authentication
+                     │
+                     ▼
+              Authorization
+                     │
+                     ▼
+Controllers ─────► Services ─────► External APIs
+                     │                  │
+                     ▼                  ▼
+                 Entity Framework    HTTPS
+                     │
+                     ▼
+                  MySQL
+
+
+
+
+| Medida                          | Implementar | Momento                                        |
+| ------------------------------- | :---------: | ---------------------------------------------- |
+| HTTPS                           |      ✅      | Desde el primer despliegue                     |
+| Password Hash (BCrypt)          |      ✅      | Módulo Usuarios                                |
+| Authentication                  |      ✅      | Módulo Login                                   |
+| Authorization por Roles         |      ✅      | Módulo Login                                   |
+| Anti-Forgery (CSRF)             |      ✅      | Todos los formularios POST                     |
+| Validación con Data Annotations |      ✅      | Todas las entidades                            |
+| Validación en Services          |      ✅      | Toda la lógica de negocio                      |
+| LINQ / EF Core                  |      ✅      | Todo el proyecto                               |
+| Logging                         |      ✅      | Desde el inicio                                |
+| APIs con `HttpClient` + HTTPS   |      ✅      | Módulos de Temperatura y Estimulación Temprana |
+
+
+
+Referencias:
+
+https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-10.0
+
+https://learn.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-10.0
+
+https://learn.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-10.0&
+
+https://learn.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-10.0&
+
+
+DataAnnotation:
+https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations.displayattribute?view=net-10.0
+https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations?view=net-10.0
+https://learn.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-10.0
+
+
+Fuent API:
+
+https://learn.microsoft.com/en-us/ef/core/modeling/?
+https://learn.microsoft.com/en-us/ef/core/modeling/entity-properties?tabs=data-annotations%2Cwith-nrt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 */

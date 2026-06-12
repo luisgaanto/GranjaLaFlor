@@ -218,7 +218,7 @@ CREATE TABLE weekly_checks (
 
 
 ALTER USER 'root'@'localhost'
-IDENTIFIED BY 'root123!';
+IDENTIFIED BY '123456789';
 
 ALTER USER 'root'@'localhost'
 IDENTIFIED BY 'root123!';

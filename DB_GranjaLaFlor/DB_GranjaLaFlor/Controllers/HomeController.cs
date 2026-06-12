@@ -2,6 +2,32 @@ using DB_GranjaLaFlor.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
+using DB_GranjaLaFlor.Data.Context;
+using Microsoft.EntityFrameworkCore;
+
+namespace DB_GranjaLaFlor.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var roles = await _context.Roles
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(roles);
+        }
+    }
+}
+
+/*
 namespace DB_GranjaLaFlor.Controllers
 {
     public class HomeController : Controller
@@ -30,3 +56,4 @@ namespace DB_GranjaLaFlor.Controllers
         }
     }
 }
+*/

@@ -45,14 +45,23 @@ namespace DB_GranjaLaFlor.Controllers
         }
 
         // [HttpPost] = Allow POST requests only
-        // Micro recommendation to proetc gainst CSRF attacks (Cross-Site Request Forgery) when using POST methods and MVC. 
+        // Micro recommendation to proetc against CSRF attacks (Cross-Site Request Forgery) when using POST methods and MVC. 
         // POST: Roles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Role role)
+        public async Task<IActionResult> Create(Role role)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(role);
+            }
+
+            await _roleService.CreateAsync(role);
+
             return RedirectToAction(nameof(Index));
         }
+
+        
 
         // GET: Roles/Edit/5
         public IActionResult Edit(int id)

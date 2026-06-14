@@ -60,7 +60,10 @@ namespace DB_GranjaLaFlor.Services
 
         public async Task CreateAsync(Role role)
         {
-            throw new NotImplementedException();
+            role.RoleState = true;
+
+            _context.Roles.Add(role);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Role role)

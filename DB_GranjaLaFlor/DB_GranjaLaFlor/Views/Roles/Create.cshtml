@@ -1,0 +1,57 @@
+﻿@model DB_GranjaLaFlor.Models.Entities.Role
+
+@{
+    ViewData["Title"] = "Nuevo Rol";
+}
+
+<div class="container  mt-4">
+
+    <div class="card card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Nuevo Rol</h1>
+        </div>
+
+        <!-- Adding a card format for form --> 
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <!-- SECURITY: Protects from Cross-Site Request Forgery (CSRF) attacks by using a validation token -->
+                @Html.AntiForgeryToken()
+
+                <!-- Uisng below line to trigger a warining if not honoring model's validation-->
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="RoleName" class="form-label"></label>
+                    <input asp-for="RoleName" class="form-control" />
+                    <!-- span asp-validation triggers warinings only mapped to porperty-->
+                    <span asp-validation-for="RoleName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RoleDescription" class="form-label"></label>
+                    <textarea asp-for="RoleDescription" class="form-control"></textarea>
+                    <span asp-validation-for="RoleDescription" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <!-- button type="submit" is used when you wsnt to modify data (create, update, edit, delete...).-->
+                    <button type="submit" class="btn btn-outline-info">
+                        Guardar
+                    </button>
+                    <!-- a asp-action="Index" is used when you just want to be redirected to a page.-->
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

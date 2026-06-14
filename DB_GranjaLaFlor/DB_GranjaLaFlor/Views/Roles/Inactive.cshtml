@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DB_GranjaLaFlor.Models.Entities.Role>
+
+@{
+    ViewData["Title"] = "Roles Inactivos";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Roles Inactivos</h1>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver a Roles Activos
+        </a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.RoleName)</th>
+                <th>@Html.DisplayNameFor(model => model.RoleDescription)</th>
+                <th>@Html.DisplayNameFor(model => model.RoleState)</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var role in Model)
+                {
+                    <tr>
+                        <td>@role.RoleName</td>
+                        <td>@role.RoleDescription</td>
+                        <td>
+                            <span class="badge bg-secondary">Inactivo</span>
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Details"
+                               asp-route-id="@role.RoleId"
+                               class="btn btn-info btn-sm">
+                                Detalle
+                            </a>
+
+                            <a asp-action="Activate"
+                               asp-route-id="@role.RoleId"
+                               class="btn btn-success btn-sm">
+                                Reactivar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No existen roles inactivos.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

@@ -1,4 +1,5 @@
 using DB_GranjaLaFlor.Data.Context;
+using DB_GranjaLaFlor.Services;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         connectionString,
         ServerVersion.AutoDetect(connectionString)));
 
-
+builder.Services.AddScoped<RoleService>();
 
 var app = builder.Build();
 

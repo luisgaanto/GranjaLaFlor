@@ -31,8 +31,10 @@ namespace DB_GranjaLaFlor.Services
             throw new NotImplementedException();
         }
 
+        // Odicial Doc: "The .NET style convention is to add the "Async" suffix to all asynchronous method names."
         public async Task<List<Role>> GetAllActiveAsync()
         {
+            // Use .AsNoTracking() when only consultimg DB. It reduces memoruy consuption and improves performance as it does not track objects.  
             return await _context.Roles
                 .AsNoTracking()
                 .Where(role => role.RoleState)
@@ -48,12 +50,12 @@ namespace DB_GranjaLaFlor.Services
         }
 
 
-
         public async Task<Role?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Roles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(role => role.RoleId == id);
         }
-
         //==================================================
         // Command Methods (Create / Update / Delete)
         //==================================================
@@ -68,17 +70,48 @@ namespace DB_GranjaLaFlor.Services
 
         public async Task UpdateAsync(Role role)
         {
-            throw new NotImplementedException();
+            var existingRole = await _context.Roles
+                .FirstOrDefaultAsync(r => r.RoleId == role.RoleId);
+
+            if (existingRole == null)
+            {
+                throw new InvalidOperationException("Role not found.");
+            }
+
+            existingRole.RoleName = role.RoleName;
+            existingRole.RoleDescription = role.RoleDescription;
+
+            await _context.SaveChangesAsync();
         }
+
 
         public async Task SoftDeleteAsync(int id)
         {
-            throw new NotImplementedException();
-        }
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(role => role.RoleId == id);
 
+            if (role == null)
+            {
+                throw new InvalidOperationException("Role not found.");
+            }
+
+            role.RoleState = false;
+
+            await _context.SaveChangesAsync();
+        }
         public async Task ActivateAsync(int id)
         {
-            throw new NotImplementedException();
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(role => role.RoleId == id);
+
+            if (role == null)
+            {
+                throw new InvalidOperationException("Role not found.");
+            }
+
+            role.RoleState = true;
+
+            await _context.SaveChangesAsync();
         }
 
         //==================================================

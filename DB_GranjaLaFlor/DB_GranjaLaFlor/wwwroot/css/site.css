@@ -20,3 +20,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+.form-control,
+.form-select {
+    background-color: #f3f5f7;
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: white;
+    }

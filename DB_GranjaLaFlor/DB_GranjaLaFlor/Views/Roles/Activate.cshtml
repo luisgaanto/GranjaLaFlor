@@ -1,0 +1,80 @@
+﻿@model DB_GranjaLaFlor.Models.Entities.Role
+
+@{
+    ViewData["Title"] = "Reactivar Rol";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Reactivar Rol</h1>
+        </div>
+        
+        <div class="card-body">
+            @*
+            <div class="alert alert-info">
+                ¿Está seguro que desea reactivar este rol?
+            </div>
+            *@
+            <table class="table table-hover table-bordered align-middle">
+                <tbody>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.RoleName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.RoleName)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.RoleDescription)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.RoleDescription)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.RoleState)
+                        </th>
+                        <td>
+                            <span class="badge bg-danger">
+                                Inactivo
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <form asp-action="Activate" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="RoleId" />
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-outline-danger">
+                        Reactivar
+                    </button>
+
+                    <a asp-action="Inactive"
+                       class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

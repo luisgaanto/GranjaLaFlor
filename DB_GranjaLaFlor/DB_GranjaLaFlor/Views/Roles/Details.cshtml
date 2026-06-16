@@ -1,0 +1,84 @@
+﻿@model DB_GranjaLaFlor.Models.Entities.Role
+
+@{
+    ViewData["Title"] = "Detalle del Rol";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Detalle del Rol</h1>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <tbody>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.RoleName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.RoleName)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.RoleDescription)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.RoleDescription)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.RoleState)
+                        </th>
+                        <td>
+
+                            @if (Model.RoleState)
+                            {
+                                <span class="badge bg-info">
+                                    Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Inactivo
+                                </span>
+                            }
+
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <div class="mt-4">
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.RoleId"
+                   class="btn btn-outline-warning">
+                    Editar
+                </a>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Volver
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

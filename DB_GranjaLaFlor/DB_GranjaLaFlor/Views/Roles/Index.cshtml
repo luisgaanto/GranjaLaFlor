@@ -6,22 +6,17 @@
 
 <div class="container mt-4">
 
-    <!-- Success Messages (Future Implementation) -->
-    @*
-    @if (TempData["Success"] != null)
+    @if (TempData["SuccessMessage"] != null)
     {
-    <div class="alert alert-success alert-dismissible fade show">
+        <div id="successAlert" class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
 
-    @TempData["Success"]
-
-    <button type="button"
-    class="btn-close"
-    data-bs-dismiss="alert">
-    </button>
-
-    </div>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
     }
-    *@
 
     <div class="card border-primary">
         <div class="card-header bg-primary text-white text-center">
@@ -150,4 +145,25 @@
             </div>
         </div>
     </div>
+    @section Scripts
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                const alerts = document.querySelectorAll(".alert");
+
+                alerts.forEach(function (alert) {
+
+                    setTimeout(function () {
+
+                        const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                        bsAlert.close();
+
+                    }, 2500);
+
+                });
+
+            });
+        </script>
+    }
 </div>

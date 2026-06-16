@@ -6,6 +6,19 @@
 
 <div class="container  mt-4 col-md-7">
 
+    <!-- Adding TemData to manage posible error when creating Role-->
+    <!-- Oficial doc: "Useful for redirection when data is required for more than a single request"-->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <div class="card card border-primary">
         <div class="card-header bg-primary text-white text-center">
             <h1 class="mb-0">Nuevo Rol</h1>

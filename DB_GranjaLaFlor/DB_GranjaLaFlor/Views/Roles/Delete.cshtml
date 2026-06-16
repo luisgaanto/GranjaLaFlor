@@ -13,11 +13,17 @@
         </div>
 
         <div class="card-body">
-            @*
-            <div class="alert alert-warning">
-                ¿Está seguro que desea desactivar este rol?
-            </div>
-            *@
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                    </button>
+                </div>
+            }
             <table class="table table-hover table-bordered align-middle">
 
                 <tbody>

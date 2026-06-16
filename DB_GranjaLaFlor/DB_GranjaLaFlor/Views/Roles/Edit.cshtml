@@ -12,6 +12,16 @@
         </div>
 
         <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                    </button>
+                </div>
+            }
             <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
 

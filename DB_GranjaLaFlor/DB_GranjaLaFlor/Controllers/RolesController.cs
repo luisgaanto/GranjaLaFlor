@@ -55,6 +55,7 @@ namespace DB_GranjaLaFlor.Controllers
         // [HttpPost] = Allow POST requests only
         // Micro recommendation to proetc against CSRF attacks (Cross-Site Request Forgery) when using POST methods and MVC. 
         // POST: Roles/Create[HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Role role)
         {
@@ -106,13 +107,21 @@ namespace DB_GranjaLaFlor.Controllers
                 return View(role);
             }
 
-            await _roleService.UpdateAsync(role);
+            try
+            {
+                await _roleService.UpdateAsync(role);
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "El rol fue actualizado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "No fue posible actualizar el rol. Intente nuevamente.";
+
+                return View(role);
+            }
         }
-
-
-
 
 
         // GET: Roles/Delete/5
@@ -133,11 +142,23 @@ namespace DB_GranjaLaFlor.Controllers
         [ValidateAntiForgeryToken]
         // ASP.NET Core MVC : Doc recommends to use "ActionName" when Post method contains same parameters as Get method. 
         [ActionName("Delete")]
+        [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _roleService.SoftDeleteAsync(id);
+            try
+            {
+                await _roleService.SoftDeleteAsync(id);
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "El rol fue desactivado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "No fue posible desactivar el rol. Intente nuevamente.";
+
+                return RedirectToAction(nameof(Delete), new { id });
+            }
         }
 
         // GET: Roles/Activate/5
@@ -158,9 +179,20 @@ namespace DB_GranjaLaFlor.Controllers
         [ActionName("Activate")]
         public async Task<IActionResult> ActivateConfirmed(int id)
         {
-            await _roleService.ActivateAsync(id);
+            try
+            {
+                await _roleService.ActivateAsync(id);
 
-            return RedirectToAction(nameof(Inactive));
+                TempData["SuccessMessage"] = "El rol fue reactivado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "No fue posible reactivar el rol. Intente nuevamente.";
+
+                return RedirectToAction(nameof(Activate), new { id });
+            }
         }
 
 

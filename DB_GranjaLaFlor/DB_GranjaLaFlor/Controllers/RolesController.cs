@@ -8,18 +8,28 @@ namespace DB_GranjaLaFlor.Controllers
     {
 
         private readonly RoleService _roleService;
+        private readonly ILogger<RolesController> _logger; // ILogger: triggering logs for events 
 
-        public RolesController(RoleService roleService)
+        public RolesController(
+            RoleService roleService,
+            ILogger<RolesController> logger)
         {
             _roleService = roleService;
+            _logger = logger;
         }
 
-        // IActionResult = Recommended option based on doc dince it provides some flexibility when returning view, redirection....
+        // IActionResult = Recommended option based on doc since it provides some flexibility when returning view, redirection....
 
         // GET: Roles
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Entering RolesController.Index().");
+
             var activeRoles = await _roleService.GetAllActiveAsync();
+
+            _logger.LogInformation(
+                "RolesController.Index() loaded {RoleCount} active roles.",
+                activeRoles.Count);
 
             return View(activeRoles);
         }
@@ -27,7 +37,13 @@ namespace DB_GranjaLaFlor.Controllers
         // GET: Roles/Inactive
         public async Task<IActionResult> Inactive()
         {
+            _logger.LogInformation("Entering RolesController.Inactive().");
+
             var inactiveRoles = await _roleService.GetAllInactiveAsync();
+
+            _logger.LogInformation(
+                "RolesController.Index() loaded {RoleCount} active roles.",
+                inactiveRoles.Count);
 
             return View(inactiveRoles);
         }
@@ -35,12 +51,25 @@ namespace DB_GranjaLaFlor.Controllers
         // GET: Roles/Details/5
         public async Task<IActionResult> Details(int id)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Details(). RoleId: {RoleId}",
+                id);
+
             var role = await _roleService.GetByIdAsync(id);
 
             if (role == null)
             {
+                _logger.LogWarning(
+                    "RolesController.Details() role not found. RoleId: {RoleId}",
+                    id);
+
                 return NotFound();
             }
+
+            _logger.LogInformation(
+                "RolesController.Details() loaded role. RoleId: {RoleId}, RoleName: {RoleName}",
+                role.RoleId,
+                role.RoleName);
 
             return View(role);
         }
@@ -49,6 +78,8 @@ namespace DB_GranjaLaFlor.Controllers
         // GET: Roles/Create
         public IActionResult Create()
         {
+            _logger.LogInformation("Entering RolesController.Create() GET.");
+
             return View();
         }
 
@@ -59,21 +90,42 @@ namespace DB_GranjaLaFlor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Role role)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Create() POST. RoleName: {RoleName}",
+                role.RoleName);
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning(
+                    "RolesController.Create() POST validation failed. RoleName: {RoleName}",
+                    role.RoleName);
+
                 return View(role);
             }
 
             try
             {
+                _logger.LogInformation(
+                    "Calling RoleService.CreateAsync(). RoleName: {RoleName}",
+                    role.RoleName);
+
                 await _roleService.CreateAsync(role);
+
+                _logger.LogInformation(
+                    "Role created successfully. RoleName: {RoleName}",
+                    role.RoleName);
 
                 TempData["SuccessMessage"] = "El rol fue registrado correctamente.";
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while creating role. RoleName: {RoleName}",
+                    role.RoleName);
+
                 TempData["ErrorMessage"] = "No fue posible registrar el rol. Intente nuevamente.";
 
                 return View(role);
@@ -83,10 +135,18 @@ namespace DB_GranjaLaFlor.Controllers
         // GET: Roles/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Edit() GET. RoleId: {RoleId}",
+                id);
+
             var role = await _roleService.GetByIdAsync(id);
 
             if (role == null)
             {
+                _logger.LogWarning(
+                    "RolesController.Edit() GET role not found. RoleId: {RoleId}",
+                    id);
+
                 return NotFound();
             }
 
@@ -97,26 +157,58 @@ namespace DB_GranjaLaFlor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Role role)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Edit() POST. RouteRoleId: {RouteRoleId}, FormRoleId: {FormRoleId}, RoleName: {RoleName}",
+                id,
+                role.RoleId,
+                role.RoleName);
+
             if (id != role.RoleId)
             {
+                _logger.LogWarning(
+                    "RolesController.Edit() POST id mismatch. RouteRoleId: {RouteRoleId}, FormRoleId: {FormRoleId}",
+                    id,
+                    role.RoleId);
+
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning(
+                    "RolesController.Edit() POST validation failed. RoleId: {RoleId}, RoleName: {RoleName}",
+                    role.RoleId,
+                    role.RoleName);
+
                 return View(role);
             }
 
             try
             {
+                _logger.LogInformation(
+                    "Calling RoleService.UpdateAsync(). RoleId: {RoleId}, RoleName: {RoleName}",
+                    role.RoleId,
+                    role.RoleName);
+
                 await _roleService.UpdateAsync(role);
+
+                _logger.LogInformation(
+                    "Role updated successfully. RoleId: {RoleId}, RoleName: {RoleName}",
+                    role.RoleId,
+                    role.RoleName);
 
                 TempData["SuccessMessage"] = "El rol fue actualizado correctamente.";
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while updating role. RoleId: {RoleId}, RoleName: {RoleName}",
+                    role.RoleId,
+                    role.RoleName);
+
                 TempData["ErrorMessage"] = "No fue posible actualizar el rol. Intente nuevamente.";
 
                 return View(role);
@@ -127,10 +219,18 @@ namespace DB_GranjaLaFlor.Controllers
         // GET: Roles/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Delete() GET. RoleId: {RoleId}",
+                id);
+
             var role = await _roleService.GetByIdAsync(id);
 
             if (role == null)
             {
+                _logger.LogWarning(
+                    "RolesController.Delete() GET role not found. RoleId: {RoleId}",
+                    id);
+
                 return NotFound();
             }
 
@@ -142,19 +242,31 @@ namespace DB_GranjaLaFlor.Controllers
         [ValidateAntiForgeryToken]
         // ASP.NET Core MVC : Doc recommends to use "ActionName" when Post method contains same parameters as Get method. 
         [ActionName("Delete")]
-        [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Delete() POST. RoleId: {RoleId}",
+                id);
+
             try
             {
                 await _roleService.SoftDeleteAsync(id);
+
+                _logger.LogInformation(
+                    "Role deactivated successfully. RoleId: {RoleId}",
+                    id);
 
                 TempData["SuccessMessage"] = "El rol fue desactivado correctamente.";
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while deactivating role. RoleId: {RoleId}",
+                    id);
+
                 TempData["ErrorMessage"] = "No fue posible desactivar el rol. Intente nuevamente.";
 
                 return RedirectToAction(nameof(Delete), new { id });
@@ -179,16 +291,29 @@ namespace DB_GranjaLaFlor.Controllers
         [ActionName("Activate")]
         public async Task<IActionResult> ActivateConfirmed(int id)
         {
+            _logger.LogInformation(
+                "Entering RolesController.Activate() POST. RoleId: {RoleId}",
+                id);
+
             try
             {
                 await _roleService.ActivateAsync(id);
+
+                _logger.LogInformation(
+                    "Role activated successfully. RoleId: {RoleId}",
+                    id);
 
                 TempData["SuccessMessage"] = "El rol fue reactivado correctamente.";
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while activating role. RoleId: {RoleId}",
+                    id);
+
                 TempData["ErrorMessage"] = "No fue posible reactivar el rol. Intente nuevamente.";
 
                 return RedirectToAction(nameof(Activate), new { id });

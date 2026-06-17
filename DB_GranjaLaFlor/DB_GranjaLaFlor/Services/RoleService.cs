@@ -75,7 +75,7 @@ namespace DB_GranjaLaFlor.Services
 
             if (existingRole == null)
             {
-                throw new InvalidOperationException("Role not found.");
+                throw new InvalidOperationException("Rol no encontrado.");
             }
 
             existingRole.RoleName = role.RoleName;
@@ -92,7 +92,7 @@ namespace DB_GranjaLaFlor.Services
 
             if (role == null)
             {
-                throw new InvalidOperationException("Role not found.");
+                throw new InvalidOperationException("Rol no encontardo.");
             }
 
             role.RoleState = false;
@@ -106,7 +106,7 @@ namespace DB_GranjaLaFlor.Services
 
             if (role == null)
             {
-                throw new InvalidOperationException("Role not found.");
+                throw new InvalidOperationException("Rol no encontardo.");
             }
 
             role.RoleState = true;

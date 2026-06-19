@@ -16,15 +16,15 @@ namespace DB_GranjaLaFlor.Models.Entities
         [Column("role_id")]
         public int RoleId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Este campo es requerido")]
         [Display(Name = "Nombre del Rol")]
         [Column("role_name")]
-        [StringLength(30)]
+        [StringLength(30, ErrorMessage = "El nombre no puede superar los 50 caracteres.")]
         public string RoleName { get; set; } = string.Empty;
 
         [Display(Name = "Añadir descripción")]
         [Column("role_description")]
-        [StringLength(200)]
+        [StringLength(200, ErrorMessage = "La descripción no puede superar los 200 caracteres.")]
         public string? RoleDescription { get; set; }
 
         // RoleState is used to implement Soft Delete.

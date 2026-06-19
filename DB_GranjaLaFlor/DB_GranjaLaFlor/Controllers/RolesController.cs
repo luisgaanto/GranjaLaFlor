@@ -2,14 +2,30 @@
 using DB_GranjaLaFlor.Services;
 using Microsoft.AspNetCore.Mvc;
 
+         /*
+         *_logger is for debugging, for admin QA and Testing. 
+         *TempData is for user notification. 
+         */
+
 namespace DB_GranjaLaFlor.Controllers
 {
+    /*
+     * RolesController inherits from Controller --> ASP.NET Core MVC. --> provides features such as methods: view(), 
+     * RedirectToAction()..., Properties: ModelState, TempData..., or Action Methods: Index(), Create()...
+    */
     public class RolesController : Controller
     {
-
+        // variable from RoleService where logic happens.
         private readonly RoleService _roleService;
         private readonly ILogger<RolesController> _logger; // ILogger: triggering logs for events 
 
+        /*
+         * Creating construtor based on below method. So constructor is "RolesController" is made of:
+         * 1- Get service as a parameter: roleService where the logic happens and 2-Get logger as a parameter: to get logs for events. 
+         * RoleService is registered in the Dependency Injection container using: builder.Services.AddScoped<RoleService>();.
+         * When ASP.NET Core creates RolesController, the RoleService dependency is resolved from the Dependency Injection container
+         *  and injected into the constructor.
+         */
         public RolesController(
             RoleService roleService,
             ILogger<RolesController> logger)
@@ -67,9 +83,11 @@ namespace DB_GranjaLaFlor.Controllers
             }
 
             _logger.LogInformation(
-                "RolesController.Details() loaded role. RoleId: {RoleId}, RoleName: {RoleName}",
+                "RolesController.Details() loaded role. RoleId: {RoleId}, RoleName: {RoleName}, RoleDescription: {RoleDescription}, RoleState: {RoleState}",
                 role.RoleId,
-                role.RoleName);
+                role.RoleName,
+                role.RoleDescription, 
+                role.RoleState);
 
             return View(role);
         }
@@ -112,8 +130,10 @@ namespace DB_GranjaLaFlor.Controllers
                 await _roleService.CreateAsync(role);
 
                 _logger.LogInformation(
-                    "Role created successfully. RoleName: {RoleName}",
-                    role.RoleName);
+                    "Role created successfully. RoleName: {RoleName},  RoleDescription: {RoleDescription}, RoleState: {RoleState}",
+                    role.RoleName, 
+                    role.RoleDescription, 
+                    role.RoleState);
 
                 TempData["SuccessMessage"] = "El rol fue registrado correctamente.";
 
@@ -186,9 +206,11 @@ namespace DB_GranjaLaFlor.Controllers
             try
             {
                 _logger.LogInformation(
-                    "Calling RoleService.UpdateAsync(). RoleId: {RoleId}, RoleName: {RoleName}",
+                    "Calling RoleService.UpdateAsync(). RoleId: {RoleId}, RoleName: {RoleName}, RoleDescription: {RoleDescription}, RoleState: {RoleState}",
                     role.RoleId,
-                    role.RoleName);
+                    role.RoleName,
+                    role.RoleDescription,
+                    role.RoleState);
 
                 await _roleService.UpdateAsync(role);
 

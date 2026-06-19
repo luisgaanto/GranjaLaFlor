@@ -6,19 +6,6 @@
 
 <div class="container  mt-4 col-md-7">
 
-    <!-- Adding TemData to manage posible error when creating Role-->
-    <!-- Oficial doc: "Useful for redirection when data is required for more than a single request"-->
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show">
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-            @TempData["ErrorMessage"]
-        </div>
-    }
-
     <div class="card card border-primary">
         <div class="card-header bg-primary text-white text-center">
             <h1 class="mb-0">Nuevo Rol</h1>
@@ -26,6 +13,10 @@
 
         <!-- Adding a card format for form --> 
         <div class="card-body">
+
+            <!-- When using Partial view, you can use "Partial Tag Helper" to mapped event message as below. Refer to _EventMessage view.-->
+            <partial name="_EventMessage" />
+
             <form asp-action="Create" method="post">
                 <!-- SECURITY: Protects from Cross-Site Request Forgery (CSRF) attacks by using a validation token -->
                 @Html.AntiForgeryToken()

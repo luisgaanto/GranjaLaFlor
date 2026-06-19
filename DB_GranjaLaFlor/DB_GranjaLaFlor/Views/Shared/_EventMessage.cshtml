@@ -1,0 +1,35 @@
+﻿
+@*
+    Use _EventMessage view as a notification template to reduce repeated code such as TempData alerts.
+    To avoid repeated code, we can create a Partial View: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/partial?view=aspnetcore-10.0
+
+    <!-- Adding TemData to manage posible error when creating Role-->
+    <!-- Oficial doc: "Useful for redirection when data is required for more than a single request"-->
+
+    Refer to Controllers as TemData is being refered there.
+*@
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show auto-close-alert" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show auto-close-alert" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+}
+
+

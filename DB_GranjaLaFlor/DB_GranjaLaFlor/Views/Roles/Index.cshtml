@@ -6,17 +6,8 @@
 
 <div class="container mt-4">
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div id="successAlert" class="alert alert-info alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-        </div>
-    }
+    <!-- When using Partial view, you can use "Partial Tag Helper" to mapped event message as below. Refer to _EventMessage view.-->
+    <partial name="_EventMessage" />
 
     <div class="card border-primary">
         <div class="card-header bg-primary text-white text-center">

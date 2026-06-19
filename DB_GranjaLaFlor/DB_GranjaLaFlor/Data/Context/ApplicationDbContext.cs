@@ -15,5 +15,9 @@ namespace DB_GranjaLaFlor.Data.Context
         //It tells EF how to manage tables, map classes (Roles, Users...) to tables within DB. 
         //     public DbSet<Roles> = Represents a table. It has a collection of ojects. 
         public DbSet<Role> Roles { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+
     }
 }

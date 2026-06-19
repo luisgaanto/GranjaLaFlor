@@ -2304,3 +2304,28 @@ Partial Views
 Dependency Injection
 
 Authentication & Authorization (cuando implementemos Login)
+
+
+
+
+Entity Property Order
+
+Every Entity shall organize its properties using the following order:
+
+Primary Key
+
+↓
+
+Business Properties
+
+↓
+
+Status Property
+
+↓
+
+Foreign Keys
+
+↓
+
+Navigation Properties

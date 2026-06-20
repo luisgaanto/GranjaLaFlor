@@ -1,0 +1,78 @@
+﻿@model DB_GranjaLaFlor.Models.Entities.User
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<div class="container mt-4 col-md-7">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Editar Usuario</h1>
+        </div>
+        <div class="card-body">
+            <partial name="_EventMessage" />
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="UserEmail" class="form-label"></label>
+                    <input asp-for="UserEmail" class="form-control" />
+                    <span asp-validation-for="UserEmail" class="text-danger"></span>
+                </div>
+
+                @* NO need to retrieve password, it breaks project arquitecture. Decide to use password recovery. 
+                <div class="mb-3">
+                    <label asp-for="UserPassword" class="form-label"></label>
+                    <input asp-for="UserPassword" class="form-control" />
+                    <span asp-validation-for="UserPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                *@
+
+                <div class="mb-3">
+                    <label asp-for="UserDescription" class="form-label"></label>
+                    <textarea asp-for="UserDescription" class="form-control"></textarea>
+                    <span asp-validation-for="UserDescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RoleId" class="form-label"></label>
+                    <select asp-for="RoleId"
+                            asp-items="ViewBag.Roles"
+                            class="form-select">
+                        <option value="">Seleccione un rol</option>
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-outline-info">
+                        Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

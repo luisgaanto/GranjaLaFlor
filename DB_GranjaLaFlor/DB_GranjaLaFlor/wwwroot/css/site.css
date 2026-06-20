@@ -29,3 +29,9 @@ body {
     .form-select:focus {
         background-color: white;
     }
+
+
+.email-display-blue {
+    color: #0d6efd;
+}
+

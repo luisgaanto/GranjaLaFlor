@@ -14,6 +14,19 @@ namespace DB_GranjaLaFlor.Services
             _context = context;
         }
 
+
+
+
+        private static string NormalizeText(string value)
+        {
+            return Regex.Replace(
+                value.Trim(),
+                @"\s+",
+                " ");
+        }
+
+
+
         public async Task<List<User>> GetAllActiveAsync()
         {
             return await _context.Users
@@ -57,6 +70,14 @@ namespace DB_GranjaLaFlor.Services
                 throw new InvalidOperationException("El correo electrónico ya existe.");
             }
 
+            var nameExists = await _context.Users
+                .AnyAsync(existingUser => existingUser.UserName == user.UserName);
+
+            if (nameExists)
+            {
+                throw new InvalidOperationException("El usuario ya existe.");
+            }
+
             user.UserState = true;
 
             _context.Users.Add(user);
@@ -90,9 +111,20 @@ namespace DB_GranjaLaFlor.Services
                 throw new InvalidOperationException("El correo electrónico ya existe.");
             }
 
+            var nameExists = await _context.Users
+                .AnyAsync(existingUser =>
+                    existingUser.UserName == user.UserName &&
+                    existingUser.UserId != user.UserId);
+
+            if (nameExists)
+            {
+                throw new InvalidOperationException("El usuario ya existe.");
+            }
+
             existingUser.UserName = user.UserName;
             existingUser.UserEmail = user.UserEmail;
-            existingUser.UserPassword = user.UserPassword;
+            // Password is not updated from this method.
+            // Password changes will be handled through a separate Password Recovery process.
             existingUser.UserDescription = user.UserDescription;
             existingUser.RoleId = user.RoleId;
 
@@ -129,12 +161,7 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
-        private static string NormalizeText(string value)
-        {
-            return Regex.Replace(
-                value.Trim(),
-                @"\s+",
-                " ");
-        }
+
+
     }
 }

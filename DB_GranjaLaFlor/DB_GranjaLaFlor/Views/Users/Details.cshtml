@@ -1,0 +1,59 @@
+﻿@model DB_GranjaLaFlor.Models.Entities.User
+
+@{
+    ViewData["Title"] = "Detalle del Usuario";
+}
+
+<div class="container mt-4 col-md-7">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Detalle del Usuario</h1>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-bordered align-middle">
+                <tbody>
+                    <tr class="table-active">
+                        <th style="width:35%">@Html.DisplayNameFor(model => model.UserName)</th>
+                        <td>@Html.DisplayFor(model => model.UserName)</td>
+                    </tr>
+                    <tr class="table-active">
+                        <th>@Html.DisplayNameFor(model => model.UserEmail)</th>
+                        <td class="email-display-blue">@Html.DisplayFor(model => model.UserEmail)</td>
+                    </tr>
+                    <tr class="table-active">
+                        <th>@Html.DisplayNameFor(model => model.UserDescription)</th>
+                        <td>@Html.DisplayFor(model => model.UserDescription)</td>
+                    </tr>
+                    <tr class="table-active">
+                        <th>@Html.DisplayNameFor(model => model.RoleId)</th>
+                        <td>@Model.Role?.RoleName</td>
+                    </tr>
+                    <tr class="table-active">
+                        <th>@Html.DisplayNameFor(model => model.UserState)</th>
+                        <td>
+                            @if (Model.UserState)
+                            {
+                                <span class="badge bg-info">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactivo</span>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="mt-4">
+                <a asp-action="Edit"
+                   asp-route-id="@Model.UserId"
+                   class="btn btn-outline-warning">
+                    Editar
+                </a>
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

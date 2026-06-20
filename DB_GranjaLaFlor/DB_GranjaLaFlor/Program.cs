@@ -1,14 +1,22 @@
 using DB_GranjaLaFlor.Data.Context;
 using DB_GranjaLaFlor.Services;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// use a variable to connect to DB by searching a .json file in this case having the "connectionString" called "granja_la_flor_connection". It is at the appsettings.Development.json file. Recieves the connextion string "granja_la_flor_connection". 
+/* 
+ * use a variable to connect to DB by searching a .json file in this case having the "connectionString" called "granja_la_flor_connection".
+ * It is at the appsettings.Development.json file. Recieves the connextion string "granja_la_flor_connection". 
+*/
 var connectionString = builder.Configuration
     .GetConnectionString("granja_la_flor_connection");
+
+// Creates and registers ApplicationDbContext in the Dependency Injection (DI)
+// container using MySQL as the database engine. A new DbContext instance is
+// created automatically for each HTTP request.
 
 // Creates and injects  "ApplicationDbContext"
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -17,7 +25,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         connectionString,
         ServerVersion.AutoDetect(connectionString)));
 
+/*
+ * Registers application Services in the Dependency Injection (DI) container.
+ * ASP.NET Core automatically creates one instance of each Service per HTTP
+ * request (Scoped lifetime) and injects it whenever a Controller requires it.
+*/
+
 builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

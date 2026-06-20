@@ -131,13 +131,24 @@ namespace DB_GranjaLaFlor.Controllers
 
                 _logger.LogInformation(
                     "Role created successfully. RoleName: {RoleName},  RoleDescription: {RoleDescription}, RoleState: {RoleState}",
-                    role.RoleName, 
-                    role.RoleDescription, 
+                    role.RoleName,
+                    role.RoleDescription,
                     role.RoleState);
 
                 TempData["SuccessMessage"] = "El rol fue registrado correctamente.";
 
                 return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business validation failed while creating role. RoleName: {RoleName}",
+                    role.RoleName);
+
+                TempData["ErrorMessage"] = ex.Message;
+
+                return View(role);
             }
             catch (Exception ex)
             {
@@ -222,6 +233,18 @@ namespace DB_GranjaLaFlor.Controllers
                 TempData["SuccessMessage"] = "El rol fue actualizado correctamente.";
 
                 return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business validation failed while updating role. RoleId: {RoleId}, RoleName: {RoleName}",
+                    role.RoleId,
+                    role.RoleName);
+
+                TempData["ErrorMessage"] = ex.Message;
+
+                return View(role);
             }
             catch (Exception ex)
             {

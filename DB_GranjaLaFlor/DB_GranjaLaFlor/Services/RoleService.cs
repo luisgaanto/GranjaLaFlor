@@ -2,29 +2,38 @@
 using DB_GranjaLaFlor.Data.Context;
 using DB_GranjaLaFlor.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace DB_GranjaLaFlor.Services
 {
     public class RoleService
     {
-        //==================================================
-        // Dependencies
-        //==================================================
+
+        //  ************************************** Dependencies **************************************
 
         private readonly ApplicationDbContext _context;
 
-        //==================================================
-        // Constructor
-        //==================================================
+        //  ************************************** Constructor **************************************
 
         public RoleService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        //==================================================
-        // Query Methods (Read)
-        //==================================================
+        //  ************************************** Validations **************************************
+
+        private static string NormalizeText(string value)
+        {
+            /*
+             * Noramalizing text to keep a unic format in DB. \s+ = espacio en blando, mas de un espacio. " " = allow an space within the string   
+             * Private method as it is only going to be  called in RoleController. 
+            */
+            return Regex.Replace(
+                value.Trim(),@"\s+"," ");
+        }
+
+
+        //  ************************************** Query Methods (Read) **************************************
 
         public async Task<List<Role>> GetAllAsync()
         {
@@ -62,6 +71,16 @@ namespace DB_GranjaLaFlor.Services
 
         public async Task CreateAsync(Role role)
         {
+            role.RoleName = NormalizeText(role.RoleName);
+
+            var roleExists = await _context.Roles
+                .AnyAsync(existingRole => existingRole.RoleName == role.RoleName);
+
+            if (roleExists)
+            {
+                throw new InvalidOperationException("El rol ya existe.");
+            }
+
             role.RoleState = true;
 
             _context.Roles.Add(role);
@@ -70,12 +89,24 @@ namespace DB_GranjaLaFlor.Services
 
         public async Task UpdateAsync(Role role)
         {
+            role.RoleName = NormalizeText(role.RoleName);
+
             var existingRole = await _context.Roles
                 .FirstOrDefaultAsync(r => r.RoleId == role.RoleId);
 
             if (existingRole == null)
             {
                 throw new InvalidOperationException("Rol no encontrado.");
+            }
+
+            var roleExists = await _context.Roles
+                .AnyAsync(existingRole =>
+                    existingRole.RoleName == role.RoleName &&
+                    existingRole.RoleId != role.RoleId);
+
+            if (roleExists)
+            {
+                throw new InvalidOperationException("El rol ya existe.");
             }
 
             existingRole.RoleName = role.RoleName;

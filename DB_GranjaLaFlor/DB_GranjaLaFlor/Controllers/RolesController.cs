@@ -1,5 +1,6 @@
 ﻿using DB_GranjaLaFlor.Models.Entities;
 using DB_GranjaLaFlor.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
          /*
@@ -9,6 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DB_GranjaLaFlor.Controllers
 {
+    /*
+     * Enables/enforces authentication/authentication to controllers that need to be proteced.
+     * Authorize requires the user to be authenticated before accessing any action inside the
+     * controller. Unauthenticated users are automatically redirected to the Login page.
+     * Only authenticated users with the Administrador role can access this controller. ASP.NET Core validates
+     * the role using the Role claim created during Login.
+    */
+    [Authorize(Roles = "Propietario")]
+
     /*
      * RolesController inherits from Controller --> ASP.NET Core MVC. --> provides features such as methods: view(), 
      * RedirectToAction()..., Properties: ModelState, TempData..., or Action Methods: Index(), Create()...
@@ -273,8 +283,9 @@ namespace DB_GranjaLaFlor.Controllers
             if (role == null)
             {
                 _logger.LogWarning(
-                    "RolesController.Delete() GET role not found. RoleId: {RoleId}",
-                    id);
+                    "RolesController.Delete() GET role not found. RoleId: {RoleId}, RoleName: {RoleName}",
+                    id,
+                    role.RoleName);
 
                 return NotFound();
             }

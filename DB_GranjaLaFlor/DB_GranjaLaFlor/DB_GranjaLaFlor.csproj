@@ -22,7 +22,6 @@
     <Folder Include="ExternalServices\Interfaces\" />
     <Folder Include="ExternalServices\Implementations\" />
     <Folder Include="Models\Validations\" />
-    <Folder Include="Models\ViewModels\" />
     <Folder Include="Helpers\" />
     <Folder Include="ProjectDocumentation\" />
     <Folder Include="wwwroot\imagenes\" />

@@ -10,7 +10,7 @@
             <h1 class="mb-0">Editar Usuario</h1>
         </div>
         <div class="card-body">
-            <partial name="_EventMessage" />
+            <!-- <partial name="_EventMessage" /> -->
             <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="UserId" />

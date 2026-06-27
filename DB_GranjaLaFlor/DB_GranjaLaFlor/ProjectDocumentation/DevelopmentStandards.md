@@ -2329,3 +2329,83 @@ Foreign Keys
 ↓
 
 Navigation Properties
+
+
+
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++ Authenticatiion, authorization and session cookie: ++++++++++++++++++++++++++++++++++++++++++++++++
+
+Login correcto
+
+↓
+
+SignInAsync()
+
+↓
+
+Cookie
+
+↓
+
+Redirect
+
+↓
+
+Usuario autenticado
+
+
+
++++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
+
+
+Usuario entra al sistema
+        ↓
+/Account/Login
+        ↓
+Ingresa correo y contraseña
+        ↓
+Login valida usuario activo + password hash
+        ↓
+SignInAsync crea cookie de autenticación
+        ↓
+RedirectToAction("Index", "Home")
+        ↓
+Home funciona como página inicial temporal
+
++++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
+
+Login
+↓
+Cookie creada
+↓
+Navbar muestra usuario
+↓
+Logout
+↓
+Cookie eliminada
+↓
+Navbar vuelve a mostrar Login
+
++++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
+
+| Módulo / Funcionalidad   | Propietarios | Administrador | Operario    |
+| ------------------------ | ------------ | ------------- | ----------- |
+| Dashboard                | Total        | Lectura       | Lectura     |
+| Acceso y Usuarios        | Total        | Sin acceso    | Sin acceso  |
+| Roles                    | CRUD         | Sin acceso    | Sin acceso  |
+| Usuarios                 | CRUD         | Sin acceso    | Sin acceso  |
+| Mortalidad               | CRUD         | Lectura       | CRUD        |
+| Pesaje                   | CRUD         | Lectura       | CRUD        |
+| Consumo de Alimento      | CRUD         | Lectura       | CRUD        |
+| Control Diario           | CRUD         | Lectura       | CRUD        |
+| Control Semanal          | CRUD         | Lectura       | CRUD        |
+| Monitoreo de Temperatura | Total        | Lectura       | Lectura     |
+| Estimulación Temprana    | Total        | Lectura       | Por definir |
+
++++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
+

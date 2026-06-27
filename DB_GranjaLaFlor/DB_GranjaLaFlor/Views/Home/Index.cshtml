@@ -1,12 +1,93 @@
-﻿
-@{
-    ViewData["Title"] = "Home Page";
+﻿@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@*
+ * Temporary Dashboard displayed after a successful Login.
+ * It shows the authenticated user's information and provides
+ * quick access to the available application modules based on
+ * the user's Role.
+ *
+ * Additional dashboard metrics will be added as new modules
+ * are implemented.
+ *@
+ 
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="container mt-4">
+
+    <div class="card border-primary mb-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Granja La Flor</h1>
+        </div>
+
+        <div class="card-body text-center">
+
+            <h3 class="mb-3">
+                Sistema de Gestión Operativa
+            </h3>
+
+            <p class="lead">
+                Plataforma web para apoyar el control operativo, monitoreo y gestión de procesos productivos.
+            </p>
+
+            <p>
+                El sistema permite administrar información relacionada con mortalidad, pesaje,
+                consumo de alimento, control diario, control semanal, monitoreo de temperatura
+                y estimulación temprana.
+            </p>
+
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn btn-outline-primary btn-lg mt-3">
+                Iniciar Sesión
+            </a>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h5>Gestión Operativa</h5>
+                    <p>
+                        Control de mortalidad, pesaje, consumo de alimento y procesos diarios.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h5>Monitoreo</h5>
+                    <p>
+                        Seguimiento de temperatura y condiciones relevantes de producción.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h5>Acceso Seguro</h5>
+                    <p>
+                        Control de acceso mediante usuarios, roles y autorización.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
+
 
 @*
 @model List<DB_GranjaLaFlor.Models.Entities.Role>

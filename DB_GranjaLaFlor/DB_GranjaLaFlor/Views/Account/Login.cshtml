@@ -1,0 +1,57 @@
+﻿@model DB_GranjaLaFlor.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="container mt-4 col-md-5">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Iniciar Sesión</h1>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="UserEmail" class="form-label"></label>
+                    <input asp-for="UserEmail" class="form-control" />
+                    <span asp-validation-for="UserEmail" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="UserPassword" class="form-label"></label>
+                    <input asp-for="UserPassword" class="form-control" />
+                    <span asp-validation-for="UserPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-outline-info">
+                        Ingresar
+                    </button>
+
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

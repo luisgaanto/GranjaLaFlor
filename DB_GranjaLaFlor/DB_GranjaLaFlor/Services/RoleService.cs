@@ -10,10 +10,19 @@ namespace DB_GranjaLaFlor.Services
     {
 
         //  ************************************** Dependencies **************************************
+        /*
+         * Registers Microsoft's context service in the Dependency Injection (DI)
+         * container. Whenever a class requires context<Role>, ASP.NET Core
+         * automatically creates a context<Role> instance and injects it.
+        */
 
         private readonly ApplicationDbContext _context;
 
         //  ************************************** Constructor **************************************
+        /*
+          * Constructor Injection. ASP.NET Core automatically resolves and injects the required dependencies
+          * registered in the Dependency Injection (DI) container.
+        */
 
         public RoleService(ApplicationDbContext context)
         {
@@ -45,6 +54,8 @@ namespace DB_GranjaLaFlor.Services
         {
             // Use .AsNoTracking() when only consultimg DB. It reduces memoruy consuption and improves performance as it does not track objects.  
             return await _context.Roles
+                // PERFORMANCE: AsNoTracking() is used because this query only reads data.
+                // It avoids Entity Framework tracking changes, improving performance.
                 .AsNoTracking()
                 .Where(role => role.RoleState)
                 .ToListAsync();
@@ -53,6 +64,8 @@ namespace DB_GranjaLaFlor.Services
         public async Task<List<Role>> GetAllInactiveAsync()
         {
             return await _context.Roles
+                // PERFORMANCE: AsNoTracking() is used because this query only reads data.
+                // It avoids Entity Framework tracking changes, improving performance.
                 .AsNoTracking()
                 .Where(role => !role.RoleState)
                 .ToListAsync();

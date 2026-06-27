@@ -24,6 +24,84 @@ AD-011 Authentication
 
 AD-012 Authorization
 
++++++++++++++++++++++++++++++++++++DECISION A FUTURO+++++++++++++++++++++++++++++++++++++++++++++
+Lo correcto arquitectónicamente
+
+La base de datos debería decir:
+
+Role
+-------
+Propietarios
+
+Administrador
+
+Operario
+
+Supervisor
+
+Pero además:
+
+Permission
+-------------
+AccessUsers
+
+OperationalRead
+
+OperationalWrite
+
+MonitoringRead
+
+MonitoringWrite
+
+Y una tercera tabla:
+
+RolePermission
+--------------------------
+
+RoleId    PermissionId
+
+1         1
+
+1         2
+
+1         3
+
+1         4
+
+2         2
+
+2         4
+
+3         2
+
+3         3
+
+3         4
+
+4         2
+
+4         4
+
+Entonces el Login hace esto:
+
+Buscar Usuario
+
+↓
+
+Buscar Rol
+
+↓
+
+Buscar TODOS los permisos
+que tiene ese Rol
+
+↓
+
+Crear Claims
+
+↓
+
+Login
 
 
 

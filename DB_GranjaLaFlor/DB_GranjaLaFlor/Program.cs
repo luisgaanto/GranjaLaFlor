@@ -1,12 +1,33 @@
 using DB_GranjaLaFlor.Data.Context;
 using DB_GranjaLaFlor.Services;
 using Microsoft.EntityFrameworkCore;
+using DB_GranjaLaFlor.Models.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+/*
+  * Configures Cookie Authentication as the application's authentication scheme.
+  * If an unauthenticated user requests a protected resource, ASP.NET Core
+  * automatically redirects to the Login page. Logout and Access Denied
+  * routes are also configured for future authentication and authorization.
+ */
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+        options.SlidingExpiration = true;
+    });
 /* 
  * use a variable to connect to DB by searching a .json file in this case having the "connectionString" called "granja_la_flor_connection".
  * It is at the appsettings.Development.json file. Recieves the connextion string "granja_la_flor_connection". 
@@ -24,6 +45,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         connectionString,
         ServerVersion.AutoDetect(connectionString)));
+
+
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 /*
  * Registers application Services in the Dependency Injection (DI) container.
@@ -49,6 +73,18 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+/*
+  * Authentication identifies the current user by reading the authentication
+  * cookie and creating the user's identity.
+  *
+  * Authorization then evaluates whether the authenticated user has permission
+  * to access the requested resource.
+  *
+  * Authentication must always execute before Authorization.
+ */
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

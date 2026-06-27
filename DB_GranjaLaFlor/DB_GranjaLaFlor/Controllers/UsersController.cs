@@ -2,13 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DB_GranjaLaFlor.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DB_GranjaLaFlor.Controllers
 {
+    // Enables/enforces authentication/authentication to controllers that need to be proteced.  
+    [Authorize(Roles = "Propietario")]
     public class UsersController : Controller
     {
         private readonly UserService _userService;
-        private readonly RoleService _roleService; // 
+        private readonly RoleService _roleService;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
@@ -278,7 +281,7 @@ namespace DB_GranjaLaFlor.Controllers
                     "User deactivated successfully. UserId: {UserId}",
                     id);
 
-                TempData["SuccessMessage"] = "El usuario fue desactivado correctamente.";
+                TempData["SuccessMessage"] = "El usuario fue eliminado correctamente.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -289,7 +292,7 @@ namespace DB_GranjaLaFlor.Controllers
                     "Unexpected error while deactivating user. UserId: {UserId}",
                     id);
 
-                TempData["ErrorMessage"] = "No fue posible desactivar el usuario. Intente nuevamente.";
+                TempData["ErrorMessage"] = "No fue posible eliminar el usuario. Intente nuevamente.";
 
                 return RedirectToAction(nameof(Delete), new { id });
             }

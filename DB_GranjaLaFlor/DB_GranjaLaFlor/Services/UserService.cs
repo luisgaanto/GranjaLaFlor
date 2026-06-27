@@ -2,20 +2,27 @@
 using DB_GranjaLaFlor.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 
 namespace DB_GranjaLaFlor.Services
 {
     public class UserService
     {
+        /*
+         * Registers Microsoft's PasswordHasher service in the Dependency Injection (DI)
+         * container. Whenever a class requires IPasswordHasher<User>, ASP.NET Core
+         * automatically creates a PasswordHasher<User> instance and injects it.
+        */
         private readonly ApplicationDbContext _context;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(ApplicationDbContext context)
+        public UserService(
+            ApplicationDbContext context,
+            IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
-
-
-
 
         private static string NormalizeText(string value)
         {
@@ -24,7 +31,6 @@ namespace DB_GranjaLaFlor.Services
                 @"\s+",
                 " ");
         }
-
 
 
         public async Task<List<User>> GetAllActiveAsync()
@@ -53,6 +59,18 @@ namespace DB_GranjaLaFlor.Services
                 .FirstOrDefaultAsync(user => user.UserId == id);
         }
 
+        public async Task<User?> GetActiveByEmailAsync(string email)
+        {
+            var normalizedEmail = email.Trim().ToLower();
+
+            return await _context.Users
+                .AsNoTracking()
+                .Include(user => user.Role)
+                .FirstOrDefaultAsync(user =>
+                    user.UserEmail == normalizedEmail &&
+                    user.UserState);
+        }
+
         public async Task CreateAsync(User user)
         {
             user.UserName = NormalizeText(user.UserName);
@@ -79,6 +97,12 @@ namespace DB_GranjaLaFlor.Services
             }
 
             user.UserState = true;
+
+            /*
+              * Hashes the user's password before saving it into the database.
+              * The original password is never stored, only its secure hash.
+             */
+            user.UserPassword = _passwordHasher.HashPassword(user,user.UserPassword);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();

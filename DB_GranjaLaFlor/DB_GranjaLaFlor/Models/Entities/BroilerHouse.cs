@@ -1,6 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
+/*
+ * Represents a Broiler House (Chicken House) in the farm.
+ * This entity is a fixed catalog and is intended for read-only operations.
+ * Records are created directly in the database and are not managed
+ * through the web application.
+ */
 namespace DB_GranjaLaFlor.Models.Entities
 {
     [Table("broiler_houses")]

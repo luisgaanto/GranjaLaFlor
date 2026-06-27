@@ -57,6 +57,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<BroilerHouseService>();
 
 var app = builder.Build();
 

@@ -18,6 +18,7 @@ namespace DB_GranjaLaFlor.Data.Context
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<BroilerHouse> BroilerHouses { get; set; }
 
     }
 }

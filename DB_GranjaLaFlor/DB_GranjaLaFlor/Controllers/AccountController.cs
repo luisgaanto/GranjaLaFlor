@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DB_GranjaLaFlor.Controllers
 {
@@ -26,7 +27,7 @@ namespace DB_GranjaLaFlor.Controllers
         }
 
 
-        private async Task SignInUserAsync(User user, bool rememberMe)
+        private async Task SignInUserAsync(User user)
         {
             /*
              * Creates the user's authentication claims.
@@ -134,7 +135,7 @@ namespace DB_GranjaLaFlor.Controllers
              * Once authenticated, ASP.NET Core recognizes the user in future requests
              * until Logout or cookie expiration.
              */
-            await SignInUserAsync(user, model.RememberMe);
+            await SignInUserAsync(user);
 
             _logger.LogInformation(
                 "User logged in successfully. UserId: {UserId}, UserEmail: {UserEmail}",
@@ -142,7 +143,18 @@ namespace DB_GranjaLaFlor.Controllers
                 user.UserEmail);
 
             TempData["SuccessMessage"] = "Inicio de sesión exitoso.";
-            return RedirectToAction("Dashboard", "Home");
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Dashboard()
+        {
+            _logger.LogInformation(
+                "Entering AccountController.Dashboard(). User: {UserName}",
+                User.Identity?.Name);
+
+            return View();
         }
 
         /*
@@ -164,7 +176,7 @@ namespace DB_GranjaLaFlor.Controllers
 
             TempData["SuccessMessage"] = "La sesión fue cerrada correctamente.";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpGet]

@@ -20,5 +20,7 @@ namespace DB_GranjaLaFlor.Data.Context
 
         public DbSet<BroilerHouse> BroilerHouses { get; set; }
 
+        public DbSet<Brood> Broods { get; set; }
+
     }
 }

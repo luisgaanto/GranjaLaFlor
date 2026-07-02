@@ -1,0 +1,88 @@
+﻿@model DB_GranjaLaFlor.Models.ViewModels.Broods.BroodFormViewModel
+
+@{
+    ViewData["Title"] = "Editar Camada";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Editar Camada</h1>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="BroodId" />
+                <input type="hidden" asp-for="BroodDate" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="BroodName" class="form-label"></label>
+                    <select asp-for="BroodName"
+                            asp-items="Model.BroodNames"
+                            class="form-select">
+                        <option value="">Seleccione una camada</option>
+                    </select>
+                    <span asp-validation-for="BroodName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BroodDate" class="form-label"></label>
+                    <input asp-for="BroodDate"
+                           class="form-control"
+                           type="date"
+                           readonly />
+                    <span asp-validation-for="BroodDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BroodBirdInitialNum" class="form-label"></label>
+                    <input asp-for="BroodBirdInitialNum" class="form-control" />
+                    <span asp-validation-for="BroodBirdInitialNum" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BroilerHouseId" class="form-label"></label>
+                    <select asp-for="BroilerHouseId"
+                            asp-items="Model.BroilerHouses"
+                            class="form-select">
+                        <option value="">Seleccione una pollera</option>
+                    </select>
+                    <span asp-validation-for="BroilerHouseId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BroodDescription" class="form-label"></label>
+                    <textarea asp-for="BroodDescription" class="form-control"></textarea>
+                    <span asp-validation-for="BroodDescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-outline-info">
+                        Guardar
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

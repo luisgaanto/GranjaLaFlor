@@ -2,56 +2,57 @@
 
 @{
     ViewData["Title"] = "Iniciar Sesión";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
 }
 
-<div class="container mt-4 col-md-5">
-    <div class="card border-primary">
-        <div class="card-header bg-primary text-white text-center">
-            <h1 class="mb-0">Iniciar Sesión</h1>
+<div class="login-full-page">
+
+    <div class="login-card">
+
+        <div class="text-center mb-4">
+            <h1 class="login-title">Granja La Flor</h1>
+            <p class="login-subtitle">Sistema de Gestión Operativa</p>
         </div>
 
-        <div class="card-body">
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
 
-            <form asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
 
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="UserEmail" class="form-label login-label"></label>
+                <input asp-for="UserEmail"
+                       class="form-control login-input"
+                       placeholder="correo@ejemplo.com" />
+                <span asp-validation-for="UserEmail" class="text-warning small"></span>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="UserEmail" class="form-label"></label>
-                    <input asp-for="UserEmail" class="form-control" />
-                    <span asp-validation-for="UserEmail" class="text-danger"></span>
-                </div>
+            <div class="mb-3">
+                <label asp-for="UserPassword" class="form-label login-label"></label>
+                <input asp-for="UserPassword"
+                       class="form-control login-input"
+                       placeholder="Ingrese su contraseña" />
+                <span asp-validation-for="UserPassword" class="text-warning small"></span>
+            </div>
+            <!--
+            <div class="mb-4 form-check">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label login-label"></label>
+            </div>
+            -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Ingresar
+                </button>
 
-                <div class="mb-3">
-                    <label asp-for="UserPassword" class="form-label"></label>
-                    <input asp-for="UserPassword" class="form-control" />
-                    <span asp-validation-for="UserPassword" class="text-danger"></span>
-                </div>
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn btn-outline-light">
+                    Volver
+                </a>
+            </div>
+        </form>
 
-                <div class="mb-3 form-check">
-                    <input asp-for="RememberMe" class="form-check-input" />
-                    <label asp-for="RememberMe" class="form-check-label"></label>
-                </div>
-
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-outline-info">
-                        Ingresar
-                    </button>
-
-                    <a asp-controller="Home"
-                       asp-action="Index"
-                       class="btn btn-outline-secondary">
-                        Volver
-                    </a>
-                </div>
-            </form>
-        </div>
     </div>
-</div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+</div>

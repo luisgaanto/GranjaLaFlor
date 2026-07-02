@@ -1,0 +1,57 @@
+﻿@model DB_GranjaLaFlor.Models.ViewModels.Broods.BroodGetByIdViewModel
+
+@{
+    ViewData["Title"] = "Desactivar Camada";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-info">
+
+        <div class="card-header bg-info text-white text-center">
+            <h1 class="mb-0">Eliminar Camada</h1>
+        </div>
+
+        <div class="card-body">
+
+            <p class="text-danger">
+                ¿Está seguro que desea eliminar esta camada?
+            </p>
+
+            <dl class="row">
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.BroodName</dd>
+
+                <dt class="col-sm-4">Fecha de Ingreso</dt>
+                <dd class="col-sm-8">@Model.BroodDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4">Aves Iniciales</dt>
+                <dd class="col-sm-8">@Model.BroodBirdInitialNum</dd>
+
+                <dt class="col-sm-4">Pollera</dt>
+                <dd class="col-sm-8">@Model.BroilerHouseName</dd>
+
+                <dt class="col-sm-4">Descripción</dt>
+                <dd class="col-sm-8">@Model.BroodDescription</dd>
+            </dl>
+
+            <form asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.BroodId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-outline-danger">
+                    Eliminar
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Volver
+                </a>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

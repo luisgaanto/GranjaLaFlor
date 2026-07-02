@@ -2409,3 +2409,22 @@ Navbar vuelve a mostrar Login
 
 +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
 
+
+/*
+ * Architecture Decision | Business Rule Validation
+ * Input validation (required fields, formats and value ranges) is implemented
+ * using DataAnnotations in ViewModels. Business rules that depend on the
+ * application's domain are enforced in the Service layer by throwing
+ * InvalidOperationException. Controllers capture those exceptions and expose
+ * user-friendly validation messages through ModelState while keeping business
+ * logic outside the presentation layer.
+ *
+ * References:
+ * https://learn.microsoft.com/aspnet/core/mvc/models/validation
+ * https://learn.microsoft.com/aspnet/core/mvc/controllers/actions
+ * https://learn.microsoft.com/dotnet/api/system.invalidoperationexception
+ */
+
+ +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
+
+

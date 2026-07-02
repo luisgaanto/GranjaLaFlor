@@ -155,8 +155,18 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task SoftDeleteAsync(int id)
+        public async Task SoftDeleteAsync(int id, int currentUserId)
         {
+            /*
+              * Business Rule | Current User Protection: The authenticated user cannot deactivate their own account.
+              * The current user is identified using the NameIdentifier claim created during Login.
+            */
+            if (id == currentUserId)
+            {
+                throw new InvalidOperationException(
+                    "No puede desactivar el usuario con el que inició sesión.");
+            }
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(user => user.UserId == id);
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DB_GranjaLaFlor.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace DB_GranjaLaFlor.Controllers
 {
@@ -275,7 +276,11 @@ namespace DB_GranjaLaFlor.Controllers
 
             try
             {
-                await _userService.SoftDeleteAsync(id);
+                //Create variable "currentUserId", this is gonna be used then in "SoftDeleteAsync" as a parameter to validate active user session. 
+                var currentUserId = int.Parse(
+                    User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+                await _userService.SoftDeleteAsync(id, currentUserId);
 
                 _logger.LogInformation(
                     "User deactivated successfully. UserId: {UserId}",
@@ -284,6 +289,17 @@ namespace DB_GranjaLaFlor.Controllers
                 TempData["SuccessMessage"] = "El usuario fue eliminado correctamente.";
 
                 return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating user. UserId: {UserId}",
+                    id);
+
+                TempData["ErrorMessage"] = ex.Message;
+
+                return RedirectToAction(nameof(Delete), new { id });
             }
             catch (Exception ex)
             {

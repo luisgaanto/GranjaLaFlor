@@ -124,19 +124,6 @@ namespace DB_GranjaLaFlor.Services
                 // Executes the LINQ query and returns the result as a List.
                 .ToList();
 
-            return validBroods
-                .GroupBy(brood => new
-                {
-                    brood.BroodName,
-                    Year = brood.BroodDate.Year
-                })
-                .Select(group => group.First())
-                .Select(brood => new SelectListItem
-                {
-                    Value = brood.BroodId.ToString(),
-                    Text = $"{brood.BroodName} - Año {brood.BroodDate.Year}"
-                })
-                .ToList();
         }
 
         /*
@@ -151,6 +138,7 @@ namespace DB_GranjaLaFlor.Services
                 .Where(income =>
                     income.BroodId == broodId &&
                     income.IncomeState)
+                //Sum all IncomeKilos from deletecd brood in form to display a pre-view ofcurrent accumulated concentrate. 
                 .SumAsync(income => income.IncomeKilos);
         }
 
@@ -196,7 +184,7 @@ namespace DB_GranjaLaFlor.Services
             /*
              * Business Rule | Accumulated Concentrate
              * Retrieves the accumulated kilograms from all active
-             * concentrate income records belonging to the same brood.
+             * concentrate income records belonging to the same selected brood.
              * This value is used to calculate the new accumulated amount.
             */
             var previousAccumulated = await _context.IncomeConcentrates
@@ -204,8 +192,6 @@ namespace DB_GranjaLaFlor.Services
                     income.BroodId == model.BroodId && //valdiates only the selected Broodid exsiting in DB. 
                     income.IncomeState) //validates ecah of the records are active.  
                 .SumAsync(income => income.IncomeKilos);//If above is meet, then sum only Incomekilos property 
-
-            
 
 
             //creates (rewrites) a new object (income) to update IncomeAccumulated by sum: "previousAccumulated + incomeKilos".

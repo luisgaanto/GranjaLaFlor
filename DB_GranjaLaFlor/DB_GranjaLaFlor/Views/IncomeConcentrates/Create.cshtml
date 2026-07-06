@@ -82,14 +82,36 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    @*
+
+         * UI Support | Live Concentrate Calculation:
+
+         * Updates the calculated fields on the Create form without requiring
+         * a page refresh. The displayed values are for user guidance only.
+         * Official calculations are always recalculated in the Service layer
+         * before saving the record.
+    *@
+
     <script>
         async function calculateIncome() {
             const quintals = parseFloat(document.getElementById("IncomeQuintals").value) || 0;
             const broodId = document.getElementById("BroodId").value;
 
+            @*
+             * Business Calculation | Quintal Conversion
+             * Converts the entered quintals into kilograms using the
+             * standard conversion factor (1 Quintal = 46 Kg).
+            *@
             const kilos = quintals * 46;
             document.getElementById("IncomeKilos").value = kilos.toFixed(2);
 
+            @*
+            * UI Support | Running Accumulated Preview:
+
+            * Retrieves the current accumulated concentrate for the selected
+            * Brood and estimates the new accumulated amount before the record
+            * is submitted.
+            *@
             if (broodId) {
                 const response = await fetch(`/IncomeConcentrates/GetCurrentAccumulatedByBrood?broodId=${broodId}`);
                 const previousAccumulated = await response.json();
@@ -98,6 +120,11 @@
                     (previousAccumulated + kilos).toFixed(2);
             }
             else {
+                @*
+                * UI Support | Initial Accumulated Value:
+                * When no Brood has been selected yet, the accumulated valueis temporarily equal to the calculated kilograms.
+                * 
+                *@
                 document.getElementById("IncomeAccumulated").value = kilos.toFixed(2);
             }
         }

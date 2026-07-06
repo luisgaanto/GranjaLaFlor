@@ -59,6 +59,7 @@ builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<BroilerHouseService>();
 builder.Services.AddScoped<BroodService>();
+builder.Services.AddScoped<IncomeConcentrateService>();
 
 var app = builder.Build();
 

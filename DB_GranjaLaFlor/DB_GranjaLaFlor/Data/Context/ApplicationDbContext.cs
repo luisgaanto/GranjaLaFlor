@@ -22,5 +22,7 @@ namespace DB_GranjaLaFlor.Data.Context
 
         public DbSet<Brood> Broods { get; set; }
 
+        public DbSet<IncomeConcentrate> IncomeConcentrates { get; set; }
+
     }
 }

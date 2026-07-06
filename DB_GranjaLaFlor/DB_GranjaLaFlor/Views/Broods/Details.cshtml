@@ -5,46 +5,109 @@
 }
 
 <div class="container mt-4 col-md-7">
-    <div class="card border-info">
-        <div class="card-header bg-info text-white text-center">
-            <h1 class="mb-0">Detalle de Camada</h1>
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">
+                Detalle de Camada
+            </h1>
         </div>
 
         <div class="card-body">
 
-            <dl class="row">
-                <dt class="col-sm-4">Nombre</dt>
-                <dd class="col-sm-8">@Model.BroodName</dd>
+            <table class="table table-hover table-bordered align-middle">
 
-                <dt class="col-sm-4">Fecha de Ingreso</dt>
-                <dd class="col-sm-8">@Model.BroodDate.ToString("dd/MM/yyyy")</dd>
+                <tbody>
 
-                <dt class="col-sm-4">Aves Iniciales</dt>
-                <dd class="col-sm-8">@Model.BroodBirdInitialNum</dd>
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.BroodName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodName)
+                        </td>
+                    </tr>
 
-                <dt class="col-sm-4">Pollera</dt>
-                <dd class="col-sm-8">@Model.BroilerHouseName</dd>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodDate)
+                        </th>
+                        <td>
+                            @Model.BroodDate.ToString("dd/MM/yyyy")
+                        </td>
+                    </tr>
 
-                <dt class="col-sm-4">Descripción</dt>
-                <dd class="col-sm-8">@Model.BroodDescription</dd>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodBirdInitialNum)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodBirdInitialNum)
+                        </td>
+                    </tr>
 
-                <dt class="col-sm-4">Estado</dt>
-                <dd class="col-sm-8">
-                    @if (Model.BroodState)
-                    {
-                        <span class="badge bg-info">Activo</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Inactivo</span>
-                    }
-                </dd>
-            </dl>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroilerHouseName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroilerHouseName)
+                        </td>
+                    </tr>
 
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                Volver
-            </a>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodDescription)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodDescription)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodState)
+                        </th>
+                        <td>
+
+                            @if (Model.BroodState)
+                            {
+                                <span class="badge bg-info">
+                                    Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Inactivo
+                                </span>
+                            }
+
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <div class="mt-4">
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.BroodId"
+                   class="btn btn-outline-warning">
+                    Editar
+                </a>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Volver
+                </a>
+
+            </div>
 
         </div>
+
     </div>
+
 </div>

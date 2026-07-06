@@ -1,28 +1,20 @@
-﻿@model DB_GranjaLaFlor.Models.ViewModels.Broods.BroodGetByIdViewModel
+﻿@model DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates.IncomeConcentrateGetByIdViewModel
 
 @{
-    ViewData["Title"] = "Desactivar Camada";
+    ViewData["Title"] = "Detalle de Ingreso";
 }
 
 <div class="container mt-4 col-md-7">
 
-    <div class="card border-active">
+    <div class="card border-primary">
 
         <div class="card-header bg-primary text-white text-center">
             <h1 class="mb-0">
-                Eliminar Camada
+                Detalle de Ingreso de Concentrado
             </h1>
         </div>
 
         <div class="card-body">
-
-            <!-- When using Partial view, you can use "Partial Tag Helper" to mapped event message as below. Refer to _EventMessage view.
-            <partial name="_EventMessage" />
-            -->
-
-            <p class="text-danger">
-                ¿Está seguro que desea eliminar esta camada?
-            </p>
 
             <table class="table table-hover table-bordered align-middle">
 
@@ -30,6 +22,15 @@
 
                     <tr class="table-active">
                         <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeConcentrateDate)
+                        </th>
+                        <td>
+                            @Model.IncomeConcentrateDate.ToString("dd/MM/yyyy")
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
                             @Html.DisplayNameFor(model => model.BroodName)
                         </th>
                         <td>
@@ -39,47 +40,47 @@
 
                     <tr class="table-active">
                         <th>
-                            @Html.DisplayNameFor(model => model.BroodDate)
+                            @Html.DisplayNameFor(model => model.IncomeQuintals)
                         </th>
                         <td>
-                            @Model.BroodDate.ToString("dd/MM/yyyy")
+                            @Html.DisplayFor(model => model.IncomeQuintals)
                         </td>
                     </tr>
 
                     <tr class="table-active">
                         <th>
-                            @Html.DisplayNameFor(model => model.BroodBirdInitialNum)
+                            @Html.DisplayNameFor(model => model.IncomeKilos)
                         </th>
                         <td>
-                            @Html.DisplayFor(model => model.BroodBirdInitialNum)
+                            @Html.DisplayFor(model => model.IncomeKilos)
                         </td>
                     </tr>
 
                     <tr class="table-active">
                         <th>
-                            @Html.DisplayNameFor(model => model.BroilerHouseName)
+                            @Html.DisplayNameFor(model => model.IncomeAccumulated)
                         </th>
                         <td>
-                            @Html.DisplayFor(model => model.BroilerHouseName)
+                            @Html.DisplayFor(model => model.IncomeAccumulated)
                         </td>
                     </tr>
 
                     <tr class="table-active">
                         <th>
-                            @Html.DisplayNameFor(model => model.BroodDescription)
+                            @Html.DisplayNameFor(model => model.IncomeDescription)
                         </th>
                         <td>
-                            @Html.DisplayFor(model => model.BroodDescription)
+                            @Html.DisplayFor(model => model.IncomeDescription)
                         </td>
                     </tr>
 
                     <tr class="table-active">
                         <th>
-                            @Html.DisplayNameFor(model => model.BroodState)
+                            @Html.DisplayNameFor(model => model.IncomeState)
                         </th>
                         <td>
 
-                            @if (Model.BroodState)
+                            @if (Model.IncomeState)
                             {
                                 <span class="badge bg-info">
                                     Activo
@@ -99,30 +100,14 @@
 
             </table>
 
-            <form asp-action="DeleteConfirmed"
-                  asp-route-id="@Model.BroodId"
-                  method="post">
+            <div class="mt-4">
 
-                @Html.AntiForgeryToken()
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Volver
+                </a>
 
-                <input type="hidden"
-                       asp-for="BroodId" />
-
-                <div class="mt-4">
-
-                    <button type="submit"
-                            class="btn btn-outline-danger">
-                        Eliminar
-                    </button>
-
-                    <a asp-action="Index"
-                       class="btn btn-outline-secondary">
-                        Volver
-                    </a>
-
-                </div>
-
-            </form>
+            </div>
 
         </div>
 

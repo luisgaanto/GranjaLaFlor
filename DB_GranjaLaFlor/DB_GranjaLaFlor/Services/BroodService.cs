@@ -24,6 +24,15 @@ namespace DB_GranjaLaFlor.Services
             _context = context;
         }
 
+
+        private static string NormalizeText(string value)
+        {
+            return Regex.Replace(
+                value.Trim(),
+                @"\s+",
+                " ");
+        }
+
         public async Task<List<BroodListViewModel>> GetAllActiveAsync()
         {
             return await _context.Broods
@@ -43,6 +52,7 @@ namespace DB_GranjaLaFlor.Services
                         ? brood.BroilerHouse.BroilerHouseName
                         : string.Empty
                 })
+                .Take(10) 
                 .ToListAsync();
         }
 
@@ -226,12 +236,5 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
-        private static string NormalizeText(string value)
-        {
-            return Regex.Replace(
-                value.Trim(),
-                @"\s+",
-                " ");
-        }
     }
 }

@@ -39,6 +39,7 @@ namespace DB_GranjaLaFlor.Services
                 .AsNoTracking()
                 .Include(user => user.Role)
                 .Where(user => user.UserState)
+                .Take(10)
                 .ToListAsync();
         }
 

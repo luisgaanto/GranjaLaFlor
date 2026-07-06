@@ -58,6 +58,7 @@ namespace DB_GranjaLaFlor.Services
                 // It avoids Entity Framework tracking changes, improving performance.
                 .AsNoTracking()
                 .Where(role => role.RoleState)
+                .Take(10)
                 .ToListAsync();
         }
 

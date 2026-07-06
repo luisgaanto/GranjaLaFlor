@@ -1,39 +1,87 @@
 ﻿@model DB_GranjaLaFlor.Models.ViewModels.Broods.BroodGetByIdViewModel
 
 @{
-    ViewData["Title"] = "Activar Camada";
+    ViewData["Title"] = "Reactivar Camada";
 }
 
 <div class="container mt-4 col-md-7">
 
-    <div class="card border-info">
+    <div class="card border-primary">
 
-        <div class="card-header bg-info text-white text-center">
-            <h1 class="mb-0">Activar Camada</h1>
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">
+                Reactivar Camada
+            </h1>
         </div>
 
         <div class="card-body">
 
-            <p class="text-info">
-                ¿Está seguro que desea activar esta camada?
-            </p>
+            <!-- When using Partial view, you can use "Partial Tag Helper" to mapped event message as below. Refer to _EventMessage view.-->
+            <partial name="_EventMessage" />
 
-            <dl class="row">
-                <dt class="col-sm-4">Nombre</dt>
-                <dd class="col-sm-8">@Model.BroodName</dd>
+            <table class="table table-hover table-bordered align-middle">
 
-                <dt class="col-sm-4">Fecha de Ingreso</dt>
-                <dd class="col-sm-8">@Model.BroodDate.ToString("dd/MM/yyyy")</dd>
+                <tbody>
 
-                <dt class="col-sm-4">Aves Iniciales</dt>
-                <dd class="col-sm-8">@Model.BroodBirdInitialNum</dd>
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.BroodName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodName)
+                        </td>
+                    </tr>
 
-                <dt class="col-sm-4">Pollera</dt>
-                <dd class="col-sm-8">@Model.BroilerHouseName</dd>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodDate)
+                        </th>
+                        <td>
+                            @Model.BroodDate.ToString("dd/MM/yyyy")
+                        </td>
+                    </tr>
 
-                <dt class="col-sm-4">Descripción</dt>
-                <dd class="col-sm-8">@Model.BroodDescription</dd>
-            </dl>
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodBirdInitialNum)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodBirdInitialNum)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroilerHouseName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroilerHouseName)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodDescription)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroodDescription)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th>
+                            @Html.DisplayNameFor(model => model.BroodState)
+                        </th>
+                        <td>
+                            <span class="badge bg-danger">
+                                Inactivo
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
 
             <form asp-action="ActivateConfirmed"
                   asp-route-id="@Model.BroodId"
@@ -41,13 +89,23 @@
 
                 @Html.AntiForgeryToken()
 
-                <button type="submit" class="btn btn-outline-danger">
-                    Activar
-                </button>
+                <input type="hidden"
+                       asp-for="BroodId" />
 
-                <a asp-action="Inactive" class="btn btn-outline-secondary">
-                    Volver
-                </a>
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+                        Reactivar
+                    </button>
+
+                    <a asp-action="Inactive"
+                       class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                </div>
+
             </form>
 
         </div>

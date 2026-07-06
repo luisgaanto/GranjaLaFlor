@@ -276,7 +276,10 @@ namespace DB_GranjaLaFlor.Controllers
 
             try
             {
-                //Create variable "currentUserId", this is gonna be used then in "SoftDeleteAsync" as a parameter to validate active user session. 
+                /*
+                 * Retrieves the authenticated user's identifier from the NameIdentifier Claim.This value is passed to the Service 
+                 * layer to prevent a user from deactivating their own account.
+                */
                 var currentUserId = int.Parse(
                     User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 

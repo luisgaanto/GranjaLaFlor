@@ -1,0 +1,108 @@
+﻿@model DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates.IncomeConcentrateFormViewModel
+
+@{
+    ViewData["Title"] = "Nuevo Ingreso de Concentrado";
+}
+
+<div class="container mt-4 col-md-7">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Nuevo Ingreso de Concentrado</h1>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="IncomeConcentrateDate" class="form-label"></label>
+                    <input asp-for="IncomeConcentrateDate"
+                           class="form-control"
+                           type="date" readonly/>
+                    <span asp-validation-for="IncomeConcentrateDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BroodId" class="form-label"></label>
+                    <select asp-for="BroodId"
+                            asp-items="Model.Broods"
+                            class="form-select">
+                        <option value="">Seleccione una camada</option>
+                    </select>
+                    <span asp-validation-for="BroodId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IncomeQuintals" class="form-label"></label>
+                    <input asp-for="IncomeQuintals" class="form-control" />
+                    <span asp-validation-for="IncomeQuintals" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IncomeKilos" class="form-label"></label>
+                    <!-- Read-Only Fields: Displays values automatically calculated by the system. Users can view the information but cannot edit it -->
+                    <input asp-for="IncomeKilos" class="form-control" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IncomeAccumulated" class="form-label"></label>
+                    <input asp-for="IncomeAccumulated" class="form-control" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IncomeDescription" class="form-label"></label>
+                    <textarea asp-for="IncomeDescription" class="form-control"></textarea>
+                    <span asp-validation-for="IncomeDescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-outline-info">
+                        Guardar
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@*
+    Business Rule | Automatic Income Calculation
+    Automatically calculates kilograms from the entered quintals
+    and updates the accumulated concentrate based on the selected brood.
+*@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        async function calculateIncome() {
+            const quintals = parseFloat(document.getElementById("IncomeQuintals").value) || 0;
+            const broodId = document.getElementById("BroodId").value;
+
+            const kilos = quintals * 46;
+            document.getElementById("IncomeKilos").value = kilos.toFixed(2);
+
+            if (broodId) {
+                const response = await fetch(`/IncomeConcentrates/GetCurrentAccumulatedByBrood?broodId=${broodId}`);
+                const previousAccumulated = await response.json();
+
+                document.getElementById("IncomeAccumulated").value =
+                    (previousAccumulated + kilos).toFixed(2);
+            }
+            else {
+                document.getElementById("IncomeAccumulated").value = kilos.toFixed(2);
+            }
+        }
+
+        document.getElementById("IncomeQuintals").addEventListener("input", calculateIncome);
+        document.getElementById("BroodId").addEventListener("change", calculateIncome);
+    </script>
+}

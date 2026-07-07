@@ -52,16 +52,20 @@ namespace DB_GranjaLaFlor.Controllers
             return View(income);
         }
 
+
         /*
-          * UI Support | Concentrate Calculation
-          * Returns the current accumulated concentrate for the selected brood.This endpoint is called asynchronously from 
-          * the Create view to display the estimated accumulated amount before the record is saved.
+          * UI Support | Concentrate Calculation: Returns the current accumulated concentrate for the selected Brood.
+          * In Edit mode, the current record can be excluded to prevent duplicate calculation in the accumulated preview.
          */
         [HttpGet]
-        public async Task<IActionResult> GetCurrentAccumulatedByBrood(int broodId)
+        public async Task<IActionResult> GetCurrentAccumulatedByBrood(
+            int broodId,
+            int? excludeIncomeConcentrateId = null)
         {
             var accumulated =
-                await _incomeConcentrateService.GetCurrentAccumulatedByBroodAsync(broodId);
+                await _incomeConcentrateService.GetCurrentAccumulatedByBroodAsync(
+                    broodId,
+                    excludeIncomeConcentrateId);
 
             return Json(accumulated);
         }
@@ -131,5 +135,95 @@ namespace DB_GranjaLaFlor.Controllers
                 return View(model);
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.Edit() GET. IncomeConcentrateId: {IncomeConcentrateId}",
+                id);
+
+            var model = await _incomeConcentrateService.GetFormByIdAsync(id);
+
+            if (model == null)
+            {
+                TempData["ErrorMessage"] = "Ingreso de concentrado no encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            model.Broods = await _incomeConcentrateService.GetBroodSelectListAsync();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, IncomeConcentrateFormViewModel model)
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.Edit() POST. RouteId: {RouteId}, FormId: {FormId}, BroodId: {BroodId}, IncomeQuintals: {IncomeQuintals}",
+                id,
+                model.IncomeConcentrateId,
+                model.BroodId,
+                model.IncomeQuintals);
+
+            if (id != model.IncomeConcentrateId)
+            {
+                TempData["ErrorMessage"] = "Solicitud inválida.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Broods = await _incomeConcentrateService.GetBroodSelectListAsync();
+                return View(model);
+            }
+
+            try
+            {
+                await _incomeConcentrateService.UpdateAsync(model);
+
+                TempData["SuccessMessage"] = "El ingreso de concentrado fue actualizado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            // catches bunisness rule erros in service and show them.
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while updating income concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    model.IncomeConcentrateId);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                model.Broods = await _incomeConcentrateService.GetBroodSelectListAsync();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while updating income concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    model.IncomeConcentrateId);
+
+                TempData["ErrorMessage"] = "No se pudo actualizar el ingreso de concentrado. Intente nuevamente.";
+
+                model.Broods = await _incomeConcentrateService.GetBroodSelectListAsync();
+
+                return View(model);
+            }
+        }
+
+
+
+
+
+
+
     }
 }

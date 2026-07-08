@@ -77,9 +77,9 @@
                                     <td>
                                         @income.IncomeConcentrateDate.ToString("dd/MM/yyyy")
                                     </td>
-
-                                    <td>
-                                        @income.BroodName
+                                    <!-- Adding brood name  + brood year for better understanding -->
+                                    <td style="min-width:180px;">
+                                        @income.BroodName - Año @income.BroodYear
                                     </td>
 
                                     <td>

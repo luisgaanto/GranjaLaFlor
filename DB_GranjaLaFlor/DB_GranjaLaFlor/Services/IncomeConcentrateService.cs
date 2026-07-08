@@ -36,7 +36,14 @@ namespace DB_GranjaLaFlor.Services
                 .AsNoTracking()
                 .Include(income => income.Brood)
                 .Where(income => income.IncomeState)
-                .OrderByDescending(income => income.IncomeConcentrateDate)
+                .OrderByDescending(income => income.Brood != null
+                    ? income.Brood.BroodDate.Year
+                    : 0)
+                .ThenBy(income => income.Brood != null
+                    ? income.Brood.BroodName
+                    : string.Empty)
+                .ThenByDescending(income => income.IncomeConcentrateDate)
+
                 /* Converts the entity model into a ViewModel by creating a new object that contains only the properties required by 
                  * the view. This helps separate the data layer from the presentation layer, reducing unnecessary data exposure and 
                  * improving maintainability. The resulting ViewModel is what the system uses to display the list of income concentrate 
@@ -54,11 +61,17 @@ namespace DB_GranjaLaFlor.Services
                     BroodId = income.BroodId,
                     BroodName = income.Brood != null
                         ? income.Brood.BroodName
-                        : string.Empty
+                        // if not found, return an empty string. ? equal to allow null 
+                        : string.Empty,
+                    BroodYear = income.Brood != null
+                        ? income.Brood.BroodDate.Year
+                        // if not found, return 0 as value
+                        : 0
                 })
                 .Take(10)
                 .ToListAsync();
         }
+
 
         //Details - Delete - Activate. Use GetById ViewModel. 
         public async Task<IncomeConcentrateGetByIdViewModel?> GetByIdAsync(int id)
@@ -193,13 +206,13 @@ namespace DB_GranjaLaFlor.Services
              * Retrieves the accumulated kilograms from all active
              * concentrate income records belonging to the same selected brood.
              * This value is used to calculate the new accumulated amount.
-            */
+            
             var previousAccumulated = await _context.IncomeConcentrates
                 .Where(income =>
                     income.BroodId == model.BroodId && //valdiates only the selected Broodid exsiting in DB. 
                     income.IncomeState) //validates ecah of the records are active.  
                 .SumAsync(income => income.IncomeKilos);//If above is meet, then sum only Incomekilos property 
-
+            */
 
             //creates (rewrites) a new object (income) to update IncomeAccumulated by sum: "previousAccumulated + incomeKilos".
             var income = new IncomeConcentrate
@@ -210,8 +223,10 @@ namespace DB_GranjaLaFlor.Services
                 /*
                  * Business Rule | Running Accumulated:The accumulated concentrate is calculated by adding the
                  * current income to the accumulated active concentrate previously registered for the same brood.
-                */
+                
                 IncomeAccumulated = previousAccumulated + incomeKilos,
+                */
+                IncomeAccumulated = 0,
                 IncomeDescription = string.IsNullOrWhiteSpace(model.IncomeDescription)
                     ? null
                     : NormalizeText(model.IncomeDescription),
@@ -222,6 +237,14 @@ namespace DB_GranjaLaFlor.Services
             _context.IncomeConcentrates.Add(income);
 
             await _context.SaveChangesAsync();
+
+            /*
+             * Business Rule | Running Accumulated
+             * Recalculates the accumulated concentrate for every active
+             * Income Concentrate belonging to the selected Brood.
+             */
+            await RecalculateAccumulatedAsync(model.BroodId);
+
         }
 
         //Edit - GET
@@ -243,12 +266,13 @@ namespace DB_GranjaLaFlor.Services
                 .FirstOrDefaultAsync();
         }
 
+        /*
         public async Task UpdateAsync(IncomeConcentrateFormViewModel model)
         {
             /*
              * Business Rule | Income Quintals
              * Concentrate income must be greater than zero.
-             */
+             
             if (model.IncomeQuintals <= 0)
             {
                 throw new InvalidOperationException(
@@ -282,6 +306,7 @@ namespace DB_GranjaLaFlor.Services
 
             var incomeKilos = model.IncomeQuintals * KilosPerQuintal;
 
+            /*
             var previousAccumulated = await _context.IncomeConcentrates
                 .Where(existingIncome =>
                     existingIncome.BroodId == model.BroodId &&
@@ -289,20 +314,135 @@ namespace DB_GranjaLaFlor.Services
                     // Need to exclude the record being edited as it already exists in DB.
                     existingIncome.IncomeConcentrateId != model.IncomeConcentrateId)
                 .SumAsync(existingIncome => existingIncome.IncomeKilos);
-
+            
             income.IncomeConcentrateDate = model.IncomeConcentrateDate;
             income.IncomeQuintals = model.IncomeQuintals;
             income.IncomeKilos = incomeKilos;
+            /*
             income.IncomeAccumulated = previousAccumulated + incomeKilos;
+            
             income.IncomeDescription = string.IsNullOrWhiteSpace(model.IncomeDescription)
                 ? null
                 : NormalizeText(model.IncomeDescription);
             income.BroodId = model.BroodId;
 
             await _context.SaveChangesAsync();
+
+            /*
+             * Business Rule | Running Accumulated
+             * Recalculates the accumulated concentrate for every active
+             * Income Concentrate belonging to the selected Brood.
+             
+            await RecalculateAccumulatedAsync(model.BroodId);
+        }
+        */
+
+        public async Task UpdateAsync(IncomeConcentrateFormViewModel model)
+        {
+            /*
+             * Business Rule | Income Quintals
+             * Concentrate income must be greater than zero.
+             */
+            if (model.IncomeQuintals <= 0)
+            {
+                throw new InvalidOperationException(
+                    "La cantidad de quintales debe ser mayor que cero.");
+            }
+
+            var income = await _context.IncomeConcentrates
+                .FirstOrDefaultAsync(income =>
+                    income.IncomeConcentrateId == model.IncomeConcentrateId &&
+                    income.IncomeState);
+
+            if (income == null)
+            {
+                throw new InvalidOperationException(
+                    "Ingreso de concentrado no encontrado.");
+            }
+
+            /*
+             * Business Rule | Previous Brood Tracking
+             * Stores the original Brood before updating the record.
+             * If the user changes the Brood in Edit, both the previous
+             * and the new Brood accumulated values must be recalculated.
+             */
+            var previousBroodId = income.BroodId;
+
+            var broodExists = await _context.Broods
+                .Include(brood => brood.BroilerHouse)
+                .AnyAsync(brood =>
+                    brood.BroodId == model.BroodId &&
+                    brood.BroodState &&
+                    brood.BroilerHouse != null &&
+                    brood.BroilerHouse.BroilerHouseState);
+
+            if (!broodExists)
+            {
+                throw new InvalidOperationException(
+                    "Camada no disponible.");
+            }
+
+            var incomeKilos = model.IncomeQuintals * KilosPerQuintal;
+
+            income.IncomeConcentrateDate = model.IncomeConcentrateDate;
+            income.IncomeQuintals = model.IncomeQuintals;
+            income.IncomeKilos = incomeKilos;
+            income.IncomeAccumulated = 0;
+            income.IncomeDescription = string.IsNullOrWhiteSpace(model.IncomeDescription)
+                ? null
+                : NormalizeText(model.IncomeDescription);
+            income.BroodId = model.BroodId;
+
+            await _context.SaveChangesAsync();
+
+            /*
+             * Business Rule | Recalculate New Brood Accumulated
+             * Recalculates the accumulated concentrate for the Brood currently
+             * assigned to the edited record.
+             */
+            await RecalculateAccumulatedAsync(model.BroodId);
+
+            /*
+             * Business Rule | Recalculate Previous Brood Accumulated
+             * If the edited record was moved to a different Brood, the previous
+             * Brood also needs to be recalculated because it no longer includes
+             * this income concentrate record.
+             */
+            if (previousBroodId != model.BroodId)
+            {
+                await RecalculateAccumulatedAsync(previousBroodId);
+            }
         }
 
+        /*
+          * Business Rule | Recalculate Running Accumulated: Recalculates the accumulated concentrate for all active Income
+         * Concentrate records belonging to the specified Brood. Records are processed chronologically to guarantee that every
+         * accumulated value reflects the sum of all previous active concentrate incomes.
+         */
+        private async Task RecalculateAccumulatedAsync(int broodId)
+        {
+            // Object list: lists valid incomeconcentrate in incomes var. 
+            var incomes = await _context.IncomeConcentrates
+                .Where(income =>
+                    income.BroodId == broodId &&
+                    income.IncomeState)
+                .OrderBy(income => income.IncomeConcentrateDate)
+                .ThenBy(income => income.IncomeConcentrateId)
+                .ToListAsync();
 
+            decimal accumulated = 0; // Initiates var at 0, used then in the loop to calculate real accumulated. 
+
+            // For each incomekilos record in object list "incomes"
+            foreach (var income in incomes)
+            {
+                //Sums incomekilos to the running accumulated total using accumulated = accumulated + income.IncomeKilos.
+                accumulated += income.IncomeKilos;
+
+                income.IncomeAccumulated = accumulated;
+            }
+
+            await _context.SaveChangesAsync();
+        }
 
         private static string NormalizeText(string value)
         {

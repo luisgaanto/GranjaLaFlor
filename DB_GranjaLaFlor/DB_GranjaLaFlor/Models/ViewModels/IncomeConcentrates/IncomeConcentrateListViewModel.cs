@@ -19,9 +19,6 @@ namespace DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates
         [DataType(DataType.Date)]
         public DateTime IncomeConcentrateDate { get; set; }
 
-        [Display(Name = "Camada")]
-        public string BroodName { get; set; } = string.Empty;
-
         [Display(Name = "Quintales")]
         public decimal IncomeQuintals { get; set; }
 
@@ -36,6 +33,12 @@ namespace DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates
 
         [Display(Name = "Estado")]
         public bool IncomeState { get; set; }
+
+        [Display(Name = "Camada")]
+        public string BroodName { get; set; } = string.Empty;
+
+        [Display(Name = "Año")]
+        public int BroodYear { get; set; }
 
         public int BroodId { get; set; }
     }

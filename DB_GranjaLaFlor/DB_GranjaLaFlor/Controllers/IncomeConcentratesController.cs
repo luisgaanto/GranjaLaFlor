@@ -220,7 +220,51 @@ namespace DB_GranjaLaFlor.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var income = await _incomeConcentrateService.GetByIdAsync(id);
 
+            if (income == null)
+            {
+                TempData["ErrorMessage"] = "Ingreso de concentrado no encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(income);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                await _incomeConcentrateService.SoftDeleteAsync(id);
+
+                TempData["SuccessMessage"] = "El ingreso de concentrado fue desactivado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while deactivating income concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    id);
+
+                TempData["ErrorMessage"] = "No se pudo desactivar el ingreso de concentrado. Intente nuevamente.";
+
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+        }
 
 
 

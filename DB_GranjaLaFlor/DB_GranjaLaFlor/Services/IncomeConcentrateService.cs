@@ -414,6 +414,33 @@ namespace DB_GranjaLaFlor.Services
             }
         }
 
+        public async Task SoftDeleteAsync(int id)
+        {
+            var income = await _context.IncomeConcentrates
+                .FirstOrDefaultAsync(income =>
+                    income.IncomeConcentrateId == id &&
+                    income.IncomeState);
+
+            if (income == null)
+            {
+                throw new InvalidOperationException(
+                    "Ingreso de concentrado no encontrado o ya se encuentra inactivo.");
+            }
+
+            var broodId = income.BroodId;
+
+            income.IncomeState = false;
+
+            await _context.SaveChangesAsync();
+
+            /*
+             * Business Rule | Recalculate Accumulated After Delete: When an Income Concentrate is deactivated, it must no longer
+             * be considered in accumulated calculations. The selected Brood is recalculated to keep all active records consistent.
+             */
+            await RecalculateAccumulatedAsync(broodId);
+        }
+        
+
         /*
           * Business Rule | Recalculate Running Accumulated: Recalculates the accumulated concentrate for all active Income
          * Concentrate records belonging to the specified Brood. Records are processed chronologically to guarantee that every

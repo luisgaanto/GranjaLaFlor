@@ -37,7 +37,7 @@ body {
 
 
 
-
+/* Login  */
 
 
 
@@ -95,4 +95,186 @@ body {
         background-color: white;
         box-shadow: 0 0 0 .2rem rgba(13, 202, 240, .25);
     }
+
+
+
+/* Dashboard  */
+
+/* =========================================================
+   Dashboard Page
+   ========================================================= */
+
+.dashboard-page {
+    min-height: 100vh;
+    padding: 30px 0;
+    background-image: linear-gradient( rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12) ), url('/imagenes/granja-dashboard-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+/* =========================================================
+   Dashboard Main Header
+   ========================================================= */
+
+.dashboard-hero {
+    background: rgba(255, 255, 255, 0.48);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.60);
+    border-radius: 22px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.60);
+    overflow: hidden;
+}
+
+.dashboard-logo {
+    max-width: 165px;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
+}
+
+.dashboard-title {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.dashboard-subtitle {
+    font-weight: 500;
+}
+
+.dashboard-system-name {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   Dashboard Module Cards
+   ========================================================= */
+
+.dashboard-module-card {
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    overflow: hidden;
+}
+
+    .dashboard-module-card:hover {
+        transform: translateY(-7px);
+        background: rgba(255, 255, 255, 0.52);
+        box-shadow: 0 20px 42px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.70);
+    }
+
+
+/* =========================================================
+   Card Top Strip
+   ========================================================= */
+
+.dashboard-card-strip {
+    height: 6px;
+}
+
+
+/* =========================================================
+   Card Content
+   ========================================================= */
+
+.dashboard-card-body {
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.dashboard-card-title {
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.dashboard-card-text {
+    color: rgba(33, 37, 41, 0.78);
+    line-height: 1.55;
+}
+
+.dashboard-card-action {
+    margin-top: auto;
+}
+
+
+/* =========================================================
+   Dashboard Card Icon
+   ========================================================= */
+
+.dashboard-icon-container {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.dashboard-icon {
+    font-size: 1.65rem;
+}
+
+
+/* =========================================================
+   Dashboard Badges
+   ========================================================= */
+
+.dashboard-badge {
+    padding: 0.55rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.dashboard-card-action .btn {
+    min-width: 135px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   Responsive Design
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .dashboard-page {
+        padding: 20px 0;
+        background-attachment: scroll;
+    }
+
+    .dashboard-hero {
+        border-radius: 18px;
+    }
+
+    .dashboard-module-card {
+        border-radius: 16px;
+    }
+
+    .dashboard-card-body {
+        min-height: auto;
+    }
+
+    .dashboard-logo {
+        max-width: 135px;
+    }
+}
+
 

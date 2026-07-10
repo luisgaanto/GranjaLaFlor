@@ -6,150 +6,308 @@
     var roleName = User.FindFirst(ClaimTypes.Role)?.Value ?? "Sin rol asignado";
 }
 
-<div class="container mt-4">
+<div class="dashboard-page">
 
-    <div class="card border-primary mb-4 shadow-sm">
-        <div class="card-body">
+    <div class="container">
 
-            <div class="row align-items-center">
+        <div class="card dashboard-hero mb-4">
 
-                <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <img src="~/imagenes/LogoGranjaLaFlor.png"
-                         alt="Logo Granja La Flor"
-                         class="img-fluid"
-                         style="max-width: 160px;" />
-                </div>
+            <div class="card-body p-4">
 
-                <div class="col-md-9">
-                    <h2 class="mb-2">Dashboard</h2>
+                <div class="row align-items-center">
 
-                    <h5 class="text-muted mb-3">
-                        Bienvenido, @User.Identity?.Name
-                    </h5>
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
 
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-primary">
-                            Usuario: @User.Identity?.Name
-                        </span>
+                        <img src="~/imagenes/LogoGranjaLaFlor.png"
+                             alt="Logo Granja La Flor"
+                             class="img-fluid dashboard-logo" />
 
-                        <span class="badge bg-info">
-                            Rol: @roleName
-                        </span>
                     </div>
 
-                    <p class="mt-3 mb-0">
-                        Sistema de Gestión Operativa - Granja La Flor
-                    </p>
-                </div>
+                    <div class="col-md-9">
 
-            </div>
+                        <h2 class="dashboard-title mb-2">
+                            Dashboard
+                        </h2>
 
-        </div>
-    </div>
+                        <h5 class="dashboard-subtitle text-muted mb-3">
+                            Bienvenido, @User.Identity?.Name
+                        </h5>
 
-    <div class="row">
+                        <div class="d-flex flex-wrap gap-2">
 
-        @if (User.IsInRole("Propietario"))
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card border-success h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Acceso y Usuarios</h5>
+                            <span class="badge bg-primary dashboard-badge">
+                                Usuario: @User.Identity?.Name
+                            </span>
 
-                        <p class="card-text">
-                            Administración de roles, usuarios y permisos del sistema.
+                            <span class="badge bg-info dashboard-badge">
+                                Rol: @roleName
+                            </span>
+
+                        </div>
+
+                        <p class="dashboard-system-name mt-3 mb-0">
+                            Sistema de Gestión Operativa - Granja La Flor
                         </p>
 
-                        <a asp-controller="Broods"
-                           asp-action="Index"
-                           class="btn btn-outline-success">
-                            Camadas
-                        </a>
                     </div>
+
                 </div>
+
             </div>
-        }
 
-        <div class="col-md-4 mb-4">
-            <div class="card border-primary h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Polleras</h5>
-
-                    <p class="card-text">
-                        Consulta de las polleras disponibles para la gestión de camadas.
-                    </p>
-
-                    <a asp-controller="BroilerHouses"
-                       asp-action="Index"
-                       class="btn btn-outline-primary">
-                        Ver polleras
-                    </a>
-                </div>
-            </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card border-info h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Camadas</h5>
+        <div class="row">
 
-                    <p class="card-text">
-                        Registro y seguimiento de camadas asociadas a cada pollera.
-                    </p>
+            @if (User.IsInRole("Propietario"))
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
 
-                    <button class="btn btn-outline-info" disabled>
-                        Próximamente
-                    </button>
+                    <div class="card dashboard-module-card h-100">
+
+                        <div class="dashboard-card-strip bg-success"></div>
+
+                        <div class="card-body dashboard-card-body">
+
+                            <div class="dashboard-icon-container">
+
+                                <i class="bi bi-people-fill dashboard-icon text-success"></i>
+
+                            </div>
+
+                            <h5 class="dashboard-card-title">
+                                Acceso y Usuarios
+                            </h5>
+
+                            <p class="dashboard-card-text">
+                                Administración de roles, usuarios y permisos del sistema.
+                            </p>
+
+                            <div class="dashboard-card-action">
+
+                                <a asp-controller="Users"
+                                   asp-action="Index"
+                                   class="btn btn-outline-success">
+
+                                    Ver usuarios
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
-        </div>
+            }
 
-        <div class="col-md-4 mb-4">
-            <div class="card border-danger h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Mortalidad</h5>
+            <div class="col-lg-4 col-md-6 mb-4">
 
-                    <p class="card-text">
-                        Registro y control de mortalidad natural y selección de aves.
-                    </p>
+                <div class="card dashboard-module-card h-100">
 
-                    <button class="btn btn-outline-danger" disabled>
-                        Próximamente
-                    </button>
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-house-door-fill dashboard-icon text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Polleras
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Consulta y administración de las polleras disponibles
+                            para la gestión de camadas.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="BroilerHouses"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver polleras
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
-        </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card border-warning h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Alimento</h5>
+            <div class="col-lg-4 col-md-6 mb-4">
 
-                    <p class="card-text">
-                        Control de consumo e ingreso de concentrado por camada.
-                    </p>
+                <div class="card dashboard-module-card h-100">
 
-                    <button class="btn btn-outline-warning" disabled>
-                        Próximamente
-                    </button>
+                    <div class="dashboard-card-strip bg-info"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-diagram-3-fill dashboard-icon text-info"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Camadas
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro y seguimiento de camadas asociadas
+                            a cada pollera activa.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="Broods"
+                               asp-action="Index"
+                               class="btn btn-outline-info">
+
+                                Ver camadas
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
-        </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card border-secondary h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Monitoreo</h5>
+            <div class="col-lg-4 col-md-6 mb-4">
 
-                    <p class="card-text">
-                        Monitoreo de temperatura y estimulación temprana.
-                    </p>
+                <div class="card dashboard-module-card h-100">
 
-                    <button class="btn btn-outline-secondary" disabled>
-                        Próximamente
-                    </button>
+                    <div class="dashboard-card-strip bg-danger"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-clipboard2-pulse-fill dashboard-icon text-danger"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Mortalidad
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro y control de mortalidad natural,
+                            selección de aves y acumulados por camada.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    disabled>
+
+                                Próximamente
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-warning"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-box-seam-fill dashboard-icon text-warning"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Alimento
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Control de ingreso de concentrado, kilos,
+                            quintales y acumulados por camada.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="IncomeConcentrates"
+                               asp-action="Index"
+                               class="btn btn-outline-warning">
+
+                                Ver ingresos
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-secondary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-thermometer-half dashboard-icon text-secondary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Monitoreo
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Monitoreo de temperatura, alertas ambientales
+                            y estimulación temprana.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    disabled>
+
+                                Próximamente
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>

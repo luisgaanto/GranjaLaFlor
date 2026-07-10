@@ -1,21 +1,38 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Granja La Flor</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - Granja La Flor
+    </title>
 
     <!-- Bootswatch Theme: Sandstone -->
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/sandstone/bootstrap.min.css"
-          rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/sandstone/bootstrap.min.css" />
 
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DB_GranjaLaFlor.styles.css" asp-append-version="true" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/DB_GranjaLaFlor.styles.css"
+          asp-append-version="true" />
+
 </head>
 
 @*
  * Current authorization is based on the approved project roles:
- * Propietarios, Administrador and Operario.
+ * Propietario, Administrador and Operario.
  *
  * This is a project scope decision. Future dynamic roles and permissions
  * are excluded from the current implementation and can be added later
@@ -23,15 +40,21 @@
  *@
 
 <body>
+
     <header>
-        <nav class="navbar navbar-expand-lg bg-primary border-bottom box-shadow mb-3" data-bs-theme="dark">
+
+        <nav class="navbar navbar-expand-lg bg-primary border-bottom box-shadow mb-3"
+             data-bs-theme="dark">
+
             <div class="container-fluid">
 
-                <a class="navbar-brand"
+                <a class="navbar-brand active"
                    asp-area=""
                    asp-controller="Account"
                    asp-action="Dashboard">
+
                     Granja La Flor
+
                 </a>
 
                 <button class="navbar-toggler"
@@ -41,253 +64,287 @@
                         aria-controls="navbarColor01"
                         aria-expanded="false"
                         aria-label="Mostrar navegación">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarColor01">
+                <div class="collapse navbar-collapse"
+                     id="navbarColor01">
 
                     <ul class="navbar-nav me-auto">
 
                         @*
-                        <li class="nav-item">
-                            <a class="nav-link active"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Index">
-                                Inicio
-                                <span class="visually-hidden">(current)</span>
-                            </a>
-                        </li>
-                        *@
-
-                        @*
                         * Dashboard is only displayed for authenticated users.
-                        * The public Landing Page remains available through the navbar brand.
+                        * The public Landing Page remains available through
+                        * the navbar brand.
                         *@
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @if (User.Identity != null &&
+                        User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
+
                                 <a class="nav-link active"
                                    asp-area=""
                                    asp-controller="Account"
                                    asp-action="Dashboard">
+
                                     Panel
+
                                 </a>
+
                             </li>
                         }
 
                         @*
-                        * Access and Users is only available for Propietarios.
-                        * Administrador and Operario do not have access to Roles or Users.
+                        * Access and Users is only available for Propietario.
+                        * Administrador and Operario do not have access
+                        * to Roles or Users.
                         *@
                         @if (User.IsInRole("Propietario"))
                         {
                             <li class="nav-item dropdown">
+
                                 <a class="nav-link active dropdown-toggle"
                                    href="#"
                                    id="accessDropdown"
                                    role="button"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
+
                                     Acceso y Usuarios
+
                                 </a>
 
-                                <ul class="dropdown-menu" aria-labelledby="accessDropdown">
+                                <ul class="dropdown-menu"
+                                    aria-labelledby="accessDropdown">
+
                                     <li>
+
                                         <a class="dropdown-item"
+                                           asp-area=""
                                            asp-controller="Roles"
                                            asp-action="Index">
+
                                             Roles
+
                                         </a>
+
                                     </li>
 
                                     <li>
+
                                         <a class="dropdown-item"
+                                           asp-area=""
                                            asp-controller="Users"
                                            asp-action="Index">
+
                                             Usuarios
+
                                         </a>
+
                                     </li>
+
                                 </ul>
+
                             </li>
                         }
 
                         @*
                         * Gestión is displayed for all authenticated users.
-                        * Action permissions will be controlled later at controller/action level.
+                        * Action permissions are controlled at the
+                        * Controller and Action levels.
                         *@
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @if (User.Identity != null &&
+                        User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item dropdown">
+
                                 <a class="nav-link active dropdown-toggle"
                                    href="#"
-                                   id="profileDropdown"
+                                   id="managementDropdown"
                                    role="button"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
+
                                     Gestión
+
                                 </a>
 
-                                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                                <ul class="dropdown-menu"
+                                    aria-labelledby="managementDropdown">
+
                                     <li>
+
                                         <a class="dropdown-item"
                                            asp-area=""
                                            asp-controller="BroilerHouses"
                                            asp-action="Index">
+
                                             Polleras
+
                                         </a>
+
                                     </li>
 
                                     <li>
+
                                         <a class="dropdown-item"
                                            asp-area=""
                                            asp-controller="Broods"
                                            asp-action="Index">
+
                                             Camadas
+
                                         </a>
+
                                     </li>
 
                                     <li>
+
                                         <a class="dropdown-item"
                                            asp-area=""
                                            asp-controller="IncomeConcentrates"
                                            asp-action="Index">
+
                                             Ingreso de Concentrado
+
                                         </a>
+
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-area=""
-                                           asp-controller="Roles"
-                                           asp-action="Index">
+
+                                        <a class="dropdown-item disabled"
+                                           href="#"
+                                           aria-disabled="true">
+
                                             Control Semanal
+
                                         </a>
+
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-area=""
-                                           asp-controller="Roles"
-                                           asp-action="Index">
+
+                                        <a class="dropdown-item disabled"
+                                           href="#"
+                                           aria-disabled="true">
+
                                             Control Diario
+
                                         </a>
-                                    </li>
-                                    @*
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            Polleras
-                                        </a>
+
                                     </li>
 
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            Camadas
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            Ingreso de Concentrado
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            Control Diario
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            Control Semanal
-                                        </a>
-                                    </li>
-                                *@
                                 </ul>
+
                             </li>
                         }
-                       
 
                     </ul>
 
-                    <!-- btn btn-outline-info-->
-                   
                     <ul class="navbar-nav ms-auto">
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @if (User.Identity != null &&
+                        User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <span class="nav-link">
+
+                                <span class="nav-link active">
+
                                     Hola @User.Identity.Name
+
                                 </span>
+
                             </li>
 
                             <li class="nav-item">
-                                <form asp-controller="Account"
+
+                                <form asp-area=""
+                                      asp-controller="Account"
                                       asp-action="Logout"
                                       method="post">
 
                                     @Html.AntiForgeryToken()
 
                                     <button type="submit"
-                                            class="btn btn-link nav-link">
+                                            class="btn btn active nav-link">
+
                                         Cerrar Sesión
+
                                     </button>
+
                                 </form>
+
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a asp-controller="Account"
-                                   asp-action="Login"
-                                   class="nav-link">
+
+                                <a class="nav-link active"
+                                   asp-area=""
+                                   asp-controller="Account"
+                                   asp-action="Login">
+
                                     Iniciar Sesión
+
                                 </a>
+
                             </li>
                         }
 
                     </ul>
 
-                    @*
-                    <form class="d-flex me-3">
-                        <input class="form-control me-sm-2"
-                               type="search"
-                               placeholder="Buscar">
-
-                        <button class="btn btn-outline-secondary my-2 my-sm-0"
-                                type="submit">
-                            Buscar
-                        </button>
-                    </form>
-                    *@
-
                 </div>
+
             </div>
+
         </nav>
+
     </header>
-    <!-- When using Partial view, you can use "Partial Tag Helper" to mapped event message as below. Refer to _EventMessage view.-->
-    <!-- LAYOUT: Defines the main content area shared by all views.
-     _EventMessage displays temporary success, warning, and error messages,
-     while RenderBody() injects the content of the current view. -->
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <!--
+        LAYOUT:
+        Defines the main content area shared by all views.
+        _EventMessage displays temporary success, warning and error messages,
+        while RenderBody injects the content of the current view.
+    -->
+    <main role="main"
+          class="pb-3">
+
+        <div class="container">
+
             <partial name="_EventMessage" />
-            @RenderBody()
-        </main>
-    </div>
+
+        </div>
+
+        @RenderBody()
+
+    </main>
 
     <footer class="border-top footer text-muted">
+
         <div class="container">
+
             &copy; 2026 - Granja La Flor
+
         </div>
+
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync(
+            "Scripts",
+            required: false)
+
 </body>
+
 </html>

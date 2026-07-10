@@ -1,0 +1,114 @@
+﻿@model DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates.IncomeConcentrateGetByIdViewModel
+
+@{
+    ViewData["Title"] = "Reactivar Ingreso de Concentrado";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">
+                Reactivar Ingreso de Concentrado
+            </h1>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <tbody>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeConcentrateDate)
+                        </th>
+                        <td>
+                            @Model.IncomeConcentrateDate.ToString("dd/MM/yyyy")
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.BroodName)
+                        </th>
+                        <td style="min-width:180px;">
+                            @Model.BroodName - Año @Model.BroodYear)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeQuintals)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.IncomeQuintals)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeKilos)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.IncomeKilos)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeAccumulated)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.IncomeAccumulated)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeDescription)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.IncomeDescription)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.IncomeState)
+                        </th>
+                        <td>
+                            <span class="badge bg-danger">
+                                Inactivo
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <form asp-action="ActivateConfirmed"
+                  asp-route-id="@Model.IncomeConcentrateId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-outline-primary">
+                    Reactivar
+                </button>
+
+                <a asp-action="Inactive"
+                   class="btn btn-outline-secondary">
+                    Volver
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

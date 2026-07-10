@@ -266,7 +266,74 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
+        public async Task<IActionResult> Inactive()
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.Inactive().");
 
+            var inactiveIncomes =
+                await _incomeConcentrateService.GetAllInactiveAsync();
+
+            return View(inactiveIncomes);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Activate(int id)
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.Activate() GET. IncomeConcentrateId: {IncomeConcentrateId}",
+                id);
+
+            var income = await _incomeConcentrateService.GetByIdAsync(id);
+
+            if (income == null)
+            {
+                TempData["ErrorMessage"] = "Ingreso de concentrado no encontrado.";
+                return RedirectToAction(nameof(Inactive));
+            }
+
+            return View(income);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActivateConfirmed(int id)
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.ActivateConfirmed() POST. IncomeConcentrateId: {IncomeConcentrateId}",
+                id);
+
+            try
+            {
+                await _incomeConcentrateService.ActivateAsync(id);
+
+                TempData["SuccessMessage"] = "El ingreso de concentrado fue reactivado correctamente.";
+
+                return RedirectToAction(nameof(Inactive));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while activating income concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    id);
+
+                TempData["ErrorMessage"] = ex.Message;
+
+                return RedirectToAction(nameof(Activate), new { id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while activating income concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    id);
+
+                TempData["ErrorMessage"] = "No se pudo reactivar el ingreso de concentrado. Intente nuevamente.";
+
+                return RedirectToAction(nameof(Activate), new { id });
+            }
+        }
 
 
     }

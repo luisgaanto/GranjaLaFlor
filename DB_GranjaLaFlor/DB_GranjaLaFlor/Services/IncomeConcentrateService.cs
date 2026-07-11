@@ -35,6 +35,7 @@ namespace DB_GranjaLaFlor.Services
             return await _context.IncomeConcentrates
                 .AsNoTracking()
                 .Include(income => income.Brood)
+                    .ThenInclude(brood => brood.BroilerHouse)
                 .Where(income => income.IncomeState)
                 .OrderByDescending(income => income.IncomeConcentrateDate)
                 .ThenBy(income => income.Brood != null
@@ -64,7 +65,11 @@ namespace DB_GranjaLaFlor.Services
                     BroodYear = income.Brood != null
                         ? income.Brood.BroodDate.Year
                         // if not found, return 0 as value
-                        : 0
+                        : 0,
+                    BroilerHouseName = income.Brood != null &&
+                        income.Brood.BroilerHouse != null
+                        ? income.Brood.BroilerHouse.BroilerHouseName
+                        : string.Empty
                 })
                 .Take(10)
                 .ToListAsync();
@@ -77,6 +82,7 @@ namespace DB_GranjaLaFlor.Services
             return await _context.IncomeConcentrates
                 .AsNoTracking()
                 .Include(income => income.Brood)
+                    .ThenInclude(brood => brood.BroilerHouse)
                 .Where(income => income.IncomeConcentrateId == id)
                 .Select(income => new IncomeConcentrateGetByIdViewModel
                 {
@@ -90,17 +96,24 @@ namespace DB_GranjaLaFlor.Services
                     BroodId = income.BroodId,
                     BroodName = income.Brood != null
                         ? income.Brood.BroodName
+                        : string.Empty,
+                    BroilerHouseName =
+                    income.Brood != null &&
+                    income.Brood.BroilerHouse != null
+                        ? income.Brood.BroilerHouse.BroilerHouseName
                         : string.Empty
+
                 })
                 .FirstOrDefaultAsync();
         }
+
 
         /*
           * UI Data | Unique Active Brood Select List: Returns one option per Brood name: the Brood must be active and its related Broiler
           * House must also be active. Not duplicated Brood names are grouped in memory and only one option is displayed in the Create form.
           * Groups broods by name and calendar year to ensure that each brood name appears only once per year in the dropdown list.
           * Called in GET - Create
-         */
+         
         public async Task<List<SelectListItem>> GetBroodSelectListAsync()
         {
             var validBroods = await _context.Broods
@@ -137,8 +150,40 @@ namespace DB_GranjaLaFlor.Services
                 .ToList();
 
         }
+        */
 
-       
+        /*
+          * UI Data | Active Brood and Broiler House Select List: Returns every active Brood associated with an active Broiler House.
+          * Concentrate income is managed independently for each Brood and Broiler House because every Broiler House has its own concentrate
+          * silo. Therefore, Broods with the same name and year must not be grouped.
+         */
+        public async Task<List<SelectListItem>> GetBroodSelectListAsync()
+        {
+            return await _context.Broods
+                .AsNoTracking()
+                .Include(brood => brood.BroilerHouse)
+                .Where(brood =>
+                    brood.BroodState &&
+                    brood.BroilerHouse != null &&
+                    brood.BroilerHouse.BroilerHouseState)
+                .OrderByDescending(brood => brood.BroodDate.Year)
+                .ThenBy(brood => brood.BroodName)
+                .ThenBy(brood => brood.BroilerHouse!.BroilerHouseName)
+                // Converts each brood into a SelectListItem
+                // used by the ASP.NET Core dropdown.
+                .Select(brood => new SelectListItem
+                {
+                    Value = brood.BroodId.ToString(),
+
+                    Text = $"{brood.BroodName} - " +
+                           $"{brood.BroilerHouse!.BroilerHouseName} - " +
+                           $"Año {brood.BroodDate.Year}"
+                })
+                // Executes the LINQ query and returns the result as a List.
+                .ToListAsync();
+        }
+
+
 
         /*
           * Business Calculation | Current Accumulated Concentrate: Retrieves the current accumulated concentrate for the selected Brood.
@@ -462,6 +507,7 @@ namespace DB_GranjaLaFlor.Services
             return await _context.IncomeConcentrates
                 .AsNoTracking()
                 .Include(income => income.Brood)
+                    .ThenInclude(brood => brood.BroilerHouse)
                 .Where(income => !income.IncomeState)
                 .OrderByDescending(income => income.IncomeConcentrateDate)
                 .Select(income => new IncomeConcentrateListViewModel
@@ -479,7 +525,12 @@ namespace DB_GranjaLaFlor.Services
                         : string.Empty,
                     BroodYear = income.Brood != null
                         ? income.Brood.BroodDate.Year
-                        : 0
+                        : 0,
+                    BroilerHouseName =
+                    income.Brood != null &&
+                    income.Brood.BroilerHouse != null
+                        ? income.Brood.BroilerHouse.BroilerHouseName
+                        : string.Empty
                 })
                 .ToListAsync();
         }

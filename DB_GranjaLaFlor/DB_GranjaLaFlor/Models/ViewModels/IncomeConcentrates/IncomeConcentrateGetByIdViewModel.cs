@@ -41,5 +41,8 @@ namespace DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates
 
         [Display(Name = "Año")]
         public int BroodYear { get; set; }
+
+        [Display(Name = "Pollera")]
+        public string BroilerHouseName { get; set; } = string.Empty;
     }
 }

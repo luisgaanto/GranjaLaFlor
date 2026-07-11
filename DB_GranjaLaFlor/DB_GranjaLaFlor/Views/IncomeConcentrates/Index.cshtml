@@ -46,6 +46,10 @@
                                 @Html.DisplayNameFor(model => model.BroodName)
                             </th>
 
+                            <th style="min-width:180px;">
+                                @Html.DisplayNameFor(model => model.BroilerHouseName)
+                            </th>
+
                             <th>
                                 @Html.DisplayNameFor(model => model.IncomeQuintals)
                             </th>
@@ -85,6 +89,10 @@
                                     <!-- Adding brood name  + brood year for better understanding -->
                                     <td style="min-width:180px;">
                                         @income.BroodName - Año @income.BroodYear
+                                    </td>
+
+                                    <td style="min-width:180px;">
+                                        @Html.DisplayFor(modelItem => income.BroilerHouseName)
                                     </td>
 
                                     <td>

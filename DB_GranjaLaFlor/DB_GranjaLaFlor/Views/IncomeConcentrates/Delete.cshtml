@@ -6,10 +6,10 @@
 
 <div class="container mt-4 col-md-7">
 
-    <div class="card border-danger">
+    <div class="card border-primary">
 
-        <div class="card-header bg-danger text-white text-center">
-            <h1 class="mb-0">Desactivar Ingreso de Concentrado</h1>
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Eliminar Ingreso de Concentrado</h1>
         </div>
 
         <div class="card-body">
@@ -36,6 +36,15 @@
                         </th>
                         <td>
                             @Html.DisplayFor(model => model.BroodName)
+                        </td>
+                    </tr>
+
+                    <tr class="table-active">
+                        <th style="width:35%">
+                            @Html.DisplayNameFor(model => model.BroilerHouseName)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(model => model.BroilerHouseName)
                         </td>
                     </tr>
 
@@ -96,7 +105,7 @@
                 @Html.AntiForgeryToken()
 
                 <button type="submit" class="btn btn-outline-danger">
-                    Desactivar
+                    Eliminar
                 </button>
 
                 <a asp-action="Index" class="btn btn-outline-secondary">

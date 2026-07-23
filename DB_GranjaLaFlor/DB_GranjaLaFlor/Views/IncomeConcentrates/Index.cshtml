@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates.IncomeConcentrateListViewModel>
+﻿@model ProjectGranjaLaFlor.ViewModels.IncomeConcentrates.IncomeConcentrateFilterViewModel
 
 @{
     ViewData["Title"] = "Ingresos de Concentrado";
@@ -7,6 +7,7 @@
 <div class="container mt-4">
 
     <div class="card border-primary">
+
         <div class="card-header bg-primary text-white text-center">
             <h3 class="mb-0">
                 Ingresos de Concentrado
@@ -14,7 +15,9 @@
         </div>
 
         <div class="card-body">
+
             <div class="d-flex justify-content-between align-items-center mb-3">
+
                 <h5 class="mb-0">
                     Ingresos Activos Registrados
                 </h5>
@@ -32,86 +35,214 @@
                     </a>
 
                 </div>
+
             </div>
 
+            <!--
+                Sends the selected filters to the Index GET action
+                through query string parameters.
+            -->
+            <form asp-action="Index"
+                  method="get"
+                  class="row g-3 align-items-end mb-4">
+
+                <div class="col-md-4">
+
+                    <label asp-for="BroodName"
+                           class="form-label">
+                        Camada
+                    </label>
+
+                    <select asp-for="BroodName"
+                            asp-items="Model.BroodOptions"
+                            class="form-select">
+
+                        <option value="">
+                            Todas las camadas
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label asp-for="Year"
+                           class="form-label">
+                        Año
+                    </label>
+
+                    <select asp-for="Year"
+                            asp-items="Model.YearOptions"
+                            class="form-select">
+
+                        <option value="">
+                            Todos los años
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label asp-for="BroilerHouseId"
+                           class="form-label">
+                        Pollera
+                    </label>
+
+                    <select asp-for="BroilerHouseId"
+                            asp-items="Model.BroilerHouseOptions"
+                            class="form-select">
+
+                        <option value="">
+                            Todas las polleras
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <div class="d-grid gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Filtrar
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Limpiar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
             <div class="table-responsive">
+
                 <table class="table table-hover table-bordered align-middle">
+
                     <thead class="table-primary">
+
                         <tr>
-                            <th>
-                                @Html.DisplayNameFor(model => model.IncomeConcentrateDate)
-                            </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.BroodName)
-                            </th>
-
-                            <th style="min-width:180px;">
-                                @Html.DisplayNameFor(model => model.BroilerHouseName)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeConcentrateDate)
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.IncomeQuintals)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .BroodName)
+                            </th>
+
+                            <th style="min-width: 180px;">
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .BroilerHouseName)
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.IncomeKilos)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeQuintals)
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.IncomeAccumulated)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeKilos)
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.IncomeDescription)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeAccumulated)
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(model => model.IncomeState)
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeDescription)
                             </th>
 
-                            <th class="text-center" style="width: 170px;">
+                            <th>
+                                @Html.DisplayNameFor(model =>
+                                         model.IncomeConcentrates
+                                         .First()
+                                         .IncomeState)
+                            </th>
+
+                            <th class="text-center"
+                                style="width: 170px;">
                                 Acciones
                             </th>
+
                         </tr>
+
                     </thead>
 
                     <tbody>
 
-                        @if (Model.Any())
+                        @if (Model.IncomeConcentrates.Any())
                         {
-                            foreach (var income in Model)
+                            foreach (var income in Model.IncomeConcentrates)
                             {
                                 <tr>
+
                                     <td>
                                         @income.IncomeConcentrateDate.ToString("dd/MM/yyyy")
                                     </td>
-                                    <!-- Adding brood name  + brood year for better understanding -->
-                                    <td style="min-width:180px;">
+
+                                    <!--
+                                        Displays the Brood name and registration
+                                        year to identify the selected Brood.
+                                    -->
+                                    <td style="min-width: 180px;">
                                         @income.BroodName - Año @income.BroodYear
                                     </td>
 
-                                    <td style="min-width:180px;">
-                                        @Html.DisplayFor(modelItem => income.BroilerHouseName)
+                                    <td style="min-width: 180px;">
+                                        @Html.DisplayFor(modelItem =>
+                                                 income.BroilerHouseName)
                                     </td>
 
                                     <td>
-                                        @income.IncomeQuintals
+                                        @Html.DisplayFor(modelItem =>
+                                                 income.IncomeQuintals)
                                     </td>
 
                                     <td>
-                                        @income.IncomeKilos
+                                        @Html.DisplayFor(modelItem =>
+                                                 income.IncomeKilos)
                                     </td>
 
                                     <td>
-                                        @income.IncomeAccumulated
+                                        @Html.DisplayFor(modelItem =>
+                                                 income.IncomeAccumulated)
                                     </td>
 
                                     <td>
-                                        @income.IncomeDescription
+                                        @Html.DisplayFor(modelItem =>
+                                                 income.IncomeDescription)
                                     </td>
 
                                     <td>
+
                                         @if (income.IncomeState)
                                         {
                                             <span class="badge bg-info">
@@ -124,76 +255,85 @@
                                                 Inactivo
                                             </span>
                                         }
+
                                     </td>
 
                                     <td>
+
                                         <div class="d-flex justify-content-center gap-2">
 
                                             <a asp-action="Details"
                                                asp-route-id="@income.IncomeConcentrateId"
                                                class="btn btn-outline-info btn-sm">
-
                                                 Detalle
-
                                             </a>
 
                                             <a asp-action="Edit"
                                                asp-route-id="@income.IncomeConcentrateId"
                                                class="btn btn-outline-warning btn-sm">
-
                                                 Editar
-
                                             </a>
 
                                             <a asp-action="Delete"
                                                asp-route-id="@income.IncomeConcentrateId"
                                                class="btn btn-outline-danger btn-sm">
-
                                                 Eliminar
-
                                             </a>
 
                                         </div>
+
                                     </td>
+
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="8"
+
+                                <td colspan="9"
                                     class="text-center text-muted">
 
-                                    No existen ingresos de concentrado registrados.
+                                    No existen ingresos de concentrado que coincidan
+                                    con los filtros seleccionados.
 
                                 </td>
+
                             </tr>
                         }
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </div>
 
-    @section Scripts
-    {
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
+</div>
 
-                const alerts = document.querySelectorAll(".alert");
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-                alerts.forEach(function (alert) {
+            const alerts = document.querySelectorAll(".alert");
 
-                    setTimeout(function () {
+            alerts.forEach(function (alert) {
 
-                        const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                        bsAlert.close();
+                setTimeout(function () {
 
-                    }, 2500);
+                    const bsAlert =
+                        bootstrap.Alert.getOrCreateInstance(alert);
 
-                });
+                    bsAlert.close();
+
+                }, 2500);
 
             });
-        </script>
-    }
-</div>
+
+        });
+    </script>
+}

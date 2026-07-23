@@ -1,25 +1,27 @@
 html {
-  font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
 .form-control,
 .form-select {
     background-color: #f3f5f7;
@@ -30,45 +32,42 @@ body {
         background-color: white;
     }
 
-
 .email-display-blue {
     color: #0d6efd;
 }
 
 
-
-/* Login  */
-
-
-
-
+/* =========================================================
+   Login
+   ========================================================= */
 
 .login-body {
-    margin: 0;
     min-height: 100vh;
+    margin: 0;
 }
 
 .login-full-page {
-    min-height: 100vh;
     width: 100%;
-    background: linear-gradient(rgba(20, 45, 25, 0.50), rgba(20, 45, 25, 0.75)), url('/imagenes/granja-login-bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    min-height: 100vh;
+    padding: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    background: linear-gradient( rgba(20, 45, 25, 0.50), rgba(20, 45, 25, 0.75) ), url('/imagenes/granja-login-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .login-card {
     width: 100%;
     max-width: 430px;
     padding: 2rem;
-    border-radius: 18px;
     background: rgba(255, 255, 255, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 18px;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
 }
 
@@ -93,10 +92,9 @@ body {
 
     .login-input:focus {
         background-color: white;
-        box-shadow: 0 0 0 .2rem rgba(13, 202, 240, .25);
+        box-shadow: 0 0 0 0.2rem rgba(13, 202, 240, 0.25);
     }
 
-/* Dashboard */
 
 /* =========================================================
    Dashboard Page
@@ -112,19 +110,32 @@ body {
     background-attachment: fixed;
 }
 
+/*
+ * Keeps the Dashboard slightly wider than the default
+ * Bootstrap container without stretching it excessively.
+ */
+.dashboard-container {
+    width: 100%;
+    max-width: 1420px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
+}
+
 
 /* =========================================================
    Dashboard Main Header
    ========================================================= */
 
 .dashboard-hero {
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.48);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.60);
     border-radius: 22px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.60);
-    overflow: hidden;
 }
 
 .dashboard-logo {
@@ -151,13 +162,13 @@ body {
    ========================================================= */
 
 .dashboard-production-card {
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.44);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.60);
     border-radius: 22px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.60);
-    overflow: hidden;
 }
 
 .dashboard-production-title {
@@ -174,13 +185,19 @@ body {
     font-weight: 500;
 }
 
+
+/* =========================================================
+   Broiler House Production Cards
+   ========================================================= */
+
 .dashboard-broiler-house-card {
+    height: 100%;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.36);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 18px;
-    padding: 1.5rem;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.55);
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
@@ -191,24 +208,68 @@ body {
         box-shadow: 0 16px 34px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.65);
     }
 
+/*
+ * Displays Broiler House information on the left
+ * and operational metrics on the right.
+ */
+.dashboard-broiler-house-layout {
+    min-height: 310px;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+}
+
+.dashboard-broiler-house-sidebar {
+    padding: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.28);
+    border-right: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.dashboard-broiler-house-name {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.dashboard-broiler-house-description {
+    color: rgba(33, 37, 41, 0.65);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.dashboard-broiler-house-metrics {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .dashboard-production-icon-container {
     width: 52px;
     height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.60);
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.48);
-    border: 1px solid rgba(255, 255, 255, 0.60);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.60);
     font-size: 1.55rem;
 }
 
+
+/* =========================================================
+   Dashboard Metrics
+   ========================================================= */
+
 .dashboard-metric-row {
+    padding: 0.85rem 0;
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.85rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.42);
 }
 
@@ -228,6 +289,7 @@ body {
 }
 
 .dashboard-metric-content {
+    min-width: 0;
     display: flex;
     flex-direction: column;
 }
@@ -263,14 +325,14 @@ body {
    ========================================================= */
 
 .dashboard-module-card {
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.42);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 18px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.55);
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-    overflow: hidden;
 }
 
     .dashboard-module-card:hover {
@@ -281,28 +343,23 @@ body {
 
 
 /* =========================================================
-   Card Top Strip
+   Dashboard Card Content
    ========================================================= */
 
 .dashboard-card-strip {
     height: 6px;
 }
 
-
-/* =========================================================
-   Card Content
-   ========================================================= */
-
 .dashboard-card-body {
     min-height: 210px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
 }
 
 .dashboard-card-title {
-    font-weight: 700;
     margin-bottom: 0.75rem;
+    font-weight: 700;
 }
 
 .dashboard-card-text {
@@ -316,19 +373,19 @@ body {
 
 
 /* =========================================================
-   Dashboard Card Icon
+   Dashboard Module Icons
    ========================================================= */
 
 .dashboard-icon-container {
     width: 54px;
     height: 54px;
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 15px;
-    margin-bottom: 1rem;
     background: rgba(255, 255, 255, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 15px;
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
@@ -338,7 +395,7 @@ body {
 
 
 /* =========================================================
-   Dashboard Badges
+   Dashboard Badges and Buttons
    ========================================================= */
 
 .dashboard-badge {
@@ -346,11 +403,6 @@ body {
     font-size: 0.85rem;
     font-weight: 500;
 }
-
-
-/* =========================================================
-   Dashboard Buttons
-   ========================================================= */
 
 .dashboard-card-action .btn {
     min-width: 135px;
@@ -360,14 +412,56 @@ body {
 
 
 /* =========================================================
-   Responsive Design
+   Dashboard Responsive Design
    ========================================================= */
+
+@media (max-width: 1199.98px) {
+
+    .dashboard-container {
+        max-width: 100%;
+        padding-right: 1.25rem;
+        padding-left: 1.25rem;
+    }
+
+    .dashboard-broiler-house-layout {
+        grid-template-columns: 150px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 991.98px) {
+
+    .dashboard-container {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+
+    .dashboard-broiler-house-layout {
+        min-height: auto;
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-broiler-house-sidebar {
+        align-items: flex-start;
+        text-align: left;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .dashboard-broiler-house-metrics {
+        padding: 0.75rem 1.25rem;
+    }
+}
 
 @media (max-width: 767.98px) {
 
     .dashboard-page {
         padding: 20px 0;
         background-attachment: scroll;
+    }
+
+    .dashboard-container {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
     }
 
     .dashboard-hero,

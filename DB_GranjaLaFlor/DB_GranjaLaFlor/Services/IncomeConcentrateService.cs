@@ -3,6 +3,7 @@ using DB_GranjaLaFlor.Models.Entities;
 using DB_GranjaLaFlor.Models.ViewModels.IncomeConcentrates;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ProjectGranjaLaFlor.ViewModels.IncomeConcentrates;
 using System.Text.RegularExpressions;
 
 namespace DB_GranjaLaFlor.Services
@@ -30,6 +31,9 @@ namespace DB_GranjaLaFlor.Services
             _context = context;
         }
 
+
+
+        /*
         public async Task<List<IncomeConcentrateListViewModel>> GetAllActiveAsync()
         {
             return await _context.IncomeConcentrates
@@ -47,7 +51,7 @@ namespace DB_GranjaLaFlor.Services
                  * the view. This helps separate the data layer from the presentation layer, reducing unnecessary data exposure and 
                  * improving maintainability. The resulting ViewModel is what the system uses to display the list of income concentrate 
                  * records. Reference: https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying?utm_source=chatgpt.com#project-only-properties-you-need
-                */
+                
                 .Select(income => new IncomeConcentrateListViewModel
                 {
                     IncomeConcentrateId = income.IncomeConcentrateId,
@@ -74,6 +78,248 @@ namespace DB_GranjaLaFlor.Services
                 .Take(10)
                 .ToListAsync();
         }
+        */
+
+        public async Task<List<IncomeConcentrateListViewModel>> GetAllActiveAsync(string? broodName = null, int? year = null,  int? broilerHouseId = null)
+        {
+
+            /*
+             * Creates the initial query used to retrieve active income concentrate
+             * records. The query is not executed at this point. It is stored in a
+             * variable so optional filters can be added before calling ToListAsync().
+             */
+            var query = _context.IncomeConcentrates
+                .AsNoTracking()
+                .Include(income => income.Brood)
+                    .ThenInclude(brood => brood.BroilerHouse)
+                .Where(income => income.IncomeState)
+                .AsQueryable();
+
+            /*
+                 * Applies the Brood name filter only when the user selects
+                 * a Brood name. Different Brood records may share the same
+                 * name but belong to different years or Broiler Houses.
+             */
+            if (!string.IsNullOrWhiteSpace(broodName))
+            {
+                query = query.Where(income =>
+                    income.Brood != null &&
+                    income.Brood.BroodName == broodName);
+            }
+
+
+            /*
+             * Applies the year filter using the year stored in BroodDate.
+             * The year is obtained through the relationship between
+             * IncomeConcentrate and Brood.
+             */
+            if (year.HasValue)
+            {
+                query = query.Where(income =>
+                    income.Brood != null &&
+                    income.Brood.BroodDate.Year == year.Value);
+            }
+
+            /*
+             * Applies the broiler house filter through the Brood relationship.
+             * If broilerHouseId is null, records from all broiler houses
+             * remain included in the query.
+             */
+            if (broilerHouseId.HasValue)
+            {
+                query = query.Where(income =>
+                    income.Brood != null &&
+                    income.Brood.BroilerHouseId == broilerHouseId.Value);
+            }
+
+            /*
+             * Executes the query after applying the optional filters.
+             * If the user does not select any filter, the method returns the
+             * same active records that were displayed before adding the filters.
+             */
+            return await query
+                .OrderByDescending(income => income.IncomeConcentrateDate)
+                .ThenBy(income => income.Brood != null
+                    ? income.Brood.BroodName
+                    : string.Empty)
+                .ThenByDescending(income => income.IncomeConcentrateId)
+
+                /*
+                 * Converts the entity model into a ViewModel by creating a new object that contains only the properties required by 
+                 * the view. This helps separate the data layer from the presentation layer, reducing
+                 * unnecessary data exposure and improving maintainability.
+                 *
+                 * The resulting ViewModel is what the system uses to display the list of income concentrate records. Reference:
+                 * https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying#project-only-properties-you-need
+                 */
+                .Select(income => new IncomeConcentrateListViewModel
+                {
+                    IncomeConcentrateId = income.IncomeConcentrateId,
+                    IncomeConcentrateDate = income.IncomeConcentrateDate,
+                    IncomeQuintals = income.IncomeQuintals,
+                    IncomeKilos = income.IncomeKilos,
+                    IncomeAccumulated = income.IncomeAccumulated,
+                    IncomeDescription = income.IncomeDescription,
+                    IncomeState = income.IncomeState,
+                    BroodId = income.BroodId,
+
+                    BroodName = income.Brood != null
+                        ? income.Brood.BroodName
+                        // If the brood is not found, returns an empty string.
+                        : string.Empty,
+
+                    BroodYear = income.Brood != null
+                        ? income.Brood.BroodDate.Year
+                        // If the brood is not found, returns 0 as the value.
+                        : 0,
+
+                    BroilerHouseName = income.Brood != null &&
+                        income.Brood.BroilerHouse != null
+                        ? income.Brood.BroilerHouse.BroilerHouseName
+                        // If the broiler house is not found, returns an empty string.
+                        : string.Empty
+                })
+                .Take(10)
+                .ToListAsync();
+        }
+
+
+        /*
+         * UI Data | Income Concentrate Index Filter: Creates the complete ViewModel required by the Index view.
+         * The method retrieves the active Income Concentrate records by calling GetAllActiveAsync(). It also loads the Brood, year and
+         * Broiler House options used by the filter dropdown menus.
+         */
+        public async Task<IncomeConcentrateFilterViewModel>GetFilterViewModelAsync(string? broodName = null, int? year = null,int? broilerHouseId = null)
+        {
+            /*
+             * Retrieves the active Income Concentrate records. If all filter values are null, GetAllActiveAsync returns
+             * the same active list displayed before adding the filters.
+             */
+            var incomeConcentrates = await GetAllActiveAsync(broodName, year,broilerHouseId);
+
+            /*
+              * Retrieves unique Brood names so the dropdown
+              * does not repeat the same name.
+            */
+            var availableBroodNames = await _context.Broods
+                .AsNoTracking()
+                .Where(brood =>
+                    brood.BroodState &&
+                    brood.BroilerHouse != null &&
+                    brood.BroilerHouse.BroilerHouseState)
+                .Select(brood =>
+                    brood.BroodName)
+                .Distinct()
+                .OrderBy(name =>
+                    name)
+                .ToListAsync();
+
+            /*
+             * UI Data | Brood Filter Options: Retrieves every active Brood associated with an active Broiler House.
+             * The Brood name, Broiler House and year are displayed to clearly identify each option.
+             */
+            var broodOptions = availableBroodNames
+                .Select(name =>
+                    new SelectListItem
+                    {
+                        Value = name,
+                        Text = name,
+
+                        /*
+                         * Preserves the selected Brood name
+                         * after submitting the filter form.
+                         */
+                        Selected =
+                            !string.IsNullOrWhiteSpace(broodName) &&
+                            name == broodName
+                    })
+                .ToList();
+
+            /*
+             * UI Data | Year Filter Options
+             * Retrieves the different years from active Broods
+             * associated with active Broiler Houses.
+             *
+             * Distinct prevents duplicated years in the dropdown menu.
+             */
+            var availableYears = await _context.Broods
+                .AsNoTracking()
+                .Where(brood =>
+                    brood.BroodState &&
+                    brood.BroilerHouse != null &&
+                    brood.BroilerHouse.BroilerHouseState)
+                .Select(brood =>
+                    brood.BroodDate.Year)
+                .Distinct()
+                .OrderByDescending(broodYear =>
+                    broodYear)
+                .ToListAsync();
+
+            /*
+             * Converts each available year into a SelectListItem
+             * used by the year dropdown menu.
+             */
+            var yearOptions = availableYears
+                .Select(broodYear => new SelectListItem
+                {
+                    Value = broodYear.ToString(),
+                    Text = broodYear.ToString(),
+
+                    /*
+                     * Preserves the selected year after submitting
+                     * the filter form.
+                     */
+                    Selected = year.HasValue &&
+                               broodYear == year.Value
+                })
+                .ToList();
+
+            /*
+             * UI Data | Broiler House Filter Options
+             * Retrieves every active Broiler House used by the
+             * Broiler House filter dropdown menu.
+             */
+            var broilerHouseOptions = await _context.BroilerHouses
+                .AsNoTracking()
+                .Where(broilerHouse =>
+                    broilerHouse.BroilerHouseState)
+                .OrderBy(broilerHouse =>
+                    broilerHouse.BroilerHouseName)
+                .Select(broilerHouse => new SelectListItem
+                {
+                    Value = broilerHouse.BroilerHouseId.ToString(),
+                    Text = broilerHouse.BroilerHouseName,
+
+                    /*
+                     * Preserves the selected Broiler House after
+                     * submitting the filter form.
+                     */
+                    Selected = broilerHouseId.HasValue &&
+                               broilerHouse.BroilerHouseId ==
+                               broilerHouseId.Value
+                })
+                .ToListAsync();
+
+            /*
+             * Creates the ViewModel required by the Index view.
+             * The current Income Concentrate list remains unchanged.
+             * The filter values and dropdown options are added to
+             * the same page.
+             */
+            return new IncomeConcentrateFilterViewModel
+            {
+                BroodName = broodName,
+                Year = year,
+                BroilerHouseId = broilerHouseId,
+
+                BroodOptions = broodOptions,
+                YearOptions = yearOptions,
+                BroilerHouseOptions = broilerHouseOptions,
+
+                IncomeConcentrates = incomeConcentrates
+            };
+        }
+
 
 
         //Details - Delete - Activate. Use GetById ViewModel. 

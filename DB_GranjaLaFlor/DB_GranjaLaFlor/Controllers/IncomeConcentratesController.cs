@@ -2,6 +2,7 @@
 using DB_GranjaLaFlor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProjectGranjaLaFlor.ViewModels.IncomeConcentrates;
 
 namespace DB_GranjaLaFlor.Controllers
 {
@@ -24,7 +25,7 @@ namespace DB_GranjaLaFlor.Controllers
             _incomeConcentrateService = incomeConcentrateService;
             _logger = logger;
         }
-
+        /*
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation(
@@ -33,6 +34,31 @@ namespace DB_GranjaLaFlor.Controllers
             var incomes = await _incomeConcentrateService.GetAllActiveAsync();
 
             return View(incomes);
+        }
+        */
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string? broodName, int? year, int? broilerHouseId)
+        {
+            _logger.LogInformation(
+                "Entering IncomeConcentratesController.Index(). " +
+                "broodName: {broodName}, Year: {Year}, " +
+                "BroilerHouseId: {BroilerHouseId}",
+                broodName,
+                year,
+                broilerHouseId);
+
+            /*
+             * Delegates the Income Concentrate records, filter values and dropdown menu options to the Service layer.
+             * The controller only coordinates the HTTP request and returns the completed ViewModel to the Index view.
+             */
+            var model =
+                await _incomeConcentrateService.GetFilterViewModelAsync(
+                    broodName,
+                    year,
+                    broilerHouseId);
+
+            return View(model);
         }
 
         public async Task<IActionResult> Details(int id)

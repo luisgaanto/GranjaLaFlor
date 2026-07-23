@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ProjectGranjaLaFlor.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DB_GranjaLaFlor.Models.Entities
@@ -51,5 +52,12 @@ namespace DB_GranjaLaFlor.Models.Entities
         public int BroodId { get; set; }
 
         public Brood? Brood { get; set; }
+
+        /*
+         * Navigation property that represents all Daily Checks associated with the current Income Concentrate record.
+         *
+         * One Income Concentrate record can be used by multiple Daily Checks.
+        */
+        public ICollection<DailyCheck> DailyChecks { get; set; } = new List<DailyCheck>();
     }
 }

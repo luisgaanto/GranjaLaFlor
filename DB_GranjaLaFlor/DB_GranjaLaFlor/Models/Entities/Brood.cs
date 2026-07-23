@@ -18,6 +18,7 @@
  */
 
 
+using ProjectGranjaLaFlor.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -71,5 +72,13 @@ namespace DB_GranjaLaFlor.Models.Entities
          * BroilerHouseId stores the FK value; BroilerHouse represents the relationship.
          */
         public BroilerHouse? BroilerHouse { get; set; }
+
+        /*
+         * Navigation property that represents all
+         * Daily Checks associated with the current Brood.
+         *
+         * One Brood can contain multiple Daily Checks.
+        */
+        public ICollection<DailyCheck> DailyChecks { get; set; } = new List<DailyCheck>();
     }
 }

@@ -84,9 +84,8 @@ namespace DB_GranjaLaFlor.Services
         {
 
             /*
-             * Creates the initial query used to retrieve active income concentrate
-             * records. The query is not executed at this point. It is stored in a
-             * variable so optional filters can be added before calling ToListAsync().
+             * Creates the initial query used to retrieve active income concentrate records. The query is not executed at this point. It is stored in a
+             * variable so optional filters can be added before calling ToListAsync(). In summary, if there is not filters applied, show active data. 
              */
             var query = _context.IncomeConcentrates
                 .AsNoTracking()

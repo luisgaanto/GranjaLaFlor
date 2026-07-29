@@ -1,5 +1,6 @@
 ﻿using DB_GranjaLaFlor.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using ProjectGranjaLaFlor.Models;
 using System.Data;
 // "ApplicationDbContext" in general terms is the main bridge between the application and the database using Entity Framework Core.
 //Define how models relate to each other and how they map in the database.
@@ -23,6 +24,11 @@ namespace DB_GranjaLaFlor.Data.Context
         public DbSet<Brood> Broods { get; set; }
 
         public DbSet<IncomeConcentrate> IncomeConcentrates { get; set; }
+
+        /*
+         * Represents the Daily Checks stored in the database.
+        */
+        public DbSet<DailyCheck> DailyChecks { get; set; }
 
     }
 }

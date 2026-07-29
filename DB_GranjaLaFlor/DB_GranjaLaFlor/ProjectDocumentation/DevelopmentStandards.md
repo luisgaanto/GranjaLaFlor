@@ -2428,3 +2428,173 @@ Navbar vuelve a mostrar Login
  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  +++++++  
 
 
+
+ ┌───────────────────────────────────────────────────────────┐
+│ Registrar Control Diario                                 │
+├───────────────────────────────────────────────────────────┤
+│ Camada:  [Camada A - Pollera 1 - Año 2026 ▼]             │
+│ Semana:  [Semana 2 ▼]                                    │
+│ Día:     [Día 3 ▼]                                       │
+│ Fecha:   [03/08/2026]                                    │
+│                                                           │
+│ Información de la camada                                  │
+│ Pollera:                 Pollera 1                         │
+│ Cantidad inicial de aves: 10,000                          │
+│                                                           │
+│ Mortalidad                                                │
+│ Mortalidad natural: [4]                                  │
+│ Cantidad selección: [1]                                  │
+│                                                           │
+│ Resultados automáticos                                    │
+│ Mortalidad diaria total:  5                               │
+│ Mortalidad acumulada:     17                              │
+│ Saldo diario de aves:     9,983                           │
+│                                                           │
+│ Consumo de concentrado                                    │
+│ Ingreso disponible: [Ingreso 12 - 2,300 kg ▼]             │
+│ Consumo en quintales: [2.00]                              │
+│ Consumo en kilogramos: 92.00 kg                           │
+│ Consumo acumulado:     276.00 kg                          │
+│ Saldo de concentrado:  2,024.00 kg                        │
+│                                                           │
+│ Descripción: [________________________________________]   │
+│                                                           │
+│ [Guardar] [Volver]                                       │
+└───────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────┐
+│ Registrar Control Semanal                                │
+├───────────────────────────────────────────────────────────┤
+│ Camada:         [Camada A - Pollera 1 - Año 2026 ▼]       │
+│ Semana:         [Semana 2 ▼]                              │
+│ Valor esperado: [Semana 2 ▼]                              │
+│                                                           │
+│ Información seleccionada                                  │
+│ Pollera: Pollera 1                                        │
+│                                                           │
+│ Controles diarios de la semana                            │
+│ ┌───────┬────────────┬────────────┬────────────┐          │
+│ │ Día   │ Fecha      │ Mortalidad │ Consumo kg │          │
+│ ├───────┼────────────┼────────────┼────────────┤          │
+│ │ Día 1 │ 01/08/2026 │ 4          │ 92.00      │          │
+│ │ Día 2 │ 02/08/2026 │ 2          │ 92.00      │          │
+│ │ Día 3 │ 03/08/2026 │ 3          │ 92.00      │          │
+│ │ Día 4 │ 04/08/2026 │ 1          │ 92.00      │          │
+│ │ Día 5 │ 05/08/2026 │ 2          │ 92.00      │          │
+│ │ Día 6 │ 06/08/2026 │ 2          │ 92.00      │          │
+│ │ Día 7 │ 07/08/2026 │ 1          │ 92.00      │          │
+│ └───────┴────────────┴────────────┴────────────┘          │
+│                                                           │
+│ Datos del muestreo                                        │
+│ Cantidad de aves: [10]                                   │
+│ Peso total:       [8.50 kg]                              │
+│                                                           │
+│ Valores esperados                                         │
+│ Peso esperado:       0.90 kg                              │
+│ Consumo esperado:  750.00 kg                              │
+│ Conversión esperada: 1.60                                 │
+│ Mortalidad esperada: 0.50 %                               │
+│                                                           │
+│ Resultados automáticos                                    │
+│ Peso promedio:           0.85 kg                          │
+│ Consumo real semanal:  644.00 kg                          │
+│ Diferencia consumo:   -106.00 kg                          │
+│ Diferencia peso:        -0.05 kg                          │
+│ Conversión real:         1.72                             │
+│ Diferencia conversión:   0.12                             │
+│ Mortalidad semanal:     15                                │
+│ Diferencia mortalidad:   0.10 %                           │
+│                                                           │
+│ Descripción: [________________________________________]   │
+│                                                           │
+│ [Guardar] [Volver]                                       │
+└───────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+ Estoy de acuerdo con la opcion 1 donde se sigue usando el flujo del DER actual. 
+
+
+ 1- dar comandos para actualizar tablas daily_checks y weekly_checks y asi añadir los atributos necesarios 
+
+ 2- 
+
+
+ antes de seguir con paso 2. me parece que habias dicho que para futuras recalculaciones ibamos a usar el siguiente metodo 
+
+
+
+
+
+        /*
+
+ * Business Calculation | Recalculate Brood Accumulated
+
+ * Recalculates the accumulated concentrate (kilograms) for all active
+
+ * income records belonging to the specified Brood.
+
+ *
+
+ * Records are processed in chronological order to preserve the business
+
+ * rule that each accumulated value represents the running total at the
+
+ * time the income was registered.
+
+ */
+
+        private async Task RecalculateAccumulatedAsync(int broodId)
+
+        {
+
+            // Object list: lists valid incomeconcentrate in incomes var. 
+
+            var incomes = await _context.IncomeConcentrates
+
+                .Where(income =>
+
+                    income.BroodId == broodId &&
+
+                    income.IncomeState)
+
+                .OrderBy(income => income.IncomeConcentrateDate)
+
+                .ThenBy(income => income.IncomeConcentrateId)
+
+                .ToListAsync();
+
+
+
+            decimal accumulated = 0; // Initiates var at 0, used then in the loop to calculate real accumulated. 
+
+
+
+            foreach (var income in incomes)
+
+            {
+
+                //Sums incomekilos to the running accumulated total using accumulated = accumulated + income.IncomeKilos.
+
+                accumulated += income.IncomeKilos;
+
+                income.IncomeAccumulated = accumulated;
+
+            }
+
+
+
+            await _context.SaveChangesAsync();
+
+        }
+
+    }
+
+
+
+
+
+

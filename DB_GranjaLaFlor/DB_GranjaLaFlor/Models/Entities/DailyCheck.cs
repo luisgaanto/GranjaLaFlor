@@ -18,13 +18,23 @@ namespace ProjectGranjaLaFlor.Models
         [Key]
         [Column("daily_check_id")]
         public int DailyCheckId { get; set; }
-       
+
         [Required]
         [Column("daily_check_date", TypeName = "date")]
         [DataType(DataType.Date)]
         [Display(Name = "Fecha")]
         public DateTime DailyCheckDate { get; set; }
-        
+
+        /*
+         * Control week represented by one of the supported
+         * values such as Semana 1, Semana 2 and subsequent weeks.
+         */
+        [Required]
+        [Column("daily_check_week")]
+        [StringLength(20)]
+        [Display(Name = "Semana")]
+        public string DailyCheckWeek { get; set; } = string.Empty;
+
         [Required]
         [Column("natural_mortality")]
         [Display(Name = "Mortalidad natural")]
@@ -49,13 +59,13 @@ namespace ProjectGranjaLaFlor.Models
         [Column("daily_bird_balance")]
         [Display(Name = "Saldo de aves")]
         public int DailyBirdBalance { get; set; }
-      
+
         [Required]
         [Precision(10, 2)]
         [Column("consumption_quintals")]
         [Display(Name = "Consumo en quintales")]
         public decimal ConsumptionQuintals { get; set; }
-       
+
         [Required]
         [Precision(10, 2)]
         [Column("consumption_kilos")]
@@ -103,12 +113,15 @@ namespace ProjectGranjaLaFlor.Models
         [Required]
         [Column("daily_check_day")]
         [StringLength(10)]
-        [Display(Name = "Día de control")]
+        [Display(Name = "Día")]
         public string DailyCheckDay { get; set; } = string.Empty;
 
         /*
          * Foreign key that identifies the Income Concentrate
-         * record associated with the Daily Check.
+         * record used to calculate the concentrate balance.
+         *
+         * The value is assigned automatically by the Service
+         * from the latest active Income Concentrate of the Brood.
          */
         [Required]
         [Column("income_concentrate_id")]
@@ -119,12 +132,14 @@ namespace ProjectGranjaLaFlor.Models
          * Navigation property to the Brood associated
          * with this Daily Check.
          */
-        [ForeignKey(nameof(BroodId))] public Brood Brood { get; set; } = null!;
+        [ForeignKey(nameof(BroodId))]
+        public Brood Brood { get; set; } = null!;
 
         /*
          * Navigation property to the Income Concentrate
          * record associated with this Daily Check.
          */
-        [ForeignKey(nameof(IncomeConcentrateId))] public IncomeConcentrate IncomeConcentrate { get; set; } = null!;
+        [ForeignKey(nameof(IncomeConcentrateId))]
+        public IncomeConcentrate IncomeConcentrate { get; set; } = null!;
     }
 }

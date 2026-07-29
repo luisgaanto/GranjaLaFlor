@@ -60,6 +60,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<BroilerHouseService>();
 builder.Services.AddScoped<BroodService>();
 builder.Services.AddScoped<IncomeConcentrateService>();
+builder.Services.AddScoped<DailyCheckService>();
 
 var app = builder.Build();
 

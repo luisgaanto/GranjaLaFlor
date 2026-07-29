@@ -1,6 +1,128 @@
-﻿namespace DB_GranjaLaFlor.Models.ViewModels.DailyChecks
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectGranjaLaFlor.Models.ViewModels
 {
+    /*
+     * Represents the complete Daily Check information
+     * required by the Details, Delete and Activate views.
+     *
+     * Related entity names are included to prevent the views
+     * from depending directly on navigation properties.
+     */
     public class DailyCheckGetByIdViewModel
     {
+        /*
+         * Internal identifier used by the Details, Delete,
+         * Activate and Edit actions.
+         */
+        [Display(Name = "ID")]
+        public int DailyCheckId { get; set; }
+
+        /*
+         * Daily Check information.
+         */
+        [DataType(DataType.Date)]
+        [Display(Name = "Fecha")]
+        public DateTime DailyCheckDate { get; set; }
+
+        [Display(Name = "Semana")]
+        public string DailyCheckWeek { get; set; } = string.Empty;
+
+        [Display(Name = "Día")]
+        public string DailyCheckDay { get; set; } = string.Empty;
+
+        /*
+         * Related Broiler House and Brood information.
+         */
+        [Display(Name = "Pollera")]
+        public int BroilerHouseId { get; set; }
+
+        [Display(Name = "Pollera")]
+        public string BroilerHouseName { get; set; } = string.Empty;
+
+        [Display(Name = "Camada")]
+        public int BroodId { get; set; }
+
+        [Display(Name = "Camada")]
+        public string BroodName { get; set; } = string.Empty;
+
+        [Display(Name = "Fecha de la camada")]
+        [DataType(DataType.Date)]
+        public DateTime BroodDate { get; set; }
+
+        [Display(Name = "Aves iniciales")]
+        public int BroodBirdInitialNum { get; set; }
+
+        /*
+         * Income Concentrate information associated
+         * with the Daily Check.
+         */
+        public int IncomeConcentrateId { get; set; }
+
+        [Display(Name = "Fecha del ingreso")]
+        [DataType(DataType.Date)]
+        public DateTime IncomeConcentrateDate { get; set; }
+
+        [Display(Name = "Ingreso en quintales")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal IncomeQuintals { get; set; }
+
+        [Display(Name = "Ingreso en kilos")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal IncomeKilos { get; set; }
+
+        /*
+         * This value is obtained from the associated
+         * Income Concentrate record. It is not stored in DailyCheck.
+         */
+        [Display(Name = "Concentrado acumulado")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal IncomeAccumulated { get; set; }
+
+        /*
+         * User-entered values.
+         */
+        [Display(Name = "Mortalidad natural")]
+        public int NaturalMortality { get; set; }
+
+        [Display(Name = "Selección")]
+        public int SelectQuantity { get; set; }
+
+        [Display(Name = "Consumo en quintales")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal ConsumptionQuintals { get; set; }
+
+        /*
+         * Calculated values stored in DailyCheck.
+         */
+        [Display(Name = "Consumo en kilos")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal ConsumptionKilos { get; set; }
+
+        [Display(Name = "Mortalidad diaria total")]
+        public int TotalDailyMortality { get; set; }
+
+        [Display(Name = "Mortalidad acumulada")]
+        public int AccumulatedMortality { get; set; }
+
+        [Display(Name = "Saldo de aves")]
+        public int DailyBirdBalance { get; set; }
+
+        [Display(Name = "Consumo acumulado")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal AccumulatedConsumption { get; set; }
+
+        [Display(Name = "Saldo de concentrado")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal ConcentrateBalance { get; set; }
+
+        /*
+         * Additional Daily Check information.
+         */
+        [Display(Name = "Descripción")]
+        public string? DailyCheckDescription { get; set; }
+
+        [Display(Name = "Estado")]
+        public bool DailyCheckState { get; set; }
     }
 }

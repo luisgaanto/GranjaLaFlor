@@ -1,0 +1,728 @@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.DailyCheckFormViewModel
+
+@{
+    ViewData["Title"] = "Registrar Control Diario";
+}
+
+<div class="container mt-4">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Registrar Control Diario</h1>
+        </div>
+
+        <div class="card-body">
+            <!-- <partial name="_EventMessage" /> -->
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger">
+                </div>
+
+                <div id="dynamicMessage"
+                     class="alert alert-danger d-none"
+                     role="alert">
+                </div>
+
+                @*
+                * General Daily Check information.
+                *@
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="DailyCheckDate"
+                               class="form-label">
+                        </label>
+
+                        <input asp-for="DailyCheckDate"
+                               class="form-control"
+                               type="date" />
+
+                        <span asp-validation-for="DailyCheckDate"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="BroilerHouseId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroilerHouseId"
+                                asp-items="Model.BroilerHouseOptions"
+                                class="form-select"
+                                id="BroilerHouseId">
+                            <option value="">Seleccione una pollera</option>
+                        </select>
+
+                        <span asp-validation-for="BroilerHouseId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="BroodId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroodId"
+                                asp-items="Model.BroodOptions"
+                                class="form-select"
+                                id="BroodId"
+                                disabled="@(Model.BroilerHouseId <= 0)">
+                            <option value="">Seleccione una camada</option>
+                        </select>
+
+                        <span asp-validation-for="BroodId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DailyCheckWeek"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="DailyCheckWeek"
+                                asp-items="Model.DailyCheckWeekOptions"
+                                class="form-select">
+                            <option value="">Seleccione una semana</option>
+                        </select>
+
+                        <span asp-validation-for="DailyCheckWeek"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DailyCheckDay"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="DailyCheckDay"
+                                asp-items="Model.DailyCheckDayOptions"
+                                class="form-select">
+                            <option value="">Seleccione un día</option>
+                        </select>
+
+                        <span asp-validation-for="DailyCheckDay"
+                              class="text-danger">
+                        </span>
+                    </div>
+                </div>
+
+                @*
+                * Information obtained from the selected Brood.
+                *@
+                <div class="card border-secondary mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            Información de la camada
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="BroodBirdInitialNum"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="BroodBirdInitialNum"
+                                       class="form-control"
+                                       id="BroodBirdInitialNum"
+                                       readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*
+                * Mortality information and calculated values.
+                *@
+                <div class="card border-secondary mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Mortalidad</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="NaturalMortality"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="NaturalMortality"
+                                       class="form-control"
+                                       id="NaturalMortality"
+                                       type="number"
+                                       min="0" />
+
+                                <span asp-validation-for="NaturalMortality"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="SelectQuantity"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="SelectQuantity"
+                                       class="form-control"
+                                       id="SelectQuantity"
+                                       type="number"
+                                       min="0" />
+
+                                <span asp-validation-for="SelectQuantity"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="TotalDailyMortality"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="TotalDailyMortality"
+                                       class="form-control"
+                                       id="TotalDailyMortality"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="AccumulatedMortality"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="AccumulatedMortality"
+                                       class="form-control"
+                                       id="AccumulatedMortality"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DailyBirdBalance"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="DailyBirdBalance"
+                                       class="form-control"
+                                       id="DailyBirdBalance"
+                                       readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*
+                * Concentrate and consumption information.
+                *@
+                <div class="card border-secondary mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            Información de consumo y concentrado
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <input asp-for="IncomeConcentrateId"
+                               id="IncomeConcentrateId"
+                               type="hidden" />
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="IncomeAccumulated"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="IncomeAccumulated"
+                                       class="form-control"
+                                       id="IncomeAccumulated"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="ConsumptionQuintals"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ConsumptionQuintals"
+                                       class="form-control"
+                                       id="ConsumptionQuintals"
+                                       type="number"
+                                       min="0"
+                                       step="0.01" />
+
+                                <span asp-validation-for="ConsumptionQuintals"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="ConsumptionKilos"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ConsumptionKilos"
+                                       class="form-control"
+                                       id="ConsumptionKilos"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="AccumulatedConsumption"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="AccumulatedConsumption"
+                                       class="form-control"
+                                       id="AccumulatedConsumption"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConcentrateBalance"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="ConcentrateBalance"
+                                       class="form-control"
+                                       id="ConcentrateBalance"
+                                       readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*
+                * Optional Daily Check description.
+                *@
+                <div class="mb-4">
+                    <label asp-for="DailyCheckDescription"
+                           class="form-label">
+                    </label>
+
+                    <textarea asp-for="DailyCheckDescription"
+                              class="form-control"
+                              rows="4"
+                              maxlength="200">
+                    </textarea>
+
+                    <span asp-validation-for="DailyCheckDescription"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Crear
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const kilosPerQuintal = 46;
+
+            const broilerHouseSelect =
+                document.getElementById("BroilerHouseId");
+
+            const broodSelect =
+                document.getElementById("BroodId");
+
+            const naturalMortalityInput =
+                document.getElementById("NaturalMortality");
+
+            const selectQuantityInput =
+                document.getElementById("SelectQuantity");
+
+            const consumptionQuintalsInput =
+                document.getElementById("ConsumptionQuintals");
+
+            const broodBirdInitialNumInput =
+                document.getElementById("BroodBirdInitialNum");
+
+            const incomeConcentrateIdInput =
+                document.getElementById("IncomeConcentrateId");
+
+            const incomeAccumulatedInput =
+                document.getElementById("IncomeAccumulated");
+
+            const totalDailyMortalityInput =
+                document.getElementById("TotalDailyMortality");
+
+            const accumulatedMortalityInput =
+                document.getElementById("AccumulatedMortality");
+
+            const dailyBirdBalanceInput =
+                document.getElementById("DailyBirdBalance");
+
+            const consumptionKilosInput =
+                document.getElementById("ConsumptionKilos");
+
+            const accumulatedConsumptionInput =
+                document.getElementById("AccumulatedConsumption");
+
+            const concentrateBalanceInput =
+                document.getElementById("ConcentrateBalance");
+
+            const dynamicMessage =
+                document.getElementById("dynamicMessage");
+
+            /*
+             * Stores the accumulated values already registered for the
+             * selected Brood. These values are used as the base for the
+             * calculations displayed while completing the form.
+             */
+            let previousAccumulatedMortality = 0;
+            let previousAccumulatedConsumption = 0;
+            let availableIncomeAccumulated = 0;
+            let initialBirdQuantity = 0;
+
+            /*
+             * Converts the value of a form field into a valid number.
+             * Empty or invalid values are interpreted as zero.
+             */
+            function getNumericValue(input) {
+                const normalizedValue =
+                    input.value.toString().replace(",", ".");
+
+                const value = Number.parseFloat(normalizedValue);
+
+                return Number.isFinite(value)
+                    ? value
+                    : 0;
+            }
+
+            /*
+             * Displays decimal values using two decimal places.
+             */
+            function formatDecimal(value) {
+                return Number(value).toFixed(2);
+            }
+
+            /*
+             * Displays an error message generated while loading
+             * Brood or Broiler House information.
+             */
+            function showDynamicMessage(message) {
+                dynamicMessage.textContent = message;
+                dynamicMessage.classList.remove("d-none");
+            }
+
+            /*
+             * Removes the current dynamic error message.
+             */
+            function clearDynamicMessage() {
+                dynamicMessage.textContent = "";
+                dynamicMessage.classList.add("d-none");
+            }
+
+            /*
+             * Clears all information and calculated values associated
+             * with the previously selected Brood.
+             */
+            function resetBroodInformation() {
+                previousAccumulatedMortality = 0;
+                previousAccumulatedConsumption = 0;
+                availableIncomeAccumulated = 0;
+                initialBirdQuantity = 0;
+
+                broodBirdInitialNumInput.value = 0;
+                incomeConcentrateIdInput.value = 0;
+                incomeAccumulatedInput.value = formatDecimal(0);
+
+                totalDailyMortalityInput.value = 0;
+                accumulatedMortalityInput.value = 0;
+                dailyBirdBalanceInput.value = 0;
+
+                consumptionKilosInput.value = formatDecimal(0);
+                accumulatedConsumptionInput.value =
+                    formatDecimal(0);
+                concentrateBalanceInput.value =
+                    formatDecimal(0);
+            }
+
+            /*
+             * Recalculates the mortality values displayed in the form.
+             * The Service recalculates these values again before saving.
+             */
+            function calculateMortality() {
+                const naturalMortality =
+                    getNumericValue(naturalMortalityInput);
+
+                const selectQuantity =
+                    getNumericValue(selectQuantityInput);
+
+                const totalDailyMortality =
+                    naturalMortality + selectQuantity;
+
+                const accumulatedMortality =
+                    previousAccumulatedMortality +
+                    totalDailyMortality;
+
+                const dailyBirdBalance =
+                    initialBirdQuantity -
+                    accumulatedMortality;
+
+                totalDailyMortalityInput.value =
+                    Math.trunc(totalDailyMortality);
+
+                accumulatedMortalityInput.value =
+                    Math.trunc(accumulatedMortality);
+
+                dailyBirdBalanceInput.value =
+                    Math.trunc(dailyBirdBalance);
+            }
+
+            /*
+             * Recalculates the consumption and concentrate values
+             * displayed in the form.
+             *
+             * One quintal is equivalent to 46 kilograms according
+             * to the project business rule.
+             */
+            function calculateConsumption() {
+                const consumptionQuintals =
+                    getNumericValue(consumptionQuintalsInput);
+
+                const consumptionKilos =
+                    consumptionQuintals * kilosPerQuintal;
+
+                const accumulatedConsumption =
+                    previousAccumulatedConsumption +
+                    consumptionKilos;
+
+                const concentrateBalance =
+                    availableIncomeAccumulated -
+                    accumulatedConsumption;
+
+                consumptionKilosInput.value =
+                    formatDecimal(consumptionKilos);
+
+                accumulatedConsumptionInput.value =
+                    formatDecimal(accumulatedConsumption);
+
+                concentrateBalanceInput.value =
+                    formatDecimal(concentrateBalance);
+            }
+
+            /*
+             * Loads the active Broods associated with the selected
+             * Broiler House.
+             */
+            async function loadBroodsByBroilerHouse(
+                broilerHouseId,
+                selectedBroodId = "") {
+
+                broodSelect.innerHTML =
+                    '<option value="">Seleccione una camada</option>';
+
+                broodSelect.disabled = true;
+
+                resetBroodInformation();
+                clearDynamicMessage();
+
+                if (!broilerHouseId) {
+                    return;
+                }
+
+                try {
+                    const url =
+                        '@Url.Action(
+            "GetBroodsByBroilerHouse",
+                "DailyChecks")' +
+                    '?broilerHouseId=' +
+                        encodeURIComponent(broilerHouseId);
+
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+
+                        throw new Error(
+                            errorData.message ||
+                            "No se pudieron cargar las camadas.");
+                    }
+
+                    const broodOptions = await response.json();
+
+                    broodOptions.forEach(function (option) {
+                        const broodOption =
+                            document.createElement("option");
+
+                        broodOption.value = option.value;
+                        broodOption.textContent = option.text;
+
+                        if (option.value.toString() ===
+                            selectedBroodId.toString()) {
+
+                            broodOption.selected = true;
+                        }
+
+                        broodSelect.appendChild(broodOption);
+                    });
+
+                    broodSelect.disabled =
+                        broodOptions.length === 0;
+
+                    if (broodOptions.length === 0) {
+                        showDynamicMessage(
+                            "La pollera seleccionada no tiene " +
+                            "camadas disponibles con ingresos de " +
+                            "concentrado activos.");
+                    }
+                }
+                catch (error) {
+                    showDynamicMessage(error.message);
+                }
+            }
+
+            /*
+             * Loads the current bird, mortality, consumption and
+             * concentrate information for the selected Brood.
+             */
+            async function loadBroodInformation() {
+                const broilerHouseId =
+                    broilerHouseSelect.value;
+
+                const broodId =
+                    broodSelect.value;
+
+                resetBroodInformation();
+                clearDynamicMessage();
+
+                if (!broilerHouseId || !broodId) {
+                    return;
+                }
+
+                try {
+                    const url =
+                        '@Url.Action(
+            "GetBroodInformation",
+                "DailyChecks")' +
+                    '?broilerHouseId=' +
+                        encodeURIComponent(broilerHouseId) +
+                        '&broodId=' +
+                        encodeURIComponent(broodId);
+
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+
+                        throw new Error(
+                            errorData.message ||
+                            "No se pudo cargar la información " +
+                            "de la camada.");
+                    }
+
+                    const broodInformation =
+                        await response.json();
+
+                    initialBirdQuantity =
+                        Number(
+                            broodInformation
+                                .broodBirdInitialNum) || 0;
+
+                    previousAccumulatedMortality =
+                        Number(
+                            broodInformation
+                                .accumulatedMortality) || 0;
+
+                    previousAccumulatedConsumption =
+                        Number(
+                            broodInformation
+                                .accumulatedConsumption) || 0;
+
+                    availableIncomeAccumulated =
+                        Number(
+                            broodInformation
+                                .incomeAccumulated) || 0;
+
+                    broodBirdInitialNumInput.value =
+                        initialBirdQuantity;
+
+                    incomeConcentrateIdInput.value =
+                        broodInformation.incomeConcentrateId;
+
+                    incomeAccumulatedInput.value =
+                        formatDecimal(
+                            availableIncomeAccumulated);
+
+                    calculateMortality();
+                    calculateConsumption();
+                }
+                catch (error) {
+                    resetBroodInformation();
+                    showDynamicMessage(error.message);
+                }
+            }
+
+            broilerHouseSelect.addEventListener(
+                "change",
+                async function () {
+                    await loadBroodsByBroilerHouse(
+                        broilerHouseSelect.value);
+                });
+
+            broodSelect.addEventListener(
+                "change",
+                loadBroodInformation);
+
+            naturalMortalityInput.addEventListener(
+                "input",
+                calculateMortality);
+
+            selectQuantityInput.addEventListener(
+                "input",
+                calculateMortality);
+
+            consumptionQuintalsInput.addEventListener(
+                "input",
+                calculateConsumption);
+
+            /*
+             * Restores the selected Broiler House and Brood when
+             * the form is returned after a validation error.
+             */
+            const initialBroilerHouseId =
+                '@Model.BroilerHouseId';
+
+            const initialBroodId =
+                '@Model.BroodId';
+
+            if (initialBroilerHouseId &&
+                initialBroilerHouseId !== "0") {
+
+                loadBroodsByBroilerHouse(
+                    initialBroilerHouseId,
+                    initialBroodId)
+                    .then(function () {
+                        if (initialBroodId &&
+                            initialBroodId !== "0") {
+
+                            loadBroodInformation();
+                        }
+                    });
+            }
+            else {
+                resetBroodInformation();
+            }
+        });
+    </script>
+}

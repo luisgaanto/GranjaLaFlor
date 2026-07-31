@@ -1,6 +1,7 @@
 ﻿using DB_GranjaLaFlor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProjectGranjaLaFlor.Models.ViewModels;
 
 namespace DB_GranjaLaFlor.Controllers
 {
@@ -31,7 +32,7 @@ namespace DB_GranjaLaFlor.Controllers
          */
         [HttpGet]
         public async Task<IActionResult> Index(
-            string? broodName,
+            int? broodId,
             int? year,
             int? broilerHouseId,
             string? dailyCheckWeek,
@@ -39,12 +40,12 @@ namespace DB_GranjaLaFlor.Controllers
         {
             _logger.LogInformation(
                 "Entering DailyChecksController.Index(). " +
-                "BroodName: {BroodName}, " +
+                "BroodId: {BroodId}, " +
                 "Year: {Year}, " +
                 "BroilerHouseId: {BroilerHouseId}, " +
                 "DailyCheckWeek: {DailyCheckWeek}, " +
                 "DailyCheckDay: {DailyCheckDay}",
-                broodName,
+                broodId,
                 year,
                 broilerHouseId,
                 dailyCheckWeek,
@@ -55,13 +56,222 @@ namespace DB_GranjaLaFlor.Controllers
              * and dropdown menu options to the Service layer.
              */
             var model = await _dailyCheckService.GetFilterViewModelAsync(
-                broodName,
+                broodId,
                 year,
                 broilerHouseId,
                 dailyCheckWeek,
                 dailyCheckDay);
 
             return View(model);
+        }
+
+        /*
+         * GET: DailyChecks/Create
+         * Displays the Create view and loads the information
+         * required to register a new Daily Check.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.Create() GET.");
+
+            var model =
+                await _dailyCheckService.GetCreateViewModelAsync();
+
+            return View(model);
+        }
+
+        /*
+         * UI Request | Broods by Broiler House
+         * Retrieves the active Broods associated with the selected
+         * Broiler House and returns them to the Create or Edit view.
+         */
+        [HttpGet]
+        public async Task<IActionResult> GetBroodsByBroilerHouse(
+            int broilerHouseId)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.GetBroodsByBroilerHouse(). " +
+                "BroilerHouseId: {BroilerHouseId}",
+                broilerHouseId);
+
+            if (broilerHouseId <= 0)
+            {
+                _logger.LogWarning(
+                    "Invalid BroilerHouseId received while retrieving Broods. " +
+                    "BroilerHouseId: {BroilerHouseId}",
+                    broilerHouseId);
+
+                return BadRequest(new
+                {
+                    message =
+                        "Debe seleccionar una pollera válida."
+                });
+            }
+
+            var broodOptions =
+                await _dailyCheckService
+                    .GetBroodsByBroilerHouseAsync(
+                        broilerHouseId);
+
+            return Json(broodOptions.Select(option => new
+            {
+                value = option.Value,
+                text = option.Text
+            }));
+        }
+
+        /*
+         * UI Request | Selected Brood Information
+         * Retrieves the Brood, mortality and concentrate information
+         * displayed after selecting a Broiler House and a Brood.
+         */
+        [HttpGet]
+        public async Task<IActionResult> GetBroodInformation(
+            int broilerHouseId,
+            int broodId)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.GetBroodInformation(). " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}",
+                broilerHouseId,
+                broodId);
+
+            if (broilerHouseId <= 0 || broodId <= 0)
+            {
+                _logger.LogWarning(
+                    "Invalid identifiers received while retrieving " +
+                    "Daily Check Brood information. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}",
+                    broilerHouseId,
+                    broodId);
+
+                return BadRequest(new
+                {
+                    message =
+                        "Debe seleccionar una pollera y una camada válidas."
+                });
+            }
+
+            var broodInformation =
+                await _dailyCheckService.GetBroodInformationAsync(
+                    broilerHouseId,
+                    broodId);
+
+            if (broodInformation == null)
+            {
+                _logger.LogWarning(
+                    "Daily Check Brood information was not found. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}",
+                    broilerHouseId,
+                    broodId);
+
+                return NotFound(new
+                {
+                    message =
+                        "La camada seleccionada no está disponible " +
+                        "para la pollera indicada."
+                });
+            }
+
+            return Json(new
+            {
+                broodInformation.BroilerHouseId,
+                broodInformation.BroodId,
+                broodInformation.BroodBirdInitialNum,
+                broodInformation.IncomeConcentrateId,
+                broodInformation.IncomeAccumulated,
+                broodInformation.AccumulatedMortality,
+                broodInformation.DailyBirdBalance,
+                broodInformation.AccumulatedConsumption,
+                broodInformation.ConcentrateBalance
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            DailyCheckFormViewModel model)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.Create() POST. " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}, " +
+                "DailyCheckWeek: {DailyCheckWeek}, " +
+                "DailyCheckDay: {DailyCheckDay}",
+                model.BroilerHouseId,
+                model.BroodId,
+                model.DailyCheckWeek,
+                model.DailyCheckDay);
+
+            if (!ModelState.IsValid)
+            {
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+
+            try
+            {
+                await _dailyCheckService.CreateAsync(model);
+
+                TempData["SuccessMessage"] =
+                    "El control diario fue registrado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while creating " +
+                    "Daily Check. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "DailyCheckWeek: {DailyCheckWeek}, " +
+                    "DailyCheckDay: {DailyCheckDay}",
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.DailyCheckWeek,
+                    model.DailyCheckDay);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while creating Daily Check. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "DailyCheckWeek: {DailyCheckWeek}, " +
+                    "DailyCheckDay: {DailyCheckDay}",
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.DailyCheckWeek,
+                    model.DailyCheckDay);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo registrar el control diario. " +
+                    "Intente nuevamente.";
+
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
         }
     }
 }

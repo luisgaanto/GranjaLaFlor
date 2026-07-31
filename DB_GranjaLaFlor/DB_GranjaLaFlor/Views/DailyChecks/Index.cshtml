@@ -5,8 +5,7 @@
 }
 
 <div class="container-fluid mt-4 px-3">
-    <partial name="_EventMessage" />
-
+    <!-- <partial name="_EventMessage" /> -->
     <div class="card border-primary">
         <div class="card-header bg-primary text-white text-center">
             <h1 class="mb-0">
@@ -32,30 +31,9 @@
                   class="row g-3 mb-4">
 
                 <div class="col-xl-2 col-lg-3 col-md-6">
-                    <label asp-for="BroodName"
-                           class="form-label"></label>
-
-                    <select asp-for="BroodName"
-                            asp-items="Model.BroodOptions"
-                            class="form-select">
-                        <option value="">Todas</option>
-                    </select>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <label asp-for="Year"
-                           class="form-label"></label>
-
-                    <select asp-for="Year"
-                            asp-items="Model.YearOptions"
-                            class="form-select">
-                        <option value="">Todos</option>
-                    </select>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
                     <label asp-for="BroilerHouseId"
-                           class="form-label"></label>
+                           class="form-label">
+                    </label>
 
                     <select asp-for="BroilerHouseId"
                             asp-items="Model.BroilerHouseOptions"
@@ -65,8 +43,33 @@
                 </div>
 
                 <div class="col-xl-2 col-lg-3 col-md-6">
+                    <label asp-for="BroodId"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="BroodId"
+                            asp-items="Model.BroodOptions"
+                            class="form-select">
+                        <option value="">Seleccione una camada</option>
+                    </select>
+                </div>
+
+                <div class="col-xl-2 col-lg-3 col-md-6">
+                    <label asp-for="Year"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="Year"
+                            asp-items="Model.YearOptions"
+                            class="form-select">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+
+                <div class="col-xl-2 col-lg-3 col-md-6">
                     <label asp-for="DailyCheckWeek"
-                           class="form-label"></label>
+                           class="form-label">
+                    </label>
 
                     <select asp-for="DailyCheckWeek"
                             asp-items="Model.DailyCheckWeekOptions"
@@ -77,7 +80,8 @@
 
                 <div class="col-xl-2 col-lg-3 col-md-6">
                     <label asp-for="DailyCheckDay"
-                           class="form-label"></label>
+                           class="form-label">
+                    </label>
 
                     <select asp-for="DailyCheckDay"
                             asp-items="Model.DailyCheckDayOptions"

@@ -31,7 +31,46 @@ namespace DB_GranjaLaFlor.Services
             _context = context;
         }
 
+        
+        private static string NormalizeText(string value)
+        {
+            return Regex.Replace(
+                value.Trim(),
+                @"\s+",
+                " ");
+        }
 
+        /*
+             * Business Calculation | Recalculate Brood Accumulated
+             * Recalculates the accumulated concentrate (kilograms) for all active
+             * income records belonging to the specified Brood.
+             *
+             * Records are processed in chronological order to preserve the business
+             * rule that each accumulated value represents the running total at the
+             * time the income was registered.
+         */
+        private async Task RecalculateAccumulatedAsync(int broodId)
+        {
+            // Object list: lists valid incomeconcentrate in incomes var. 
+            var incomes = await _context.IncomeConcentrates
+                .Where(income =>
+                    income.BroodId == broodId &&
+                    income.IncomeState)
+                .OrderBy(income => income.IncomeConcentrateDate)
+                .ThenBy(income => income.IncomeConcentrateId)
+                .ToListAsync();
+
+            decimal accumulated = 0; // Initiates var at 0, used then in the loop to calculate real accumulated. 
+
+            foreach (var income in incomes)
+            {
+                //Sums incomekilos to the running accumulated total using accumulated = accumulated + income.IncomeKilos.
+                accumulated += income.IncomeKilos;
+                income.IncomeAccumulated = accumulated;
+            }
+
+            await _context.SaveChangesAsync();
+        }
 
         /*
         public async Task<List<IncomeConcentrateListViewModel>> GetAllActiveAsync()
@@ -842,44 +881,5 @@ namespace DB_GranjaLaFlor.Services
         }
         */
 
-        private static string NormalizeText(string value)
-        {
-            return Regex.Replace(
-                value.Trim(),
-                @"\s+",
-                " ");
-        }
-
-        /*
- * Business Calculation | Recalculate Brood Accumulated
- * Recalculates the accumulated concentrate (kilograms) for all active
- * income records belonging to the specified Brood.
- *
- * Records are processed in chronological order to preserve the business
- * rule that each accumulated value represents the running total at the
- * time the income was registered.
- */
-        private async Task RecalculateAccumulatedAsync(int broodId)
-        {
-            // Object list: lists valid incomeconcentrate in incomes var. 
-            var incomes = await _context.IncomeConcentrates
-                .Where(income =>
-                    income.BroodId == broodId &&
-                    income.IncomeState)
-                .OrderBy(income => income.IncomeConcentrateDate)
-                .ThenBy(income => income.IncomeConcentrateId)
-                .ToListAsync();
-
-            decimal accumulated = 0; // Initiates var at 0, used then in the loop to calculate real accumulated. 
-
-            foreach (var income in incomes)
-            {
-                //Sums incomekilos to the running accumulated total using accumulated = accumulated + income.IncomeKilos.
-                accumulated += income.IncomeKilos;
-                income.IncomeAccumulated = accumulated;
-            }
-
-            await _context.SaveChangesAsync();
-        }
     }
 }

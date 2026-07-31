@@ -19,16 +19,37 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
         [Display(Name = "ID")]
         public int DailyCheckId { get; set; }
 
+        /*
+         * User-entered and selected values.
+         */
         [Required(ErrorMessage = "La fecha es obligatoria.")]
         [DataType(DataType.Date)]
         [Display(Name = "Fecha")]
         public DateTime DailyCheckDate { get; set; } = DateTime.Today;
 
-        [Required(ErrorMessage = "Debe seleccionar una semana de control.")]
-        [StringLength(
-            20,
+        [Required(ErrorMessage = "Debe seleccionar una pollera.")]
+        [Range(
+            1,
+            int.MaxValue,
             ErrorMessage =
-                "La semana de control no puede superar los 20 caracteres.")]
+                "Debe seleccionar una pollera válida.")]
+        [Display(Name = "Pollera")]
+        public int BroilerHouseId { get; set; }
+
+        [Required(ErrorMessage = "Debe seleccionar una camada.")]
+        [Range(
+            1,
+            int.MaxValue,
+            ErrorMessage =
+                "Debe seleccionar una camada válida.")]
+        [Display(Name = "Camada")]
+        public int BroodId { get; set; }
+
+        [Required(ErrorMessage = "Debe seleccionar un día de control.")]
+        [Display(Name = "Día")]
+        public string DailyCheckDay { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debe seleccionar una semana de control.")]
         [Display(Name = "Semana")]
         public string DailyCheckWeek { get; set; } = string.Empty;
 
@@ -67,23 +88,6 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
         [Display(Name = "Descripción")]
         public string? DailyCheckDescription { get; set; }
 
-        [Required(ErrorMessage = "Debe seleccionar una camada.")]
-        [Range(
-            1,
-            int.MaxValue,
-            ErrorMessage =
-                "Debe seleccionar una camada válida.")]
-        [Display(Name = "Camada")]
-        public int BroodId { get; set; }
-
-        [Required(ErrorMessage = "Debe seleccionar un día de control.")]
-        [StringLength(
-            10,
-            ErrorMessage =
-                "El día de control no puede superar los 10 caracteres.")]
-        [Display(Name = "Día")]
-        public string DailyCheckDay { get; set; } = string.Empty;
-
         /*
          * Internal identifier of the Income Concentrate record
          * used by the Daily Check.
@@ -94,23 +98,16 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
         public int IncomeConcentrateId { get; set; }
 
         /*
-         * Read-only information displayed after selecting a Brood.
-         * These properties are not persisted directly from the form.
+         * Information obtained from the selected Brood and its
+         * latest active Income Concentrate record.
+         *
+         * These properties are displayed as read-only values and
+         * are not trusted when saving the Daily Check.
          */
-        [Display(Name = "Pollera")]
-        public string BroilerHouseName { get; set; } = string.Empty;
-
         [Display(Name = "Cantidad inicial de aves")]
         public int BroodBirdInitialNum { get; set; }
 
-        /*
-         * Represents the accumulated concentrate obtained from the
-         * latest active Income Concentrate of the selected Brood.
-         *
-         * This value is displayed as a reference and used to calculate
-         * the concentrate balance, but it is not stored in DailyCheck.
-         */
-        [Display(Name = "Concentrado acumulado")]
+        [Display(Name = "Concentrado acumulado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal IncomeAccumulated { get; set; }
 
@@ -131,24 +128,27 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal ConsumptionKilos { get; set; }
 
-        [Display(Name = "Consumo acumulado")]
+        [Display(Name = "Consumo acumulado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal AccumulatedConsumption { get; set; }
 
-        [Display(Name = "Saldo de concentrado")]
+        [Display(Name = "Saldo de concentrado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal ConcentrateBalance { get; set; }
 
         /*
          * Dropdown options loaded by the Service layer.
          */
+        public IEnumerable<SelectListItem> BroilerHouseOptions { get; set; }
+            = new List<SelectListItem>();
+
         public IEnumerable<SelectListItem> BroodOptions { get; set; }
             = new List<SelectListItem>();
 
-        public IEnumerable<SelectListItem> DailyCheckWeekOptions { get; set; }
+        public IEnumerable<SelectListItem> DailyCheckDayOptions { get; set; }
             = new List<SelectListItem>();
 
-        public IEnumerable<SelectListItem> DailyCheckDayOptions { get; set; }
+        public IEnumerable<SelectListItem> DailyCheckWeekOptions { get; set; }
             = new List<SelectListItem>();
     }
 }

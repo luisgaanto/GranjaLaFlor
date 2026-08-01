@@ -273,5 +273,72 @@ namespace DB_GranjaLaFlor.Controllers
                 return View(model);
             }
         }
+
+        /*
+ * GET: DailyChecks/Details/5
+ * Retrieves and displays the complete information
+ * of the selected Daily Check.
+ */
+        [HttpGet]
+        public async Task<IActionResult> Details(
+            int? id)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.Details(). " +
+                "DailyCheckId: {DailyCheckId}",
+                id);
+
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Daily Check Details request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido para consultar el control diario.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var dailyCheck =
+                    await _dailyCheckService.GetByIdAsync(
+                        id.Value);
+
+                if (dailyCheck == null)
+                {
+                    _logger.LogWarning(
+                        "Daily Check was not found while loading Details. " +
+                        "DailyCheckId: {DailyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control diario seleccionado no existe.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(dailyCheck);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Daily Check Details. " +
+                    "DailyCheckId: {DailyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo consultar el detalle del control diario. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+
+
+
     }
 }

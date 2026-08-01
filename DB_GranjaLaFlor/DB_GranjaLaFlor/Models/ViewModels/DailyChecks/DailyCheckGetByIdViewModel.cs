@@ -35,47 +35,19 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
          * Related Broiler House and Brood information.
          */
         [Display(Name = "Pollera")]
-        public int BroilerHouseId { get; set; }
-
-        [Display(Name = "Pollera")]
         public string BroilerHouseName { get; set; } = string.Empty;
 
         [Display(Name = "Camada")]
-        public int BroodId { get; set; }
-
-        [Display(Name = "Camada")]
         public string BroodName { get; set; } = string.Empty;
-
-        [Display(Name = "Fecha de la camada")]
-        [DataType(DataType.Date)]
-        public DateTime BroodDate { get; set; }
 
         [Display(Name = "Aves iniciales")]
         public int BroodBirdInitialNum { get; set; }
 
         /*
-         * Income Concentrate information associated
-         * with the Daily Check.
-         */
-        public int IncomeConcentrateId { get; set; }
-
-        [Display(Name = "Fecha del ingreso")]
-        [DataType(DataType.Date)]
-        public DateTime IncomeConcentrateDate { get; set; }
-
-        [Display(Name = "Ingreso en quintales")]
-        [DisplayFormat(DataFormatString = "{0:N2}")]
-        public decimal IncomeQuintals { get; set; }
-
-        [Display(Name = "Ingreso en kilos")]
-        [DisplayFormat(DataFormatString = "{0:N2}")]
-        public decimal IncomeKilos { get; set; }
-
-        /*
          * This value is obtained from the associated
          * Income Concentrate record. It is not stored in DailyCheck.
          */
-        [Display(Name = "Concentrado acumulado")]
+        [Display(Name = "Concentrado acumulado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal IncomeAccumulated { get; set; }
 
@@ -108,11 +80,11 @@ namespace ProjectGranjaLaFlor.Models.ViewModels
         [Display(Name = "Saldo de aves")]
         public int DailyBirdBalance { get; set; }
 
-        [Display(Name = "Consumo acumulado")]
+        [Display(Name = "Consumo acumulado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal AccumulatedConsumption { get; set; }
 
-        [Display(Name = "Saldo de concentrado")]
+        [Display(Name = "Saldo de concentrado (kg)")]
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal ConcentrateBalance { get; set; }
 

@@ -5,7 +5,6 @@
 }
 
 <div class="container-fluid mt-4 px-3">
-    <!-- <partial name="_EventMessage" /> -->
     <div class="card border-primary">
         <div class="card-header bg-primary text-white text-center">
             <h1 class="mb-0">
@@ -37,7 +36,8 @@
 
                     <select asp-for="BroilerHouseId"
                             asp-items="Model.BroilerHouseOptions"
-                            class="form-select">
+                            class="form-select"
+                            id="BroilerHouseId">
                         <option value="">Todas</option>
                     </select>
                 </div>
@@ -49,7 +49,8 @@
 
                     <select asp-for="BroodId"
                             asp-items="Model.BroodOptions"
-                            class="form-select">
+                            class="form-select"
+                            id="BroodId">
                         <option value="">Seleccione una camada</option>
                     </select>
                 </div>
@@ -145,24 +146,33 @@
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .IncomeAccumulated)
+                                <span class="d-block">
+                                    Concentrado
+                                </span>
+
+                                <span class="d-block">
+                                    Acumulado
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .BroodBirdInitialNum)
+                                <span class="d-block">
+                                    Aves
+                                </span>
+
+                                <span class="d-block">
+                                    Iniciales
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .NaturalMortality)
+                                <span class="d-block">
+                                    Mortalidad
+                                </span>
+
+                                <span class="d-block">
+                                    Natural
+                                </span>
                             </th>
 
                             <th>
@@ -173,52 +183,77 @@
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .ConsumptionQuintals)
+                                <span class="d-block">
+                                    Consumo
+                                </span>
+
+                                <span class="d-block">
+                                    Quintales
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .ConsumptionKilos)
+                                <span class="d-block">
+                                    Consumo
+                                </span>
+
+                                <span class="d-block">
+                                    Kilos
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .TotalDailyMortality)
+                                <span class="d-block">
+                                    Mortalidad
+                                </span>
+
+                                <span class="d-block">
+                                    Diaria
+                                </span>
+
+                                <span class="d-block">
+                                    Total
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .AccumulatedMortality)
+                                <span class="d-block">
+                                    Mortalidad
+                                </span>
+
+                                <span class="d-block">
+                                    Acumulada
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .DailyBirdBalance)
+                                <span class="d-block">
+                                    Saldo
+                                </span>
+
+                                <span class="d-block">
+                                    Aves
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .AccumulatedConsumption)
+                                <span class="d-block">
+                                    Consumo
+                                </span>
+
+                                <span class="d-block">
+                                    Acumulado
+                                </span>
                             </th>
 
                             <th>
-                                @Html.DisplayNameFor(
-                                         model =>
-                                         model.DailyChecks.First()
-                                         .ConcentrateBalance)
+                                <span class="d-block">
+                                    Saldo
+                                </span>
+
+                                <span class="d-block">
+                                    Concentrado
+                                </span>
                             </th>
 
                             <th>
@@ -361,3 +396,93 @@
         </div>
     </div>
 </div>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const broilerHouseSelect =
+                document.getElementById("BroilerHouseId");
+
+            const broodSelect =
+                document.getElementById("BroodId");
+
+            /*
+             * UI Support | Broods by Broiler House
+             * Clears the previous Brood selection and loads only
+             * the Broods associated with the selected Broiler House.
+             *
+             * This prevents a Brood from a previous Broiler House
+             * from being submitted with the current filters.
+             */
+            async function loadBroodsByBroilerHouse() {
+                const broilerHouseId =
+                    broilerHouseSelect.value;
+
+                /*
+                 * Removes the Brood previously associated with
+                 * another Broiler House before the filter is submitted.
+                 */
+                broodSelect.innerHTML =
+                    '<option value="">Seleccione una camada</option>';
+
+                broodSelect.disabled = true;
+
+                if (!broilerHouseId) {
+                    broodSelect.disabled = false;
+
+                    return;
+                }
+
+                try {
+                    const url =
+                        '@Url.Action(
+            "GetBroodsByBroilerHouse",
+                "DailyChecks")' +
+                    '?broilerHouseId=' +
+                        encodeURIComponent(broilerHouseId);
+
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "No se pudieron cargar las camadas.");
+                    }
+
+                    const broodOptions =
+                        await response.json();
+
+                    broodOptions.forEach(function (option) {
+                        const broodOption =
+                            document.createElement("option");
+
+                        broodOption.value = option.value;
+                        broodOption.textContent = option.text;
+
+                        broodSelect.appendChild(broodOption);
+                    });
+                }
+                catch (error) {
+                    console.error(
+                        "Error loading Broods:",
+                        error);
+                }
+                finally {
+                    broodSelect.disabled = false;
+                }
+            }
+
+            /*
+             * Updates the Brood options only when the user changes
+             * the selected Broiler House.
+             *
+             * The function is not executed automatically when the page
+             * loads because the Service already restores the current
+             * filter options and selected Brood.
+             */
+            broilerHouseSelect.addEventListener(
+                "change",
+                loadBroodsByBroilerHouse);
+        });
+    </script>
+}

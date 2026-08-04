@@ -1,0 +1,123 @@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.ExpectedValue.ExpectedValueFormViewModel
+
+@{
+    ViewData["Title"] = "Editar Valor Esperado";
+}
+
+<div class="container mt-4 col-md-7">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">
+                Editar Valor Esperado
+            </h1>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                <input asp-for="ExpectedValueId"
+                       type="hidden" />
+
+                <input asp-for="ExpectedValueWeek"
+                       type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpectedValueWeek"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ExpectedValueWeek"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpectedConsumption"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ExpectedConsumption"
+                           class="form-control"
+                           type="number"
+                           min="0.001"
+                           step="0.001" />
+
+                    <span asp-validation-for="ExpectedConsumption"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpectedWeight"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ExpectedWeight"
+                           class="form-control"
+                           type="number"
+                           min="0.001"
+                           step="0.001" />
+
+                    <span asp-validation-for="ExpectedWeight"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpectedConversion"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ExpectedConversion"
+                           class="form-control"
+                           type="number"
+                           min="0.01"
+                           step="0.01" />
+
+                    <span asp-validation-for="ExpectedConversion"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ExpectedMortality"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ExpectedMortality"
+                           class="form-control"
+                           type="number"
+                           min="0"
+                           max="100"
+                           step="0.01" />
+
+                    <span asp-validation-for="ExpectedMortality"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit"
+                            class="btn btn-warning">
+                        Actualizar
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

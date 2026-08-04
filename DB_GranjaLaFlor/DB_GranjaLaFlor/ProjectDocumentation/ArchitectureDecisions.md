@@ -178,4 +178,173 @@ RolesController
       ▼
 Index()
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ecuaciones:
+
+| Módulo                 | Nombre del cálculo            | Columna donde se guarda                               | Tablas involucradas                   | Atributos utilizados                                      | Ecuación                                                                                 |
+| ---------------------- | ----------------------------- | ----------------------------------------------------- | ------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Income Concentrate** | Ingreso en kilos              | `income_kilos`                                        | `income_concentrates`                 | `income_quintals`                                         | `income_kilos = income_quintals × 46`                                                    |
+| **Income Concentrate** | Concentrado acumulado         | `income_accumulated`                                  | `income_concentrates`                 | `previous_income_accumulated`, `income_kilos`             | `income_accumulated = previous_income_accumulated + income_kilos`                        |
+| **Daily Check**        | Mortalidad diaria total       | `total_daily_mortality`                               | `daily_checks`                        | `natural_mortality`, `select_quantity`                    | `total_daily_mortality = natural_mortality + select_quantity`                            |
+| **Daily Check**        | Mortalidad acumulada          | `accumulated_mortality`                               | `daily_checks`                        | `previous_accumulated_mortality`, `total_daily_mortality` | `accumulated_mortality = previous_accumulated_mortality + total_daily_mortality`         |
+| **Daily Check**        | Saldo de aves                 | `daily_bird_balance`                                  | `broods`, `daily_checks`              | `brood_bird_initial_num`, `accumulated_mortality`         | `daily_bird_balance = brood_bird_initial_num − accumulated_mortality`                    |
+| **Daily Check**        | Consumo en kilos              | `consumption_kilos`                                   | `daily_checks`                        | `consumption_quintals`                                    | `consumption_kilos = consumption_quintals × 46`                                          |
+| **Daily Check**        | Consumo acumulado             | `accumulated_consumption`                             | `daily_checks`                        | `previous_accumulated_consumption`, `consumption_kilos`   | `accumulated_consumption = previous_accumulated_consumption + consumption_kilos`         |
+| **Daily Check**        | Saldo de concentrado          | `concentrate_balance`                                 | `income_concentrates`, `daily_checks` | `income_accumulated`, `accumulated_consumption`           | `concentrate_balance = income_accumulated − accumulated_consumption`                     |
+| **Weekly Check**       | Cantidad de aves a pesar (2%) | *(puede ser calculado, no necesariamente almacenado)* | `daily_checks`                        | `daily_bird_balance`                                      | `sample_bird_quantity = CEILING(daily_bird_balance × 0.02)`                              |
+| **Weekly Check**       | Peso promedio semanal         | `average_weekly_weight`                               | `weekly_checks`                       | `total_bird_weight`, `sample_bird_quantity`               | `average_weekly_weight = total_bird_weight ÷ sample_bird_quantity`                       |
+| **Weekly Check**       | Consumo real semanal          | `weekly_real_consumption`                             | `daily_checks`                        | `consumption_kilos` de los 7 controles diarios            | `weekly_real_consumption = Σ consumption_kilos`                                          |
+| **Weekly Check**       | Diferencia de consumo         | `weekly_consumption_difference`                       | `weekly_checks`, `expected_values`    | `weekly_real_consumption`, `expected_consumption`         | `weekly_consumption_difference = weekly_real_consumption − expected_consumption`         |
+| **Weekly Check**       | Diferencia de peso            | `weekly_weight_difference`                            | `weekly_checks`, `expected_values`    | `average_weekly_weight`, `expected_weight`                | `weekly_weight_difference = average_weekly_weight − expected_weight`                     |
+| **Weekly Check**       | Conversión real               | `weekly_real_conversion`                              | `weekly_checks`                       | **Pendiente de definir**                                  | **Pendiente de definir**                                                                 |
+| **Weekly Check**       | Diferencia de conversión      | `weekly_conversion_difference`                        | `weekly_checks`, `expected_values`    | `weekly_real_conversion`, `expected_conversion`           | `weekly_conversion_difference = weekly_real_conversion − expected_conversion`            |
+| **Weekly Check**       | Mortalidad real semanal       | `weekly_real_mortality`                               | `daily_checks`                        | `total_daily_mortality` de la semana                      | `weekly_real_mortality = Σ total_daily_mortality` *(o porcentaje, pendiente de definir)* |
+| **Weekly Check**       | Diferencia de mortalidad      | `weekly_mortality_difference`                         | `weekly_checks`, `expected_values`    | `weekly_real_mortality`, `expected_mortality`             | `weekly_real_mortality − expected_mortality`                                             |
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Income Concentrate:
+
+| Nombre del cálculo    | Columna donde se guarda | Tablas involucradas   | Atributos utilizados                          | Ecuación                                                          |
+| --------------------- | ----------------------- | --------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
+| Ingreso en kilos      | `income_kilos`          | `income_concentrates` | `income_quintals`                             | `income_kilos = income_quintals × 46`                             |
+| Concentrado acumulado | `income_accumulated`    | `income_concentrates` | `previous_income_accumulated`, `income_kilos` | `income_accumulated = previous_income_accumulated + income_kilos` |
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Daily Check
+
+| Nombre del cálculo      | Columna donde se guarda   | Tablas involucradas                   | Atributos utilizados                                      | Ecuación                                                                         |
+| ----------------------- | ------------------------- | ------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Mortalidad diaria total | `total_daily_mortality`   | `daily_checks`                        | `natural_mortality`, `select_quantity`                    | `total_daily_mortality = natural_mortality + select_quantity`                    |
+| Mortalidad acumulada    | `accumulated_mortality`   | `daily_checks`                        | `previous_accumulated_mortality`, `total_daily_mortality` | `accumulated_mortality = previous_accumulated_mortality + total_daily_mortality` |
+| Saldo de aves           | `daily_bird_balance`      | `broods`, `daily_checks`              | `brood_bird_initial_num`, `accumulated_mortality`         | `daily_bird_balance = brood_bird_initial_num − accumulated_mortality`            |
+| Consumo en kilos        | `consumption_kilos`       | `daily_checks`                        | `consumption_quintals`                                    | `consumption_kilos = consumption_quintals × 46`                                  |
+| Consumo acumulado       | `accumulated_consumption` | `daily_checks`                        | `previous_accumulated_consumption`, `consumption_kilos`   | `accumulated_consumption = previous_accumulated_consumption + consumption_kilos` |
+| Saldo de concentrado    | `concentrate_balance`     | `income_concentrates`, `daily_checks` | `income_accumulated`, `accumulated_consumption`           | `concentrate_balance = income_accumulated − accumulated_consumption`             |
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+| Nombre del cálculo                  | Columna donde se guarda         | Tablas involucradas                | Atributos utilizados                              | Ecuación                                                                                                |
+| ----------------------------------- | ------------------------------- | ---------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Cantidad de aves de la muestra (2%) | *(Calculado automáticamente)*   | `daily_checks`                     | `daily_bird_balance`                              | `sample_bird_quantity = CEILING(daily_bird_balance × 0.02)`                                             |
+| Peso promedio semanal               | `average_weekly_weight`         | `weekly_checks`                    | `total_bird_weight`, `sample_bird_quantity`       | `average_weekly_weight = total_bird_weight ÷ sample_bird_quantity`                                      |
+| Consumo real semanal                | `weekly_real_consumption`       | `daily_checks`                     | `consumption_kilos` de la semana                  | `weekly_real_consumption = Σ consumption_kilos`                                                         |
+| Diferencia de consumo               | `weekly_consumption_difference` | `weekly_checks`, `expected_values` | `weekly_real_consumption`, `expected_consumption` | `weekly_consumption_difference = weekly_real_consumption − expected_consumption`                        |
+| Diferencia de peso                  | `weekly_weight_difference`      | `weekly_checks`, `expected_values` | `average_weekly_weight`, `expected_weight`        | `weekly_weight_difference = average_weekly_weight − expected_weight`                                    |
+| Conversión real                     | `weekly_real_conversion`        | `weekly_checks`                    | **Pendiente de definir**                          | **Pendiente**                                                                                           |
+| Diferencia de conversión            | `weekly_conversion_difference`  | `weekly_checks`, `expected_values` | `weekly_real_conversion`, `expected_conversion`   | `weekly_conversion_difference = weekly_real_conversion − expected_conversion`                           |
+| Mortalidad real semanal             | `weekly_real_mortality`         | `daily_checks`                     | `total_daily_mortality` de la semana              | `weekly_real_mortality = Σ total_daily_mortality` *(pendiente confirmar si será cantidad o porcentaje)* |
+| Diferencia de mortalidad            | `weekly_mortality_difference`   | `weekly_checks`, `expected_values` | `weekly_real_mortality`, `expected_mortality`     | `weekly_mortality_difference = weekly_real_mortality − expected_mortality`                              |
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Peso promedio semanal (Detalle)
+
+| Concepto                           | Descripción                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Frecuencia**                     | Cada **7 días** se realiza un control de peso.                                                              |
+| **Población utilizada**            | Se toma la **población actual** (`daily_bird_balance`) proveniente del último **Daily Check** de la semana. |
+| **Cantidad de aves a pesar**       | Se pesa el **2% de la población actual**.                                                                   |
+| **Cantidad de aves de la muestra** | `sample_bird_quantity = CEILING(daily_bird_balance × 0.02)`                                                 |
+| **Peso total de la muestra**       | Es la suma de los pesos (kg) de todas las aves pesadas. Este valor lo registra el usuario.                  |
+| **Peso promedio semanal**          | `average_weekly_weight = total_bird_weight ÷ sample_bird_quantity`                                          |
+| **Unidad del resultado**           | Kilogramos por ave (kg/ave).                                                                                |
+
+Población actual: 10 000 aves
+
+Muestra:
+10 000 × 0.02 = 200 aves
+
+Peso total de las 200 aves:
+184 kg
+
+Peso promedio semanal:
+184 / 200 = 0.92 kg por ave
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Tabla expected_values
+
+| Columna                | Tipo            | Nulo | Llave               | Uso                                                              |
+| ---------------------- | --------------- | ---: | ------------------- | ---------------------------------------------------------------- |
+| `expected_value_id`    | `INT`           |   No | PK, autoincremental | Identificador interno del registro                               |
+| `expected_value_week`  | `VARCHAR(20)`   |   No | —                   | Semana fija: `Semana 1` a `Semana 6`                             |
+| `expected_consumption` | `DECIMAL(10,3)` |   No | —                   | Consumo esperado expresado en kilogramos con precisión de gramos |
+| `expected_weight`      | `DECIMAL(10,3)` |   No | —                   | Peso esperado expresado en kilogramos con precisión de gramos    |
+| `expected_conversion`  | `DECIMAL(10,2)` |   No | —                   | Conversión alimenticia esperada                                  |
+| `expected_mortality`   | `DECIMAL(10,2)` |   No | —                   | Mortalidad acumulada esperada expresada como porcentaje          |
+
+Datos iniciales
+
+| ID | Semana   | Consumo esperado | Peso esperado | Conversión esperada | Mortalidad esperada |
+| -: | -------- | ---------------: | ------------: | ------------------: | ------------------: |
+|  1 | Semana 1 |       `0.170 kg` |    `0.200 kg` |              `0.85` |            `1.00 %` |
+|  2 | Semana 2 |       `0.605 kg` |    `0.550 kg` |              `1.10` |            `1.60 %` |
+|  3 | Semana 3 |       `1.322 kg` |    `1.100 kg` |              `1.20` |            `2.20 %` |
+|  4 | Semana 4 |       `2.100 kg` |    `1.700 kg` |              `1.35` |            `2.80 %` |
+|  5 | Semana 5 |       `3.455 kg` |    `2.350 kg` |              `1.47` |            `3.50 %` |
+|  6 | Semana 6 |       `3.720 kg` |    `2.400 kg` |              `1.47` |            `4.00 %` |
+
+
+| Valor almacenado | Significado                 |
+| ---------------: | --------------------------- |
+|          `0.170` | 170 gramos                  |
+|          `0.605` | 605 gramos                  |
+|          `1.100` | 1 kilogramo con 100 gramos  |
+|          `1.322` | 1 kilogramo con 322 gramos  |
+|          `2.350` | 2 kilogramos con 350 gramos |
+|          `3.720` | 3 kilogramos con 720 gramos |
+
+
+Reglas de negocio de ExpectedValues
+
+| N.º | Regla de negocio                                                                                                            |
+| --: | --------------------------------------------------------------------------------------------------------------------------- |
+|   1 | El catálogo contiene exactamente seis registros, correspondientes a `Semana 1` hasta `Semana 6`.                            |
+|   2 | Los seis registros se crean directamente mediante SQL antes de utilizar el módulo.                                          |
+|   3 | La aplicación no permitirá crear nuevos registros de valores esperados.                                                     |
+|   4 | La aplicación no permitirá eliminar, desactivar ni reactivar valores esperados.                                             |
+|   5 | `ExpectedValueWeek` identifica la semana del catálogo y no puede modificarse desde la aplicación.                           |
+|   6 | La semana se mostrará en `Index` y `Edit`, pero será únicamente informativa.                                                |
+|   7 | El usuario podrá modificar únicamente consumo, peso, conversión y mortalidad esperados.                                     |
+|   8 | `ExpectedConsumption` se almacena en kilogramos con tres decimales.                                                         |
+|   9 | `ExpectedWeight` se almacena en kilogramos con tres decimales.                                                              |
+|  10 | Consumo y peso deben ser mayores que cero.                                                                                  |
+|  11 | `ExpectedConversion` se almacena con dos decimales y debe ser mayor que cero.                                               |
+|  12 | `ExpectedMortality` representa un porcentaje, se almacena con dos decimales y debe estar entre `0.00` y `100.00`.           |
+|  13 | La lógica y las validaciones de negocio se implementarán dentro de `ExpectedValueService`.                                  |
+|  14 | El Controller solamente coordinará solicitudes HTTP, logs, mensajes y respuestas.                                           |
+|  15 | El `Index` mostrará siempre los seis registros ordenados de `Semana 1` a `Semana 6`.                                        |
+|  16 | El `Edit` buscará el registro mediante `ExpectedValueId`.                                                                   |
+|  17 | `UpdateAsync()` no actualizará `ExpectedValueWeek`, aunque el valor sea enviado desde el formulario.                        |
+|  18 | `UpdateAsync()` actualizará únicamente `ExpectedConsumption`, `ExpectedWeight`, `ExpectedConversion` y `ExpectedMortality`. |
+|  19 | `WeeklyCheck` utilizará el registro de `expected_values` correspondiente a su misma semana.                                 |
+|  20 | La relación con `WeeklyCheck` se realizará mediante `expected_value_id`.                                                    |
+|  21 | No se agregarán por ahora restricciones de negocio como `UNIQUE` o `CHECK` directamente en la base de datos.                |
+|  22 | Si en el futuro cambian los parámetros productivos, el usuario autorizado podrá actualizarlos desde `Edit`.                 |
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
 

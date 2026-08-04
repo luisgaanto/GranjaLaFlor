@@ -30,5 +30,7 @@ namespace DB_GranjaLaFlor.Data.Context
         */
         public DbSet<DailyCheck> DailyChecks { get; set; }
 
+        public DbSet<ExpectedValue> ExpectedValues { get; set; }
+
     }
 }

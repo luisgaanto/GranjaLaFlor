@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGranjaLaFlor.Models.ViewModels;
 
+/*
+    *NOTE: SoftDeleteAsync is "imcomplete" since we are not implementing inactive and activate functions as it may break busniess logic and it is not really required. 
+*/
+
+
 namespace DB_GranjaLaFlor.Controllers
 {
     /*

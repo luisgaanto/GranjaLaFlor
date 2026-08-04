@@ -61,6 +61,7 @@ builder.Services.AddScoped<BroilerHouseService>();
 builder.Services.AddScoped<BroodService>();
 builder.Services.AddScoped<IncomeConcentrateService>();
 builder.Services.AddScoped<DailyCheckService>();
+builder.Services.AddScoped<ExpectedValueService>();
 
 var app = builder.Build();
 

@@ -56,6 +56,10 @@ namespace DB_GranjaLaFlor.Services
                 .Where(expectedValue =>
                     expectedValue.ExpectedValueId == id)
                 .Select(expectedValue =>
+                    /*
+                    * GetFormByIdAsync is used to query DB and retrieve expectedValue data by using parameter "int id", then it generates a new object "ExpectedValueFormViewModel".
+                    * "ExpectedValueFormViewModel" is then used in "UpdateAsync" to obtain data to get udpated. 
+                    */
                     new ExpectedValueFormViewModel
                     {
                         ExpectedValueId = expectedValue.ExpectedValueId,
@@ -75,7 +79,7 @@ namespace DB_GranjaLaFlor.Services
 
         /*
          * Business Operation | Update Expected Value: Validates and updates the editable values associated with the selected fixed weekly record.
-         *
+         * "ExpectedValueFormViewModel" is then used in "UpdateAsync" to obtain data to get udpated. 
          * ExpectedValueWeek is not updated because the week identifies the fixed catalog record.
          */
         public async Task UpdateAsync(ExpectedValueFormViewModel model)

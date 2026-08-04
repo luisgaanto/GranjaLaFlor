@@ -128,24 +128,17 @@ namespace DB_GranjaLaFlor.Controllers
          * displayed after selecting a Broiler House and a Brood.
          */
         [HttpGet]
-        public async Task<IActionResult> GetBroodInformation(
-            int broilerHouseId,
-            int broodId)
+        public async Task<IActionResult> GetBroodInformation(int broilerHouseId, int broodId)
         {
             _logger.LogInformation(
-                "Entering DailyChecksController.GetBroodInformation(). " +
-                "BroilerHouseId: {BroilerHouseId}, " +
-                "BroodId: {BroodId}",
+                "Entering DailyChecksController.GetBroodInformation(). " + "BroilerHouseId: {BroilerHouseId}, " + "BroodId: {BroodId}",
                 broilerHouseId,
                 broodId);
 
             if (broilerHouseId <= 0 || broodId <= 0)
             {
                 _logger.LogWarning(
-                    "Invalid identifiers received while retrieving " +
-                    "Daily Check Brood information. " +
-                    "BroilerHouseId: {BroilerHouseId}, " +
-                    "BroodId: {BroodId}",
+                    "Invalid identifiers received while retrieving " + "Daily Check Brood information. " + "BroilerHouseId: {BroilerHouseId}, " + "BroodId: {BroodId}",
                     broilerHouseId,
                     broodId);
 
@@ -337,7 +330,273 @@ namespace DB_GranjaLaFlor.Controllers
         }
 
 
+        /*
+ * GET: DailyChecks/Delete/5
+ * Retrieves and displays the Daily Check information
+ * required to confirm its logical deactivation.
+ */
+        [HttpGet]
+        public async Task<IActionResult> Delete(
+            int? id)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.Delete() GET. " +
+                "DailyCheckId: {DailyCheckId}",
+                id);
 
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Daily Check Delete request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido para desactivar el control diario.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var dailyCheck =
+                    await _dailyCheckService.GetByIdAsync(
+                        id.Value);
+
+                if (dailyCheck == null)
+                {
+                    _logger.LogWarning(
+                        "Daily Check was not found while loading Delete. " +
+                        "DailyCheckId: {DailyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control diario seleccionado no existe.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (!dailyCheck.DailyCheckState)
+                {
+                    _logger.LogWarning(
+                        "Inactive Daily Check received while loading Delete. " +
+                        "DailyCheckId: {DailyCheckId}",
+                        id.Value);
+
+                    TempData["WarningMessage"] =
+                        "El control diario seleccionado ya se encuentra inactivo.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(dailyCheck);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Daily Check Delete. " +
+                    "DailyCheckId: {DailyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar la información del control diario. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        /*
+         * GET: DailyChecks/Edit: Retrieves and displays the active Daily Check information required to update the selected record.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Edit(
+            int? id)
+        {
+            _logger.LogInformation("Entering DailyChecksController.Edit() GET. " + "DailyCheckId: {DailyCheckId}", id);
+
+            if (!id.HasValue)
+            {
+                _logger.LogWarning( "Daily Check Edit request received without an identifier.");
+
+                TempData["ErrorMessage"] = "No se proporcionó un identificador válido para editar el control diario.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var model =
+                    await _dailyCheckService.GetFormByIdAsync(
+                        id.Value);
+
+                if (model == null)
+                {
+                    _logger.LogWarning(
+                        "Daily Check was not found or is inactive while loading Edit. " +
+                        "DailyCheckId: {DailyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control diario seleccionado no existe o se encuentra inactivo.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Daily Check Edit. " +
+                    "DailyCheckId: {DailyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar la información del control diario. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        /*
+         * POST: DailyChecks/Edit: Receives the updated Daily Check information and delegates validation, persistence and recalculation to the Service layer.
+         */
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            DailyCheckFormViewModel model)
+        {
+            _logger.LogInformation("Entering DailyChecksController.Edit() POST. " + "DailyCheckId: {DailyCheckId}, " + "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}, " + "DailyCheckWeek: {DailyCheckWeek}, " + "DailyCheckDay: {DailyCheckDay}",
+                model.DailyCheckId, model.BroilerHouseId, model.BroodId, model.DailyCheckWeek, model.DailyCheckDay
+                );
+
+            if (!ModelState.IsValid)
+            {
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+
+            try
+            {
+                await _dailyCheckService.UpdateAsync(
+                    model);
+
+                TempData["SuccessMessage"] =
+                    "El control diario fue actualizado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while updating Daily Check. " +
+                    "DailyCheckId: {DailyCheckId}, " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "DailyCheckWeek: {DailyCheckWeek}, " +
+                    "DailyCheckDay: {DailyCheckDay}",
+                    model.DailyCheckId,
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.DailyCheckWeek,
+                    model.DailyCheckDay);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while updating Daily Check. " +
+                    "DailyCheckId: {DailyCheckId}, " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "DailyCheckWeek: {DailyCheckWeek}, " +
+                    "DailyCheckDay: {DailyCheckDay}",
+                    model.DailyCheckId,
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.DailyCheckWeek,
+                    model.DailyCheckDay);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo actualizar el control diario. " +
+                    "Intente nuevamente.";
+
+                await _dailyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+        }
+
+        /*
+         * POST: DailyChecks/Delete/5
+         * Delegates the logical deactivation of the selected Daily Check
+         * and the recalculation of the remaining active records to the Service.
+         */
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(
+            int id)
+        {
+            _logger.LogInformation(
+                "Entering DailyChecksController.Delete() POST. " +
+                "DailyCheckId: {DailyCheckId}",
+                id);
+
+            try
+            {
+                await _dailyCheckService.SoftDeleteAsync(
+                    id);
+
+                TempData["SuccessMessage"] =
+                    "El control diario fue desactivado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating " +
+                    "Daily Check. DailyCheckId: {DailyCheckId}",
+                    id);
+
+                TempData["WarningMessage"] =
+                    ex.Message;
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while deactivating Daily Check. " +
+                    "DailyCheckId: {DailyCheckId}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo desactivar el control diario. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
 
 
     }

@@ -1,20 +1,27 @@
 ﻿@model ProjectGranjaLaFlor.Models.ViewModels.DailyCheckFormViewModel
 
 @{
-    ViewData["Title"] = "Registrar Control Diario";
+    ViewData["Title"] = "Editar Control Diario";
 }
 
 <div class="container mt-4">
     <div class="card border-primary">
         <div class="card-header bg-primary text-white text-center">
-            <h1 class="mb-0">Registrar Control Diario</h1>
+            <h1 class="mb-0">
+                Editar Control Diario
+            </h1>
         </div>
 
         <div class="card-body">
-            <!-- <partial name="_EventMessage" /> -->
-
-            <form asp-action="Create" method="post">
+            <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
+
+                <input asp-for="DailyCheckId"
+                       type="hidden" />
+
+                <input asp-for="IncomeConcentrateId"
+                       id="IncomeConcentrateId"
+                       type="hidden" />
 
                 <div asp-validation-summary="ModelOnly"
                      class="alert alert-danger">
@@ -52,7 +59,9 @@
                                 asp-items="Model.BroilerHouseOptions"
                                 class="form-select"
                                 id="BroilerHouseId">
-                            <option value="">Seleccione una pollera</option>
+                            <option value="">
+                                Seleccione una pollera
+                            </option>
                         </select>
 
                         <span asp-validation-for="BroilerHouseId"
@@ -70,7 +79,9 @@
                                 class="form-select"
                                 id="BroodId"
                                 disabled="@(Model.BroilerHouseId <= 0)">
-                            <option value="">Seleccione una camada</option>
+                            <option value="">
+                                Seleccione una camada
+                            </option>
                         </select>
 
                         <span asp-validation-for="BroodId"
@@ -86,7 +97,9 @@
                         <select asp-for="DailyCheckWeek"
                                 asp-items="Model.DailyCheckWeekOptions"
                                 class="form-select">
-                            <option value="">Seleccione una semana</option>
+                            <option value="">
+                                Seleccione una semana
+                            </option>
                         </select>
 
                         <span asp-validation-for="DailyCheckWeek"
@@ -102,7 +115,9 @@
                         <select asp-for="DailyCheckDay"
                                 asp-items="Model.DailyCheckDayOptions"
                                 class="form-select">
-                            <option value="">Seleccione un día</option>
+                            <option value="">
+                                Seleccione un día
+                            </option>
                         </select>
 
                         <span asp-validation-for="DailyCheckDay"
@@ -142,7 +157,9 @@
                 *@
                 <div class="card border-secondary mb-4">
                     <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">Mortalidad</h5>
+                        <h5 class="mb-0">
+                            Mortalidad
+                        </h5>
                     </div>
 
                     <div class="card-body">
@@ -226,10 +243,6 @@
                     </div>
 
                     <div class="card-body">
-                        <input asp-for="IncomeConcentrateId"
-                               id="IncomeConcentrateId"
-                               type="hidden" />
-
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label asp-for="IncomeAccumulated"
@@ -316,8 +329,8 @@
 
                 <div class="d-flex justify-content-center gap-2">
                     <button type="submit"
-                            class="btn btn-outline-primary">
-                        Crear
+                            class="btn btn-warning">
+                        Actualizar
                     </button>
 
                     <a asp-action="Index"
@@ -384,9 +397,12 @@
                 document.getElementById("dynamicMessage");
 
             /*
-             * Stores the accumulated values already registered for the
-             * selected Brood. These values are used as the base for the
-             * calculations displayed while completing the form.
+             * Stores the values that existed before the current
+             * Daily Check being edited.
+             *
+             * The selected Daily Check values are subtracted from the
+             * accumulated values returned by the Service so the preview
+             * does not count the edited record twice.
              */
             let previousAccumulatedMortality = 0;
             let previousAccumulatedConsumption = 0;
@@ -401,7 +417,8 @@
                 const normalizedValue =
                     input.value.toString().replace(",", ".");
 
-                const value = Number.parseFloat(normalizedValue);
+                const value =
+                    Number.parseFloat(normalizedValue);
 
                 return Number.isFinite(value)
                     ? value
@@ -444,15 +461,19 @@
 
                 broodBirdInitialNumInput.value = 0;
                 incomeConcentrateIdInput.value = 0;
-                incomeAccumulatedInput.value = formatDecimal(0);
+                incomeAccumulatedInput.value =
+                    formatDecimal(0);
 
                 totalDailyMortalityInput.value = 0;
                 accumulatedMortalityInput.value = 0;
                 dailyBirdBalanceInput.value = 0;
 
-                consumptionKilosInput.value = formatDecimal(0);
+                consumptionKilosInput.value =
+                    formatDecimal(0);
+
                 accumulatedConsumptionInput.value =
                     formatDecimal(0);
+
                 concentrateBalanceInput.value =
                     formatDecimal(0);
             }
@@ -469,7 +490,8 @@
                     getNumericValue(selectQuantityInput);
 
                 const totalDailyMortality =
-                    naturalMortality + selectQuantity;
+                    naturalMortality +
+                    selectQuantity;
 
                 const accumulatedMortality =
                     previousAccumulatedMortality +
@@ -501,7 +523,8 @@
                     getNumericValue(consumptionQuintalsInput);
 
                 const consumptionKilos =
-                    consumptionQuintals * kilosPerQuintal;
+                    consumptionQuintals *
+                    kilosPerQuintal;
 
                 const accumulatedConsumption =
                     previousAccumulatedConsumption +
@@ -524,13 +547,18 @@
             /*
              * Loads the active Broods associated with the selected
              * Broiler House.
+             *
+             * The current Brood remains selected when the Edit form
+             * is initially loaded or returned after a validation error.
              */
             async function loadBroodsByBroilerHouse(
                 broilerHouseId,
                 selectedBroodId = "") {
 
                 broodSelect.innerHTML =
-                    '<option value="">Seleccione una camada</option>';
+                    '<option value="">' +
+                    'Seleccione una camada' +
+                    '</option>';
 
                 broodSelect.disabled = true;
 
@@ -544,29 +572,35 @@
                 try {
                     const url =
                         '@Url.Action(
-            "GetBroodsByBroilerHouse",
-                "DailyChecks")' +
-                    '?broilerHouseId=' +
-                        encodeURIComponent(broilerHouseId);
+                    "GetBroodsByBroilerHouse",
+                    "DailyChecks")' +
+                        '?broilerHouseId=' +
+                        encodeURIComponent(
+                            broilerHouseId);
 
                     const response = await fetch(url);
 
                     if (!response.ok) {
-                        const errorData = await response.json();
+                        const errorData =
+                            await response.json();
 
                         throw new Error(
                             errorData.message ||
                             "No se pudieron cargar las camadas.");
                     }
 
-                    const broodOptions = await response.json();
+                    const broodOptions =
+                        await response.json();
 
                     broodOptions.forEach(function (option) {
                         const broodOption =
                             document.createElement("option");
 
-                        broodOption.value = option.value;
-                        broodOption.textContent = option.text;
+                        broodOption.value =
+                            option.value;
+
+                        broodOption.textContent =
+                            option.text;
 
                         if (option.value.toString() ===
                             selectedBroodId.toString()) {
@@ -574,7 +608,8 @@
                             broodOption.selected = true;
                         }
 
-                        broodSelect.appendChild(broodOption);
+                        broodSelect.appendChild(
+                            broodOption);
                     });
 
                     broodSelect.disabled =
@@ -595,6 +630,10 @@
             /*
              * Loads the current bird, mortality, consumption and
              * concentrate information for the selected Brood.
+             *
+             * When the selected Brood contains the Daily Check being
+             * edited, its current values are excluded from the base
+             * accumulated values used by the preview.
              */
             async function loadBroodInformation() {
                 const broilerHouseId =
@@ -613,17 +652,20 @@
                 try {
                     const url =
                         '@Url.Action(
-            "GetBroodInformation",
-                "DailyChecks")' +
-                    '?broilerHouseId=' +
-                        encodeURIComponent(broilerHouseId) +
+                    "GetBroodInformation",
+                    "DailyChecks")' +
+                        '?broilerHouseId=' +
+                        encodeURIComponent(
+                            broilerHouseId) +
                         '&broodId=' +
-                        encodeURIComponent(broodId);
+                        encodeURIComponent(
+                            broodId);
 
                     const response = await fetch(url);
 
                     if (!response.ok) {
-                        const errorData = await response.json();
+                        const errorData =
+                            await response.json();
 
                         throw new Error(
                             errorData.message ||
@@ -639,26 +681,60 @@
                             broodInformation
                                 .broodBirdInitialNum) || 0;
 
-                    previousAccumulatedMortality =
-                        Number(
-                            broodInformation
-                                .accumulatedMortality) || 0;
-
-                    previousAccumulatedConsumption =
-                        Number(
-                            broodInformation
-                                .accumulatedConsumption) || 0;
-
                     availableIncomeAccumulated =
                         Number(
                             broodInformation
                                 .incomeAccumulated) || 0;
 
+                    const currentBroodId =
+                        '@Model.BroodId';
+
+                    const currentDailyMortality =
+        @Model.TotalDailyMortality;
+
+                    const currentConsumptionKilos =
+        @Model.ConsumptionKilos.ToString(
+                     System.Globalization.CultureInfo.InvariantCulture);
+
+                    const returnedAccumulatedMortality =
+                        Number(
+                            broodInformation
+                                .accumulatedMortality) || 0;
+
+                    const returnedAccumulatedConsumption =
+                        Number(
+                            broodInformation
+                                .accumulatedConsumption) || 0;
+
+                    /*
+                     * Excludes the current record only when it remains
+                     * associated with its original Brood.
+                     */
+                    if (broodId.toString() ===
+                        currentBroodId.toString()) {
+
+                        previousAccumulatedMortality =
+                            returnedAccumulatedMortality -
+                            currentDailyMortality;
+
+                        previousAccumulatedConsumption =
+                            returnedAccumulatedConsumption -
+                            currentConsumptionKilos;
+                    }
+                    else {
+                        previousAccumulatedMortality =
+                            returnedAccumulatedMortality;
+
+                        previousAccumulatedConsumption =
+                            returnedAccumulatedConsumption;
+                    }
+
                     broodBirdInitialNumInput.value =
                         initialBirdQuantity;
 
                     incomeConcentrateIdInput.value =
-                        broodInformation.incomeConcentrateId;
+                        broodInformation
+                            .incomeConcentrateId;
 
                     incomeAccumulatedInput.value =
                         formatDecimal(
@@ -698,7 +774,8 @@
 
             /*
              * Restores the selected Broiler House and Brood when
-             * the form is returned after a validation error.
+             * the Edit form is initially loaded or returned after
+             * a validation error.
              */
             const initialBroilerHouseId =
                 '@Model.BroilerHouseId';

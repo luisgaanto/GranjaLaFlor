@@ -32,5 +32,7 @@ namespace DB_GranjaLaFlor.Data.Context
 
         public DbSet<ExpectedValue> ExpectedValues { get; set; }
 
+        public DbSet<WeeklyCheck> WeeklyChecks { get; set; }
+
     }
 }

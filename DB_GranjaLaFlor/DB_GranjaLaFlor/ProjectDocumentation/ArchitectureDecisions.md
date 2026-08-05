@@ -333,7 +333,94 @@ Reglas de negocio de ExpectedValues
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+Tabla final weekly_checks
 
+| Columna                         | Tipo final      | Nulo | Origen                       |
+| ------------------------------- | --------------- | ---: | ---------------------------- |
+| `weekly_check_id`               | `INT`           |   No | PK autoincremental           |
+| `sample_bird_quantity`          | `INT`           |   No | Calculado                    |
+| `total_bird_weight`             | `DECIMAL(10,3)` |   No | Usuario                      |
+| `average_weekly_weight`         | `DECIMAL(10,3)` |   No | Calculado                    |
+| `weekly_real_consumption`       | `DECIMAL(10,3)` |   No | Calculado                    |
+| `weekly_expected_consumption`   | `DECIMAL(10,3)` |   No | Copiado de `expected_values` |
+| `weekly_consumption_difference` | `DECIMAL(10,3)` |   No | Calculado                    |
+| `weekly_expected_weight`        | `DECIMAL(10,3)` |   No | Copiado de `expected_values` |
+| `weekly_weight_difference`      | `DECIMAL(10,3)` |   No | Calculado                    |
+| `weekly_real_conversion`        | `DECIMAL(10,2)` |   No | Calculado                    |
+| `weekly_expected_conversion`    | `DECIMAL(10,2)` |   No | Copiado de `expected_values` |
+| `weekly_conversion_difference`  | `DECIMAL(10,2)` |   No | Calculado                    |
+| `weekly_real_mortality`         | `DECIMAL(10,2)` |   No | Calculado                    |
+| `weekly_expected_mortality`     | `DECIMAL(10,2)` |   No | Copiado de `expected_values` |
+| `weekly_mortality_difference`   | `DECIMAL(10,2)` |   No | Calculado                    |
+| `weekly_check_description`      | `VARCHAR(200)`  |   Sí | Usuario, opcional            |
+| `weekly_check_state`            | `TINYINT(1)`    |   No | Sistema                      |
+| `weekly_check_week`             | `VARCHAR(20)`   |   No | Usuario selecciona           |
+| `brood_id`                      | `INT`           |   No | FK a `broods`                |
+| `expected_value_id`             | `INT`           |   No | FK a `expected_values`       |
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+Fórmulas definitivas para programar
+
+| Campo                           | Fórmula o fuente                                               |
+| ------------------------------- | -------------------------------------------------------------- |
+| `sample_bird_quantity`          | `CEILING(final_daily_bird_balance × 0.02)`                     |
+| `average_weekly_weight`         | `total_bird_weight / sample_bird_quantity`                     |
+| `weekly_real_consumption`       | `final_accumulated_consumption / final_daily_bird_balance`     |
+| `weekly_expected_consumption`   | `expected_values.expected_consumption`                         |
+| `weekly_consumption_difference` | `weekly_real_consumption - weekly_expected_consumption`        |
+| `weekly_expected_weight`        | `expected_values.expected_weight`                              |
+| `weekly_weight_difference`      | `average_weekly_weight - weekly_expected_weight`               |
+| `weekly_real_conversion`        | `weekly_real_consumption / average_weekly_weight`              |
+| `weekly_expected_conversion`    | `expected_values.expected_conversion`                          |
+| `weekly_conversion_difference`  | `weekly_real_conversion - weekly_expected_conversion`          |
+| `weekly_real_mortality`         | `(final_accumulated_mortality / brood_bird_initial_num) × 100` |
+| `weekly_expected_mortality`     | `expected_values.expected_mortality`                           |
+| `weekly_mortality_difference`   | `weekly_real_mortality - weekly_expected_mortality`            |
+
+| Columna                         | Tipo            | Función                  |
+| ------------------------------- | --------------- | ------------------------ |
+| `weekly_check_id`               | `INT` PK AI     | Identificador            |
+| `sample_bird_quantity`          | `INT`           | 2 % del saldo actual     |
+| `total_bird_weight`             | `DECIMAL(10,3)` | Ingresado por el usuario |
+| `average_weekly_weight`         | `DECIMAL(10,3)` | Calculado                |
+| `weekly_real_consumption`       | `DECIMAL(10,3)` | Calculado                |
+| `weekly_expected_consumption`   | `DECIMAL(10,3)` | Copiado del catálogo     |
+| `weekly_consumption_difference` | `DECIMAL(10,3)` | Real menos esperado      |
+| `weekly_expected_weight`        | `DECIMAL(10,3)` | Copiado del catálogo     |
+| `weekly_weight_difference`      | `DECIMAL(10,3)` | Real menos esperado      |
+| `weekly_real_conversion`        | `DECIMAL(10,2)` | Calculado                |
+| `weekly_expected_conversion`    | `DECIMAL(10,2)` | Copiado del catálogo     |
+| `weekly_conversion_difference`  | `DECIMAL(10,2)` | Real menos esperado      |
+| `weekly_real_mortality`         | `DECIMAL(10,2)` | Porcentaje calculado     |
+| `weekly_expected_mortality`     | `DECIMAL(10,2)` | Copiado del catálogo     |
+| `weekly_mortality_difference`   | `DECIMAL(10,2)` | Real menos esperado      |
+| `weekly_check_description`      | `VARCHAR(200)`  | Opcional                 |
+| `weekly_check_state`            | `TINYINT(1)`    | Estado lógico            |
+| `weekly_check_week`             | `VARCHAR(20)`   | Semana 1 a Semana 6      |
+| `brood_id`                      | `INT` FK        | Camada                   |
+| `expected_value_id`             | `INT` FK        | Valores esperados usados |
+
+
+| Campo                         | Fórmula                                             |
+| ----------------------------- | --------------------------------------------------- |
+| `SampleBirdQuantity`          | `Ceiling(finalBirdBalance × 0.02)`                  |
+| `AverageWeeklyWeight`         | `TotalBirdWeight / SampleBirdQuantity`              |
+| `WeeklyRealConsumption`       | `finalAccumulatedConsumption / finalBirdBalance`    |
+| `WeeklyConsumptionDifference` | `WeeklyRealConsumption - WeeklyExpectedConsumption` |
+| `WeeklyWeightDifference`      | `AverageWeeklyWeight - WeeklyExpectedWeight`        |
+| `WeeklyRealConversion`        | `WeeklyRealConsumption / AverageWeeklyWeight`       |
+| `WeeklyConversionDifference`  | `WeeklyRealConversion - WeeklyExpectedConversion`   |
+| `WeeklyRealMortality`         | `(finalAccumulatedMortality / initialBirds) × 100`  |
+| `WeeklyMortalityDifference`   | `WeeklyRealMortality - WeeklyExpectedMortality`     |
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
@@ -345,6 +432,16 @@ Reglas de negocio de ExpectedValues
 
 
 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 

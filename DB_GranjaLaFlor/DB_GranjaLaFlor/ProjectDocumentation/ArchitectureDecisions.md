@@ -422,6 +422,290 @@ Fórmulas definitivas para programar
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+                                                        PESO PROMEDIO SEMANAL
+                                                        
+|      `Display(Name = ...)`      |       Atributo        |               Origen / ecuación                                              |
+| ------------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `Cantidad Aves Muestra`         | `SampleBirdQuantity`  | `CEILING(FinalDailyBirdBalance × 0.02)`                                      |
+| `Peso total de la muestra (kg)` | `TotalBirdWeight`     | Valor ingresado por el usuario después de pesar todas las aves de la muestra |
+| `Peso promedio semanal (kg)`    | `AverageWeeklyWeight` | `TotalBirdWeight ÷ SampleBirdQuantity`                                       |
+
+
+AverageWeeklyWeight
+=
+TotalBirdWeight
+÷
+SampleBirdQuantity
+
+
+
+
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                                                        CONSUMO REAL / Conversion Real
+
+FinalAccumulatedConsumption
+            /
+FinalDailyBirdBalance
+            |
+            v
+WeeklyRealConsumption
+            |
+            +--------------------------+
+            |                          |
+            v                          v
+WeeklyConsumptionDifference     WeeklyRealConversion
+            ^                          |
+            |                          v
+WeeklyExpectedConsumption   WeeklyConversionDifference
+                                       ^
+                                       |
+                             WeeklyExpectedConversion
+
+AverageWeeklyWeight ---------> WeeklyRealConversion
+
+
+
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| DISPLAY                              | ATRIBUTO                      | ECUACION / ORIGEN                                            |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Consumo acumulado final (kg)         | FinalAccumulatedConsumption   | DailyCheck.AccumulatedConsumption del Dia 7                  |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Saldo actual aves                    | FinalDailyBirdBalance         | DailyCheck.DailyBirdBalance del Dia 7                        |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Consumo Real (kg)                    | WeeklyRealConsumption         | FinalAccumulatedConsumption / FinalDailyBirdBalance          |
+|                                      |                               | Redondeo: 3 decimales                                        |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Consumo esperado (kg)                | WeeklyExpectedConsumption     | ExpectedValue.ExpectedConsumption                            |
+|                                      |                               | Se obtiene segun WeeklyCheckWeek                             |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Diferencia Consumo (kg)              | WeeklyConsumptionDifference   | WeeklyRealConsumption - WeeklyExpectedConsumption            |
+|                                      |                               | Redondeo: 3 decimales                                        |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Peso promedio semanal (kg)           | AverageWeeklyWeight           | TotalBirdWeight / SampleBirdQuantity                         |
+|                                      |                               | Formula ya validada                                          |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Conversion Real                      | WeeklyRealConversion          | WeeklyRealConsumption / AverageWeeklyWeight                  |
+|                                      |                               | Redondeo: 2 decimales                                        |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Conversion esperada                  | WeeklyExpectedConversion      | ExpectedValue.ExpectedConversion                             |
+|                                      |                               | Se obtiene segun WeeklyCheckWeek                             |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+| Diferencia Conversion                | WeeklyConversionDifference    | WeeklyRealConversion - WeeklyExpectedConversion              |
+|                                      |                               | Redondeo: 2 decimales                                        |
++--------------------------------------+-------------------------------+--------------------------------------------------------------+
+
+WeeklyRealConsumption
+=
+FinalAccumulatedConsumption
+/
+FinalDailyBirdBalance
+
+Consumo acumulado al Día 7 = 1,322 kg
+Saldo final de aves         = 1,000 aves
+
+WeeklyRealConsumption
+= 1,322 / 1,000
+= 1.322 kg por ave
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+                                                       Mortalidad Semanal
+
+
+ Brood
+  |
+  +--> BroodBirdInitialNum
+  |       Cantidad inicial aves
+  |
+  |
+DailyCheck - Dia 7
+  |
+  +--> FinalAccumulatedMortality
+          Mortalidad acumulada final
+                    |
+                    |
+                    v
+       +-----------------------------+
+       | WeeklyRealMortality         |
+       |                             |
+       | FinalAccumulatedMortality   |
+       | -------------------------   | x 100
+       | BroodBirdInitialNum         |
+       +-----------------------------+
+                    |
+                    v
+            Mortalidad Real (%)
+                    |
+                    |
+ExpectedValue ------+
+  |
+  +--> WeeklyExpectedMortality
+       = expectedValue.ExpectedMortality
+                    |
+                    v
+       +-----------------------------+
+       | WeeklyMortalityDifference   |
+       |                             |
+       | WeeklyRealMortality         |
+       | - WeeklyExpectedMortality   |
+       +-----------------------------+
+                    |
+                    v
+       Diferencia Mortalidad (%)
+
+
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| DISPLAY NAME                     | ATRIBUTO                    | ECUACION / FUENTE                                                        |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| Cantidad inicial aves            | BroodBirdInitialNum         | brood.BroodBirdInitialNum                                                |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| Mortalidad acumulada final       | FinalAccumulatedMortality   | finalDailyCheck.AccumulatedMortality                                     |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| Mortalidad esperada (%)          | WeeklyExpectedMortality     | expectedValue.ExpectedMortality                                          |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| Mortalidad Real (%)              | WeeklyRealMortality         | (FinalAccumulatedMortality / BroodBirdInitialNum) x 100                  |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+| Diferencia Mortalidad (%)        | WeeklyMortalityDifference   | WeeklyRealMortality - WeeklyExpectedMortality                            |
++----------------------------------+-----------------------------+--------------------------------------------------------------------------+
+
+WeeklyRealMortality
+=
+(FinalAccumulatedMortality / BroodBirdInitialNum) x 100
+
+FinalAccumulatedMortality
+=
+finalDailyCheck.AccumulatedMortality
+
+
+BroodBirdInitialNum
+=
+brood.BroodBirdInitialNum
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                                                                                                                                                Formulas Finales 
+
+| --------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                   |                               |                                                                                                  FÓRMULAS O FUENTES                                                                                                                                |
+| --------------------------------- | ----------------------------- |------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Display                           | Campo                         | DB                                                                                   | Entity / ViewModel                                                            | Variable local / Service                                                    |
+| --------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Cantidad inicial aves**         | `BroodBirdInitialNum`         | `broods.brood_bird_initial_num`                                                      | `Brood.BroodBirdInitialNum` → `BroodBirdInitialNum`                           | `brood.BroodBirdInitialNum`                                                 |
+| **Saldo actual aves**             | `FinalDailyBirdBalance`       | `daily_checks.daily_bird_balance`                                                    | `DailyCheck.DailyBirdBalance` → `FinalDailyBirdBalance`                       | `finalDailyCheck.DailyBirdBalance`                                          |
+| **Consumo acumulado final (kg)**  | `FinalAccumulatedConsumption` | `daily_checks.accumulated_consumption`                                               | `DailyCheck.AccumulatedConsumption` → `FinalAccumulatedConsumption`           | `finalDailyCheck.AccumulatedConsumption`                                    |
+| **Mortalidad acumulada final**    | `FinalAccumulatedMortality`   | `daily_checks.accumulated_mortality`                                                 | `DailyCheck.AccumulatedMortality` → `FinalAccumulatedMortality`               | `finalDailyCheck.AccumulatedMortality`                                      |
+| **Cantidad Aves Muestra**         | `SampleBirdQuantity`          | `weekly_checks.sample_bird_quantity`                                                 | `WeeklyCheck.SampleBirdQuantity` → `SampleBirdQuantity`                       | `decimal.Ceiling(finalDailyCheck.DailyBirdBalance × SamplePercentage)`      |
+| **Peso total de la muestra (kg)** | `TotalBirdWeight`             | `weekly_checks.total_bird_weight`                                                    | `WeeklyCheck.TotalBirdWeight` → `TotalBirdWeight`                             | `model.TotalBirdWeight`                                                     |
+| **Peso promedio semanal (kg)**    | `AverageWeeklyWeight`         | `weekly_checks.average_weekly_weight`                                                | `WeeklyCheck.AverageWeeklyWeight` → `AverageWeeklyWeight`                     | `totalBirdWeight / sampleBirdQuantity`                                      |
+| **Consumo esperado (kg)**         | `WeeklyExpectedConsumption`   | `expected_values.expected_consumption` → `weekly_checks.weekly_expected_consumption` | `ExpectedValue.ExpectedConsumption` → `WeeklyCheck.WeeklyExpectedConsumption` | `expectedValue.ExpectedConsumption`                                         |
+| **Consumo Real (kg)**             | `WeeklyRealConsumption`       | `weekly_checks.weekly_real_consumption`                                              | `WeeklyCheck.WeeklyRealConsumption` → `WeeklyRealConsumption`                 | `finalDailyCheck.AccumulatedConsumption / finalDailyCheck.DailyBirdBalance` |
+| **Diferencia Consumo (kg)**       | `WeeklyConsumptionDifference` | `weekly_checks.weekly_consumption_difference`                                        | `WeeklyCheck.WeeklyConsumptionDifference` → `WeeklyConsumptionDifference`     | `weeklyRealConsumption - expectedValue.ExpectedConsumption`                 |
+| **Peso esperado (kg)**            | `WeeklyExpectedWeight`        | `expected_values.expected_weight` → `weekly_checks.weekly_expected_weight`           | `ExpectedValue.ExpectedWeight` → `WeeklyCheck.WeeklyExpectedWeight`           | `expectedValue.ExpectedWeight`                                              |
+| **Diferencia de peso (kg)**       | `WeeklyWeightDifference`      | `weekly_checks.weekly_weight_difference`                                             | `WeeklyCheck.WeeklyWeightDifference` → `WeeklyWeightDifference`               | `averageWeeklyWeight - expectedValue.ExpectedWeight`                        |
+| **Conversión esperada**           | `WeeklyExpectedConversion`    | `expected_values.expected_conversion` → `weekly_checks.weekly_expected_conversion`   | `ExpectedValue.ExpectedConversion` → `WeeklyCheck.WeeklyExpectedConversion`   | `expectedValue.ExpectedConversion`                                          |
+| **Conversión Real**               | `WeeklyRealConversion`        | `weekly_checks.weekly_real_conversion`                                               | `WeeklyCheck.WeeklyRealConversion` → `WeeklyRealConversion`                   | `weeklyRealConsumption / averageWeeklyWeight`                               |
+| **Diferencia Conversión**         | `WeeklyConversionDifference`  | `weekly_checks.weekly_conversion_difference`                                         | `WeeklyCheck.WeeklyConversionDifference` → `WeeklyConversionDifference`       | `weeklyRealConversion - expectedValue.ExpectedConversion`                   |
+| **Mortalidad esperada (%)**       | `WeeklyExpectedMortality`     | `expected_values.expected_mortality` → `weekly_checks.weekly_expected_mortality`     | `ExpectedValue.ExpectedMortality` → `WeeklyCheck.WeeklyExpectedMortality`     | `expectedValue.ExpectedMortality`                                           |
+| **Mortalidad Real (%)**           | `WeeklyRealMortality`         | `weekly_checks.weekly_real_mortality`                                                | `WeeklyCheck.WeeklyRealMortality` → `WeeklyRealMortality`                     | `(finalDailyCheck.AccumulatedMortality / brood.BroodBirdInitialNum) × 100`  |
+| **Diferencia Mortalidad (%)**     | `WeeklyMortalityDifference`   | `weekly_checks.weekly_mortality_difference`                                          | `WeeklyCheck.WeeklyMortalityDifference` → `WeeklyMortalityDifference`         | `weeklyRealMortality - expectedValue.ExpectedMortality`                     |
+
+
+DATOS FUENTE
+─────────────────────────────────────────
+
+daily_checks.accumulated_consumption
+                │
+                ▼
+DailyCheck.AccumulatedConsumption
+                │
+                ▼
+finalDailyCheck.AccumulatedConsumption
+                │
+                │
+                │     daily_checks.daily_bird_balance
+                │                   │
+                │                   ▼
+                │       DailyCheck.DailyBirdBalance
+                │                   │
+                │                   ▼
+                │       finalDailyCheck.DailyBirdBalance
+                │                   │
+                └──────────┬────────┘
+                           │
+                           ▼
+                 WeeklyRealConsumption
+                           =
+       finalDailyCheck.AccumulatedConsumption
+       ──────────────────────────────────────
+          finalDailyCheck.DailyBirdBalance
+                           │
+                           ▼
+             WeeklyCheck.WeeklyRealConsumption
+                           │
+                           ▼
+       weekly_checks.weekly_real_consumption
+
+
+| Display                           | Campo                         | Fórmula o Fuente                                                            |
+| --------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| **Cantidad inicial aves**         | `BroodBirdInitialNum`         | `brood.BroodBirdInitialNum`                                                 |
+| **Saldo actual aves**             | `FinalDailyBirdBalance`       | `finalDailyCheck.DailyBirdBalance`                                          |
+| **Consumo acumulado final (kg)**  | `FinalAccumulatedConsumption` | `finalDailyCheck.AccumulatedConsumption`                                    |
+| **Mortalidad acumulada final**    | `FinalAccumulatedMortality`   | `finalDailyCheck.AccumulatedMortality`                                      |
+| **Cantidad Aves Muestra**         | `SampleBirdQuantity`          | `Ceiling(finalDailyCheck.DailyBirdBalance × 0.02)`                          |
+| **Peso total de la muestra (kg)** | `TotalBirdWeight`             | `model.TotalBirdWeight` — ingresado por el usuario                          |
+| **Peso promedio semanal (kg)**    | `AverageWeeklyWeight`         | `model.TotalBirdWeight / sampleBirdQuantity`                                |
+| **Consumo esperado (kg)**         | `WeeklyExpectedConsumption`   | `expectedValue.ExpectedConsumption`                                         |
+| **Consumo Real (kg)**             | `WeeklyRealConsumption`       | `finalDailyCheck.AccumulatedConsumption / finalDailyCheck.DailyBirdBalance` |
+| **Diferencia Consumo (kg)**       | `WeeklyConsumptionDifference` | `weeklyRealConsumption - weeklyExpectedConsumption`                         |
+| **Peso esperado (kg)**            | `WeeklyExpectedWeight`        | `expectedValue.ExpectedWeight`                                              |
+| **Diferencia de peso (kg)**       | `WeeklyWeightDifference`      | `averageWeeklyWeight - weeklyExpectedWeight`                                |
+| **Conversión esperada**           | `WeeklyExpectedConversion`    | `expectedValue.ExpectedConversion`                                          |
+| **Conversión Real**               | `WeeklyRealConversion`        | `weeklyRealConsumption / averageWeeklyWeight`                               |
+| **Diferencia Conversión**         | `WeeklyConversionDifference`  | `weeklyRealConversion - weeklyExpectedConversion`                           |
+| **Mortalidad esperada (%)**       | `WeeklyExpectedMortality`     | `expectedValue.ExpectedMortality`                                           |
+| **Mortalidad Real (%)**           | `WeeklyRealMortality`         | `(finalDailyCheck.AccumulatedMortality / brood.BroodBirdInitialNum) × 100`  |
+| **Diferencia Mortalidad (%)**     | `WeeklyMortalityDifference`   | `weeklyRealMortality - weeklyExpectedMortality`                             |
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 
 

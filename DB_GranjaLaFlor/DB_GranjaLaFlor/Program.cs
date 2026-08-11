@@ -62,6 +62,7 @@ builder.Services.AddScoped<BroodService>();
 builder.Services.AddScoped<IncomeConcentrateService>();
 builder.Services.AddScoped<DailyCheckService>();
 builder.Services.AddScoped<ExpectedValueService>();
+builder.Services.AddScoped<WeeklyCheckService>();
 
 var app = builder.Build();
 

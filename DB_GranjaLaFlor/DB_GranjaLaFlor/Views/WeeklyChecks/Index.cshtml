@@ -1,0 +1,436 @@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck.WeeklyCheckFilterViewModel
+
+@{
+    ViewData["Title"] = "Controles Semanales";
+}
+
+<div class="container mt-4">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">
+                Controles Semanales
+            </h1>
+        </div>
+
+        <div class="card-body">
+
+            <div class="mb-3">
+                <a asp-action="Create"
+                   class="btn btn-outline-info">
+                    Nuevo Control Semanal
+                </a>
+            </div>
+
+            @*
+            * UI Filter | Weekly Checks
+            * Allows the user to filter active Weekly Check records
+            * by Broiler House, Brood, year and production week.
+            *@
+            <form asp-action="Index"
+                  method="get"
+                  class="mb-4">
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label asp-for="BroilerHouseId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroilerHouseId"
+                                asp-items="Model.BroilerHouseOptions"
+                                class="form-select"
+                                id="BroilerHouseId">
+                            <option value="">
+                                Todas las polleras
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="BroodId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroodId"
+                                asp-items="Model.BroodOptions"
+                                class="form-select"
+                                id="BroodId">
+                            <option value="">
+                                Todas las camadas
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="Year"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="Year"
+                                asp-items="Model.YearOptions"
+                                class="form-select">
+                            <option value="">
+                                Todos los años
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="WeeklyCheckWeek"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="WeeklyCheckWeek"
+                                asp-items="Model.WeeklyCheckWeekOptions"
+                                class="form-select">
+                            <option value="">
+                                Todas las semanas
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit"
+                                class="btn btn-outline-primary me-2">
+                            Buscar
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Limpiar
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model =>
+                                         model.WeeklyChecks.First().BroilerHouseName)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model =>
+                                         model.WeeklyChecks.First().BroodName)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model =>
+                                         model.WeeklyChecks.First().BroodYear)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model =>
+                                         model.WeeklyChecks.First().WeeklyCheckWeek)
+                            </th>
+
+                            <th>
+                                <span class="d-block">
+                                    Peso
+                                </span>
+
+                                <span class="d-block">
+                                    Promedio (kg)
+                                </span>
+                            </th>
+
+                            <th>
+                                <span class="d-block">
+                                    Consumo
+                                </span>
+
+                                <span class="d-block">
+                                    (kg)
+                                </span>
+                            </th>
+
+                            <th>
+                                <span class="d-block">
+                                    Conversión
+                                </span>
+                            </th>
+
+                            <th>
+                                <span class="d-block">
+                                    Mortalidad (%)
+                                </span>
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.WeeklyChecks.Any())
+                        {
+                            @foreach (var item in Model.WeeklyChecks)
+                            {
+                                <tr class="table-active">
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem =>
+                                                 item.BroilerHouseName)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem =>
+                                                 item.BroodName)
+                                    </td>
+
+                                    <td class="text-center">
+                                        @Html.DisplayFor(
+                                                 modelItem =>
+                                                 item.BroodYear)
+                                    </td>
+
+                                    <td class="text-center">
+                                        @Html.DisplayFor(
+                                                 modelItem =>
+                                                 item.WeeklyCheckWeek)
+                                    </td>
+
+                                    <td>
+                                        <div class="mb-1">
+
+                                            <div class="form-control form-control-sm bg-light">
+                                                <span class="text-muted">
+                                                    Esperado:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyExpectedWeight.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="form-control form-control-sm">
+                                                <span class="text-muted">
+                                                    Real:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.AverageWeeklyWeight.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="mb-1">
+
+                                            <div class="form-control form-control-sm bg-light">
+                                                <span class="text-muted">
+                                                    Esperado:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyExpectedConsumption.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="form-control form-control-sm">
+                                                <span class="text-muted">
+                                                    Real:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyRealConsumption.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="mb-1">
+
+                                            <div class="form-control form-control-sm bg-light">
+                                                <span class="text-muted">
+                                                    Esperado:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyExpectedConversion.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="form-control form-control-sm">
+                                                <span class="text-muted">
+                                                    Real:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyRealConversion.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="mb-1">
+
+                                            <div class="form-control form-control-sm bg-light">
+                                                <span class="text-muted">
+                                                    Esperado:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyExpectedMortality.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="form-control form-control-sm">
+                                                <span class="text-muted">
+                                                    Real:
+                                                </span>
+
+                                                <strong class="float-end">
+                                                    @item.WeeklyRealMortality.ToString("N3")
+                                                </strong>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.WeeklyCheckId"
+                                           class="btn btn-outline-info btn-sm">
+                                            Detalles
+                                        </a>
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.WeeklyCheckId"
+                                           class="btn btn-outline-warning btn-sm">
+                                            Editar
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.WeeklyCheckId"
+                                           class="btn btn-outline-danger btn-sm">
+                                            Desactivar
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9"
+                                    class="text-center text-muted">
+                                    No existen controles semanales registrados.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const broilerHouseSelect =
+                    document.getElementById(
+                        "BroilerHouseId");
+
+                const broodSelect =
+                    document.getElementById(
+                        "BroodId");
+
+                /*
+                 * UI Support | Brood Filter
+                 * Updates the Brood filter options when the user
+                 * selects a different Broiler House.
+                 */
+                broilerHouseSelect.addEventListener(
+                    "change",
+                    async function () {
+
+                        const broilerHouseId =
+                            broilerHouseSelect.value;
+
+                        broodSelect.innerHTML =
+                            '<option value="">' +
+                            'Todas las camadas' +
+                            '</option>';
+
+                        if (!broilerHouseId) {
+                            return;
+                        }
+
+                        const url =
+                            '@Url.Action(
+                    "GetBroodsByBroilerHouse",
+                    "WeeklyChecks")' +
+                            '?broilerHouseId=' +
+                            encodeURIComponent(
+                                broilerHouseId);
+
+                        const response =
+                            await fetch(url);
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+                        const broodOptions =
+                            await response.json();
+
+                        broodOptions.forEach(
+                            function (option) {
+
+                                const broodOption =
+                                    document.createElement(
+                                        "option");
+
+                                broodOption.value =
+                                    option.value;
+
+                                broodOption.textContent =
+                                    option.text;
+
+                                broodSelect.appendChild(
+                                    broodOption);
+                            });
+                    });
+            });
+    </script>
+}

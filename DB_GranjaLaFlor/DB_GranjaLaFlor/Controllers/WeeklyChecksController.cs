@@ -1,0 +1,408 @@
+﻿using DB_GranjaLaFlor.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck;
+
+namespace DB_GranjaLaFlor.Controllers
+{
+    /*
+     * Architecture Decision | Thin Controller
+     * Controllers coordinate HTTP requests and responses only.
+     * Business rules, calculations and database operations are delegated
+     * to the Service layer.
+     */
+    [Authorize]
+    public class WeeklyChecksController : Controller
+    {
+        private readonly WeeklyCheckService _weeklyCheckService;
+        private readonly ILogger<WeeklyChecksController> _logger;
+
+        public WeeklyChecksController(
+            WeeklyCheckService weeklyCheckService,
+            ILogger<WeeklyChecksController> logger)
+        {
+            _weeklyCheckService = weeklyCheckService;
+            _logger = logger;
+        }
+
+        /*
+         * UI Request | Weekly Check Index
+         * Receives the optional filters selected by the user and delegates
+         * the retrieval of records and dropdown options to the Service layer.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Index(int? broodId,int? year,int? broilerHouseId,string? weeklyCheckWeek)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Index(). " +
+                "BroodId: {BroodId}, " +
+                "Year: {Year}, " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                broodId,
+                year,
+                broilerHouseId,
+                weeklyCheckWeek);
+
+            try
+            {
+                /*
+                 * Delegates the Weekly Check records, current filter values
+                 * and dropdown menu options to the Service layer.
+                 */
+                var model =
+                    await _weeklyCheckService
+                        .GetFilterViewModelAsync(
+                            broodId,
+                            year,
+                            broilerHouseId,
+                            weeklyCheckWeek);
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Weekly Check Index.");
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar la información de controles semanales. " +
+                    "Intente nuevamente.";
+
+                return View(
+                    new WeeklyCheckFilterViewModel());
+            }
+        }
+
+        /*
+         * GET: WeeklyChecks/Create
+         * Displays the Create view and loads the information
+         * required to register a new Weekly Check.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Create() GET.");
+
+            try
+            {
+                var model =
+                    await _weeklyCheckService
+                        .GetCreateViewModelAsync();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Weekly Check Create.");
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar el formulario de control semanal. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        /*
+         * UI Request | Broods by Broiler House
+         * Retrieves the active Broods associated with the selected
+         * Broiler House and returns them to the Create or Edit view.
+         */
+        [HttpGet]
+        public async Task<IActionResult> GetBroodsByBroilerHouse(
+            int broilerHouseId)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.GetBroodsByBroilerHouse(). " +
+                "BroilerHouseId: {BroilerHouseId}",
+                broilerHouseId);
+
+            if (broilerHouseId <= 0)
+            {
+                _logger.LogWarning(
+                    "Invalid BroilerHouseId received while retrieving Broods. " +
+                    "BroilerHouseId: {BroilerHouseId}",
+                    broilerHouseId);
+
+                return BadRequest(new
+                {
+                    message =
+                        "Debe seleccionar una pollera válida."
+                });
+            }
+
+            try
+            {
+                var broodOptions =
+                    await _weeklyCheckService
+                        .GetBroodsByBroilerHouseAsync(
+                            broilerHouseId);
+
+                return Json(
+                    broodOptions.Select(option => new
+                    {
+                        value = option.Value,
+                        text = option.Text
+                    }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while retrieving Broods. " +
+                    "BroilerHouseId: {BroilerHouseId}",
+                    broilerHouseId);
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        message =
+                            "No se pudieron cargar las camadas."
+                    });
+            }
+        }
+
+        /*
+         * UI Request | Weekly Check Information
+         * Retrieves the selected Brood, Expected Values and seven
+         * Daily Checks required to preview the Weekly Check calculations.
+         */
+        [HttpGet]
+        public async Task<IActionResult> GetWeeklyCheckInformation(
+            int broilerHouseId,
+            int broodId,
+            string weeklyCheckWeek,
+            decimal totalBirdWeight = 0)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.GetWeeklyCheckInformation(). " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}, " +
+                "WeeklyCheckWeek: {WeeklyCheckWeek}, " +
+                "TotalBirdWeight: {TotalBirdWeight}",
+                broilerHouseId,
+                broodId,
+                weeklyCheckWeek,
+                totalBirdWeight);
+
+            if (broilerHouseId <= 0 ||
+                broodId <= 0 ||
+                string.IsNullOrWhiteSpace(
+                    weeklyCheckWeek))
+            {
+                _logger.LogWarning(
+                    "Invalid information received while retrieving " +
+                    "Weekly Check information. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    broilerHouseId,
+                    broodId,
+                    weeklyCheckWeek);
+
+                return BadRequest(new
+                {
+                    message =
+                        "Debe seleccionar una pollera, camada y semana válidas."
+                });
+            }
+
+            try
+            {
+                var weeklyCheckInformation =
+                    await _weeklyCheckService
+                        .GetWeeklyCheckInformationAsync(
+                            broilerHouseId,
+                            broodId,
+                            weeklyCheckWeek,
+                            totalBirdWeight);
+
+                if (weeklyCheckInformation == null)
+                {
+                    _logger.LogWarning(
+                        "Weekly Check information was not found. " +
+                        "BroilerHouseId: {BroilerHouseId}, " +
+                        "BroodId: {BroodId}, " +
+                        "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                        broilerHouseId,
+                        broodId,
+                        weeklyCheckWeek);
+
+                    return NotFound(new
+                    {
+                        message =
+                            "La camada seleccionada no está disponible " +
+                            "para la pollera indicada."
+                    });
+                }
+
+                return Json(new
+                {
+                    weeklyCheckInformation.BroodBirdInitialNum,
+                    weeklyCheckInformation.FinalDailyBirdBalance,
+                    weeklyCheckInformation.FinalAccumulatedConsumption,
+                    weeklyCheckInformation.FinalAccumulatedMortality,
+
+                    weeklyCheckInformation.ExpectedValueId,
+
+                    weeklyCheckInformation.WeeklyExpectedConsumption,
+                    weeklyCheckInformation.WeeklyExpectedWeight,
+                    weeklyCheckInformation.WeeklyExpectedConversion,
+                    weeklyCheckInformation.WeeklyExpectedMortality,
+
+                    weeklyCheckInformation.SampleBirdQuantity,
+                    weeklyCheckInformation.AverageWeeklyWeight,
+                    weeklyCheckInformation.WeeklyRealConsumption,
+                    weeklyCheckInformation.WeeklyConsumptionDifference,
+                    weeklyCheckInformation.WeeklyWeightDifference,
+                    weeklyCheckInformation.WeeklyRealConversion,
+                    weeklyCheckInformation.WeeklyConversionDifference,
+                    weeklyCheckInformation.WeeklyRealMortality,
+                    weeklyCheckInformation.WeeklyMortalityDifference,
+
+                    dailyChecks =
+                        weeklyCheckInformation.DailyChecks
+                            .Select(dailyCheck => new
+                            {
+                                dailyCheck.DailyCheckId,
+                                dailyCheck.DailyCheckDate,
+                                dailyCheck.DailyCheckDay,
+                                dailyCheck.DailyCheckWeek,
+                                dailyCheck.TotalDailyMortality,
+                                dailyCheck.AccumulatedMortality,
+                                dailyCheck.DailyBirdBalance,
+                                dailyCheck.IncomeAccumulated,
+                                dailyCheck.ConsumptionKilos,
+                                dailyCheck.AccumulatedConsumption,
+                                dailyCheck.ConcentrateBalance
+                            })
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while retrieving " +
+                    "Weekly Check information. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    broilerHouseId,
+                    broodId,
+                    weeklyCheckWeek);
+
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while retrieving Weekly Check information. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    broilerHouseId,
+                    broodId,
+                    weeklyCheckWeek);
+
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        message =
+                            "No se pudo cargar la información del control semanal."
+                    });
+            }
+        }
+
+        /*
+         * POST: WeeklyChecks/Create
+         * Receives the Weekly Check information and delegates its
+         * validation, calculations and persistence to the Service layer.
+         */
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(WeeklyCheckFormViewModel model)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Create() POST. " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}, " +
+                "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                model.BroilerHouseId,
+                model.BroodId,
+                model.WeeklyCheckWeek);
+
+            if (!ModelState.IsValid)
+            {
+                await _weeklyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+
+            try
+            {
+                await _weeklyCheckService
+                    .CreateAsync(model);
+
+                TempData["SuccessMessage"] =
+                    "El control semanal fue registrado correctamente.";
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while creating " +
+                    "Weekly Check. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                await _weeklyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while creating Weekly Check. " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo registrar el control semanal. " +
+                    "Intente nuevamente.";
+
+                await _weeklyCheckService
+                    .PopulateFormOptionsAsync(model);
+
+                return View(model);
+            }
+        }
+    }
+}

@@ -486,3 +486,19 @@ body {
         font-size: 1.25rem;
     }
 }
+
+
+/* ============================================================
+   Weekly Check | Details
+   ============================================================ */
+
+/*
+ * Secondary Card Header
+ * Defines the dark gray header used by the internal information
+ * cards displayed in the Weekly Check Details view.
+ */
+.weekly-details-header {
+    background-color: #495057;
+    color: #ffffff;
+    text-align: center;
+}

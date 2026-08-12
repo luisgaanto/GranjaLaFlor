@@ -379,7 +379,7 @@ namespace DB_GranjaLaFlor.Services
          * Create view and loads its dropdown options.
          */
         public async Task<WeeklyCheckFormViewModel>
-            GetCreateViewModelAsync()
+                GetCreateViewModelAsync()
         {
             var model =
                 new WeeklyCheckFormViewModel();
@@ -537,16 +537,15 @@ namespace DB_GranjaLaFlor.Services
 
 
         /*
- * UI Data | Weekly Check Information
- * Retrieves the selected Brood, its seven active Daily Checks
- * and the Expected Value record associated with the selected week.
- *
- * The method also generates the Weekly Check calculation preview.
- * Official values are recalculated again by CreateAsync or UpdateAsync
- * before the Weekly Check is saved.
- */
-        public async Task<WeeklyCheckFormViewModel?>
-            GetWeeklyCheckInformationAsync(
+         * UI Data | Weekly Check Information
+         * Retrieves the selected Brood, its seven active Daily Checks
+         * and the Expected Value record associated with the selected week.
+         *
+         * The method also generates the Weekly Check calculation preview.
+         * Official values are recalculated again by CreateAsync or UpdateAsync
+         * before the Weekly Check is saved.
+         */
+        public async Task<WeeklyCheckFormViewModel?>GetWeeklyCheckInformationAsync(
                 int broilerHouseId,
                 int broodId,
                 string weeklyCheckWeek,
@@ -1330,7 +1329,167 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
+        /*
+         * Data Query | Weekly Check by ID
+         * Retrieves a Weekly Check and the related information required
+         * by the Details, Edit and Delete operations.
+         *
+         * The method also retrieves Día 7 of the corresponding Daily Check
+         * week because its accumulated values represent the final operational
+         * information used by the Weekly Check.
+         */
+        public async Task<WeeklyCheckGetByIdViewModel?>GetByIdAsync(int weeklyCheckId)
+        {
+            /*
+             * Data Query | Weekly Check
+             * Retrieves the Weekly Check and projects the stored values,
+             * Brood information and Broiler House information required
+             * by the GetById ViewModel.
+             */
+            var weeklyCheck =
+                await _context.WeeklyChecks
+                    .AsNoTracking()
+                    .Where(weeklyCheck =>
+                        weeklyCheck.WeeklyCheckId ==
+                            weeklyCheckId)
+                    .Select(weeklyCheck => new WeeklyCheckGetByIdViewModel
+                        {
+                            WeeklyCheckId = weeklyCheck.WeeklyCheckId,
 
+                            WeeklyCheckState = weeklyCheck.WeeklyCheckState,
+
+                            BroilerHouseId = weeklyCheck.Brood.BroilerHouseId,
+
+                            BroilerHouseName = weeklyCheck.Brood.BroilerHouse.BroilerHouseName,
+
+                            BroodId = weeklyCheck.BroodId,
+
+                            BroodName = weeklyCheck.Brood.BroodName,
+
+                            BroodDate = weeklyCheck.Brood.BroodDate,
+
+                            BroodBirdInitialNum =weeklyCheck.Brood.BroodBirdInitialNum,
+
+                            WeeklyCheckWeek = weeklyCheck.WeeklyCheckWeek,
+
+                            SampleBirdQuantity = weeklyCheck.SampleBirdQuantity,
+
+                            TotalBirdWeight = weeklyCheck.TotalBirdWeight,
+
+                            AverageWeeklyWeight = weeklyCheck.AverageWeeklyWeight,
+
+                            WeeklyExpectedWeight = weeklyCheck.WeeklyExpectedWeight,
+
+                            WeeklyWeightDifference = weeklyCheck.WeeklyWeightDifference,
+
+                            WeeklyRealConsumption = weeklyCheck.WeeklyRealConsumption,
+
+                            WeeklyExpectedConsumption = weeklyCheck.WeeklyExpectedConsumption,
+
+                            WeeklyConsumptionDifference = weeklyCheck.WeeklyConsumptionDifference,
+
+                            WeeklyRealConversion = weeklyCheck.WeeklyRealConversion,
+
+                            WeeklyExpectedConversion = weeklyCheck.WeeklyExpectedConversion,
+
+                            WeeklyConversionDifference = weeklyCheck.WeeklyConversionDifference,
+
+                            WeeklyRealMortality = weeklyCheck.WeeklyRealMortality,
+
+                            WeeklyExpectedMortality = weeklyCheck.WeeklyExpectedMortality,
+
+                            WeeklyMortalityDifference = weeklyCheck.WeeklyMortalityDifference,
+
+                            WeeklyCheckDescription = weeklyCheck.WeeklyCheckDescription,
+
+                            ExpectedValueId = weeklyCheck.ExpectedValueId
+                        })
+                    .FirstOrDefaultAsync();
+
+            if (weeklyCheck == null)
+            {
+                return null;
+            }
+
+            /*
+             * Data Query | Final Daily Check
+             * Retrieves Día 7 from the same Brood and production week.
+             *
+             * Its accumulated values represent the final mortality,
+             * bird balance and accumulated consumption associated
+             * with the Weekly Check.
+             */
+            var finalDailyCheck =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .Where(dailyCheck =>
+                        dailyCheck.BroodId ==
+                            weeklyCheck.BroodId &&
+                        dailyCheck.DailyCheckWeek ==
+                            weeklyCheck.WeeklyCheckWeek &&
+                        dailyCheck.DailyCheckDay ==
+                            "Día 7" &&
+                        dailyCheck.DailyCheckState)
+                    .Select(dailyCheck => new
+                    {
+                        dailyCheck.AccumulatedMortality,
+                        dailyCheck.DailyBirdBalance,
+                        dailyCheck.AccumulatedConsumption
+                    })
+                    .FirstOrDefaultAsync();
+
+            /*
+             * Related Data | Final Daily Check
+             * Copies the final operational information when Día 7
+             * is available for the Weekly Check period.
+             */
+            if (finalDailyCheck != null)
+            {
+                weeklyCheck.FinalAccumulatedMortality =
+                    finalDailyCheck.AccumulatedMortality;
+
+                weeklyCheck.FinalDailyBirdBalance =
+                    finalDailyCheck.DailyBirdBalance;
+
+                weeklyCheck.FinalAccumulatedConsumption =
+                    finalDailyCheck.AccumulatedConsumption;
+            }
+
+            /*
+             * Data Query | Weekly Daily Checks: Retrieves the seven active Daily Check records associated with the same Brood and production week.
+             * These records are displayed in the Details view to provide the operational information used to generate the Weekly Check.
+             */
+            weeklyCheck.DailyChecks =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .Where(dailyCheck =>
+                        dailyCheck.BroodId ==
+                            weeklyCheck.BroodId &&
+                        dailyCheck.DailyCheckWeek ==
+                            weeklyCheck.WeeklyCheckWeek &&
+                        dailyCheck.DailyCheckState)
+                    .OrderBy(dailyCheck =>
+                        dailyCheck.DailyCheckDate)
+                    .ThenBy(dailyCheck =>
+                        dailyCheck.DailyCheckId)
+                    .Select(dailyCheck => new WeeklyCheckDailyCheckViewModel
+                        {
+                            DailyCheckId = dailyCheck.DailyCheckId,
+                            DailyCheckDate = dailyCheck.DailyCheckDate,
+                            DailyCheckDay = dailyCheck.DailyCheckDay,
+                            DailyCheckWeek = dailyCheck.DailyCheckWeek ?? string.Empty,
+                            TotalDailyMortality = dailyCheck.TotalDailyMortality,
+                            AccumulatedMortality = dailyCheck.AccumulatedMortality,
+                            DailyBirdBalance = dailyCheck.DailyBirdBalance,
+                            IncomeAccumulated = dailyCheck.IncomeConcentrate.IncomeAccumulated,
+                            ConsumptionKilos = dailyCheck.ConsumptionKilos,
+                            AccumulatedConsumption = dailyCheck.AccumulatedConsumption,
+                            ConcentrateBalance = dailyCheck.ConcentrateBalance
+                        })
+                    .ToListAsync();
+
+            return weeklyCheck;
+        }
 
 
 

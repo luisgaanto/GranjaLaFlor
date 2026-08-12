@@ -404,5 +404,95 @@ namespace DB_GranjaLaFlor.Controllers
                 return View(model);
             }
         }
+
+
+        /*
+         * GET: WeeklyChecks/Details/5
+         * Retrieves and displays the complete information
+         * of the selected Weekly Check.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Details(int? id)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Details(). " +
+                "WeeklyCheckId: {WeeklyCheckId}",
+                id);
+
+            /*
+             * Request Validation | Weekly Check ID
+             * Confirms that a valid identifier was provided
+             * before querying the Weekly Check.
+             */
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Weekly Check Details request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido para consultar el control semanal.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+
+            try
+            {
+                /*
+                 * Data Query | Weekly Check
+                 * Retrieves the complete Weekly Check information
+                 * required by the Details view.
+                 */
+                var weeklyCheck =
+                    await _weeklyCheckService
+                        .GetByIdAsync(
+                            id.Value);
+
+                if (weeklyCheck == null)
+                {
+                    _logger.LogWarning(
+                        "Weekly Check was not found while loading Details. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control semanal seleccionado no existe.";
+
+                    return RedirectToAction(
+                        nameof(Index));
+                }
+
+                _logger.LogInformation(
+                    "Weekly Check Details loaded successfully. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id.Value);
+
+                return View(
+                    weeklyCheck);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Weekly Check Details. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo consultar el detalle del control semanal. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }

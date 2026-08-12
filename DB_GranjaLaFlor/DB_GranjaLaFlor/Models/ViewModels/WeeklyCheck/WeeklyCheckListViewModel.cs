@@ -62,15 +62,19 @@ namespace ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck
          * expected and real weekly results.
          */
         [Display(Name = "Peso esperado (kg)")]
+        [DisplayFormat(DataFormatString = "{0:N3}")]
         public decimal WeeklyExpectedWeight { get; set; }
 
         [Display(Name = "Consumo esperado (kg)")]
+        [DisplayFormat(DataFormatString = "{0:N3}")]
         public decimal WeeklyExpectedConsumption { get; set; }
 
         [Display(Name = "Conversión esperada")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal WeeklyExpectedConversion { get; set; }
 
         [Display(Name = "Mortalidad esperada (%)")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal WeeklyExpectedMortality { get; set; }
     }
 }

@@ -1,5 +1,1724 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck.WeeklyCheckFormViewModel
+
 @{
+    ViewData["Title"] = "Editar Control Semanal";
+}
+
+<div class="container-fluid mt-4 px-4"
+     style="max-width: 1800px; margin: auto;">
+
+    <div class="card border-primary">
+
+        <!-- ================================================= -->
+        <!-- Main Header                                       -->
+        <!-- ================================================= -->
+
+        <div class="card-header bg-primary text-white text-center">
+
+            <h1 class="mb-0">
+                Editar Control Semanal
+            </h1>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- ================================================= -->
+            <!-- Edit Form                                         -->
+            <!-- ================================================= -->
+
+            <form asp-action="Edit"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                @*
+                Internal identifier required by the Edit POST.
+                The identifier is not displayed to the user.
+                *@
+                <input asp-for="WeeklyCheckId"
+                       type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                @*
+                UI Feedback | Weekly Check Messages
+                Displays validation or informational messages returned
+                by asynchronous Weekly Check operations.
+                *@
+                <div id="weeklyCheckMessage"
+                     class="alert d-none"
+                     role="alert">
+                </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Section 1 | General Information                       -->
+                <!-- ===================================================== -->
+
+                <div class="weekly-section-heading">
+
+                    <h5 class="mb-0">
+                        ℹ️ Información General
+                    </h5>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <div class="row g-3">
+
+                        <!-- Broiler House -->
+                        <div class="col-md-4">
+
+                            <label asp-for="BroilerHouseId"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="BroilerHouseId"
+                                    asp-items="Model.BroilerHouseOptions"
+                                    class="form-select"
+                                    id="BroilerHouseId">
+
+                                <option value="">
+                                    Seleccione una pollera
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="BroilerHouseId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Brood -->
+                        <div class="col-md-4">
+
+                            <label asp-for="BroodId"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="BroodId"
+                                    asp-items="Model.BroodOptions"
+                                    class="form-select"
+                                    id="BroodId">
+
+                                <option value="">
+                                    Seleccione una camada
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="BroodId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Week -->
+                        <div class="col-md-4">
+
+                            <label asp-for="WeeklyCheckWeek"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="WeeklyCheckWeek"
+                                    asp-items="Model.WeeklyCheckWeekOptions"
+                                    class="form-select"
+                                    id="WeeklyCheckWeek">
+
+                                <option value="">
+                                    Seleccione una semana
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="WeeklyCheckWeek"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="text-end mt-3">
+
+                        <button type="button"
+                                id="btnLoadInformation"
+                                class="btn btn-outline-primary">
+
+                            Obtener información
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Section 2 | Automatically Obtained Information        -->
+                <!-- ===================================================== -->
+
+                <div class="weekly-section-heading">
+
+                    <h5 class="mb-0">
+                        📥 Información obtenida automáticamente
+                    </h5>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <div class="row g-4">
+
+                        <!-- ============================================= -->
+                        <!-- Base Information                              -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        Información Base
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:60%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.BroodBirdInitialNum)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="BroodBirdInitialNumDisplay">
+                                                        @Model.BroodBirdInitialNum
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalAccumulatedMortality)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalAccumulatedMortalityDisplay">
+                                                        @Model.FinalAccumulatedMortality
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalDailyBirdBalance)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalDailyBirdBalanceDisplay">
+                                                        @Model.FinalDailyBirdBalance
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalAccumulatedConsumption)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalAccumulatedConsumptionDisplay">
+                                                        @Model.FinalAccumulatedConsumption.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalConcentrateBalance)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalConcentrateBalanceDisplay">
+                                                        @Model.FinalConcentrateBalance.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Reference Values                              -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        Valores de Referencia
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:60%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.SampleBirdQuantity)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="SampleBirdQuantityDisplay">
+                                                        @Model.SampleBirdQuantity
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedConsumption)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyExpectedConsumptionDisplay">
+                                                        @Model.WeeklyExpectedConsumption.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedWeight)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyExpectedWeightDisplay">
+                                                        @Model.WeeklyExpectedWeight.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedConversion)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyExpectedConversionDisplay">
+                                                        @Model.WeeklyExpectedConversion.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedMortality)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyExpectedMortalityDisplay">
+                                                        @Model.WeeklyExpectedMortality.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Section 3 | Calculated Information                    -->
+                <!-- ===================================================== -->
+
+                <div class="weekly-section-heading">
+
+                    <h5 class="mb-0">
+                        🧮 Información calculada
+                    </h5>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <div class="row g-4">
+
+                        <!-- Weight -->
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        ⚖️ Peso
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.TotalBirdWeight)
+                                                </th>
+
+                                                <td>
+
+                                                    <input asp-for="TotalBirdWeight"
+                                                           class="form-control form-control-sm"
+                                                           type="number"
+                                                           min="0.001"
+                                                           step="0.001"
+                                                           id="TotalBirdWeight" />
+
+                                                    <span asp-validation-for="TotalBirdWeight"
+                                                          class="text-danger">
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.AverageWeeklyWeight)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="AverageWeeklyWeightDisplay">
+                                                        @Model.AverageWeeklyWeight.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyWeightDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyWeightDifferenceDisplay">
+                                                        @Model.WeeklyWeightDifference.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Consumption -->
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        🌾 Consumo
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealConsumption)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealConsumptionDisplay">
+                                                        @Model.WeeklyRealConsumption.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyConsumptionDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyConsumptionDifferenceDisplay">
+                                                        @Model.WeeklyConsumptionDifference.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Conversion -->
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        🔄 Conversión
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealConversion)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealConversionDisplay">
+                                                        @Model.WeeklyRealConversion.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyConversionDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyConversionDifferenceDisplay">
+                                                        @Model.WeeklyConversionDifference.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Mortality -->
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        📉 Mortalidad
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealMortality)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealMortalityDisplay">
+                                                        @Model.WeeklyRealMortality.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyMortalityDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyMortalityDifferenceDisplay">
+                                                        @Model.WeeklyMortalityDifference.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="mt-4">
+
+                        <label asp-for="WeeklyCheckDescription"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <textarea asp-for="WeeklyCheckDescription"
+                                  class="form-control"
+                                  rows="3">
+                        </textarea>
+
+                        <span asp-validation-for="WeeklyCheckDescription"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Daily Checks                                          -->
+                <!-- ===================================================== -->
+
+                <div class="card border-primary mb-4">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <h5 class="mb-0">
+                            📋 Controles diarios
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover table-bordered align-middle mb-0">
+
+                                <thead class="table-primary text-center">
+
+                                    <tr>
+
+                                        <th>Fecha</th>
+
+                                        <th>Día</th>
+
+                                        <th>Semana</th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Mortalidad
+                                            </span>
+                                            <span class="d-block">
+                                                Diaria
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Mortalidad
+                                            </span>
+                                            <span class="d-block">
+                                                Acumulada
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Saldo
+                                            </span>
+                                            <span class="d-block">
+                                                Aves
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Ingreso Concentrado
+                                            </span>
+                                            <span class="d-block">
+                                                Acumulado (kg)
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Consumo
+                                            </span>
+                                            <span class="d-block">
+                                                Diario (kg)
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Consumo
+                                            </span>
+                                            <span class="d-block">
+                                                Acumulado (kg)
+                                            </span>
+                                        </th>
+
+                                        <th>
+                                            <span class="d-block">
+                                                Saldo
+                                            </span>
+                                            <span class="d-block">
+                                                Concentrado (kg)
+                                            </span>
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="dailyChecksTableBody">
+
+                                    @if (Model.DailyChecks.Any())
+                                    {
+                                        @foreach (var dailyCheck in Model.DailyChecks)
+                                        {
+                                            <tr class="table-active">
+
+                                                <td class="text-center">
+                                                    @dailyCheck.DailyCheckDate.ToString("dd/MM/yyyy")
+                                                </td>
+
+                                                <td class="text-center">
+                                                    @dailyCheck.DailyCheckDay
+                                                </td>
+
+                                                <td class="text-center">
+                                                    @dailyCheck.DailyCheckWeek
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.TotalDailyMortality
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.AccumulatedMortality
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.DailyBirdBalance
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.IncomeAccumulated.ToString("N2")
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.ConsumptionKilos.ToString("N2")
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.AccumulatedConsumption.ToString("N2")
+                                                </td>
+
+                                                <td class="text-end">
+                                                    @dailyCheck.ConcentrateBalance.ToString("N2")
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr id="dailyChecksEmptyRow">
+
+                                            <td colspan="10"
+                                                class="text-center text-muted">
+
+                                                No existen controles diarios para mostrar.
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Form Actions                                          -->
+                <!-- ===================================================== -->
+
+                <div class="d-flex justify-content-end mt-4">
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary me-2">
+
+                        Cancelar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-warning">
+
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        /*
+        * UI Support | Broods by Broiler House
+        * Updates the Brood dropdown when the user selects
+        * a different Broiler House.
+        *
+        * The available Broods are retrieved from the Controller
+        * and are limited to active Broods associated with the
+        * selected active Broiler House.
+        */
+        async function loadBroods() {
+
+            clearWeeklyCheckMessage();
+
+            const broilerHouseSelect =
+                document.getElementById(
+                    "BroilerHouseId");
+
+            const broodSelect =
+                document.getElementById(
+                    "BroodId");
+
+            const broilerHouseId =
+                broilerHouseSelect.value;
+
+            /*
+             * Clears the current Brood options before loading
+             * the records associated with the selected Broiler House.
+             */
+            broodSelect.innerHTML =
+                '<option value="">' +
+                'Seleccione una camada' +
+                '</option>';
+
+            if (!broilerHouseId) {
+                return;
+            }
+
+            try {
+                const url =
+                    '@Url.Action(
+            "GetBroodsByBroilerHouse",
+                "WeeklyChecks")' +
+                '?broilerHouseId=' +
+                    encodeURIComponent(
+                        broilerHouseId);
+
+                const response =
+                    await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(
+                        "No se pudieron cargar las camadas.");
+                }
+
+                const broodOptions =
+                    await response.json();
+
+                broodOptions.forEach(
+                    function (option) {
+
+                        const broodOption =
+                            document.createElement(
+                                "option");
+
+                        broodOption.value =
+                            option.value;
+
+                        broodOption.textContent =
+                            option.text;
+
+                        broodSelect.appendChild(
+                            broodOption);
+                    });
+            }
+            catch (error) {
+                console.error(
+                    "Error loading Broods:",
+                    error);
+
+                showWeeklyCheckMessage(
+                    error.message,
+                    "danger");
+            }
+        }
+
+        /*
+        * UI Event | Broiler House Selection
+        * Clears the previous Weekly Check information and loads
+        * the Broods associated with the selected Broiler House.
+        */
+        document
+            .getElementById(
+                "BroilerHouseId")
+            .addEventListener(
+                "change",
+                async function () {
+
+                    clearWeeklyCheckInformation();
+
+                    await loadBroods();
+                });
+
+
+
+        /*
+        * UI Support | Weekly Check Information
+        * Retrieves the Brood, Expected Values and seven Daily Checks
+        * associated with the selected Broiler House, Brood and week.
+        *
+        * The information displayed in the form is for user guidance.
+        * Official validations and calculations are always performed
+        * again by WeeklyCheckService before saving the record.
+        */
+        async function loadWeeklyCheckInformation() {
+            clearWeeklyCheckMessage();
+
+            const broilerHouseId =
+                document.getElementById(
+                    "BroilerHouseId").value;
+
+            const broodId =
+                document.getElementById(
+                    "BroodId").value;
+
+            const weeklyCheckWeek =
+                document.getElementById(
+                    "WeeklyCheckWeek").value;
+
+            const totalBirdWeight =
+                parseFloat(
+                    document.getElementById(
+                        "TotalBirdWeight").value) || 0;
+
+
+            if (!broilerHouseId ||
+                !broodId ||
+                !weeklyCheckWeek) {
+
+                showWeeklyCheckMessage(
+                    "Debe seleccionar una pollera, camada y semana.",
+                    "warning");
+
+                return;
+            }
+
+            try {
+                const url =
+                    '@Url.Action(
+            "GetWeeklyCheckInformation",
+                "WeeklyChecks")' +
+                '?broilerHouseId=' +
+                    encodeURIComponent(
+                        broilerHouseId) +
+                    '&broodId=' +
+                    encodeURIComponent(
+                        broodId) +
+                    '&weeklyCheckWeek=' +
+                    encodeURIComponent(
+                        weeklyCheckWeek) +
+                    '&totalBirdWeight=' +
+                    encodeURIComponent(
+                        totalBirdWeight);
+
+                const response =
+                    await fetch(url);
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message ||
+                        "No se pudo obtener la información del control semanal.");
+                }
+
+                /*
+                 * UI Update | Brood and Final Daily Check Information
+                 * Displays the operational values obtained from the
+                 * selected Brood and its final Daily Check.
+                 */
+                document.getElementById(
+                    "BroodBirdInitialNumDisplay")
+                    .textContent =
+                    data.broodBirdInitialNum;
+
+                document.getElementById(
+                    "FinalDailyBirdBalanceDisplay")
+                    .textContent =
+                    data.finalDailyBirdBalance;
+
+                document.getElementById(
+                    "FinalAccumulatedConsumptionDisplay")
+                    .textContent =
+                    Number(
+                        data.finalAccumulatedConsumption)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "FinalConcentrateBalanceDisplay")
+                    .textContent =
+                    Number(
+                        data.finalConcentrateBalance)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "FinalAccumulatedMortalityDisplay")
+                    .textContent =
+                    data.finalAccumulatedMortality;
+
+                document.getElementById(
+                    "SampleBirdQuantityDisplay")
+                    .textContent =
+                    data.sampleBirdQuantity;
+
+                /*
+                 * UI Update | Expected Values
+                 * Displays the values obtained from expected_values
+                 * for the selected production week.
+                 */
+                document.getElementById(
+                    "WeeklyExpectedConsumptionDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyExpectedConsumption)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyExpectedWeightDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyExpectedWeight)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyExpectedConversionDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyExpectedConversion)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "WeeklyExpectedMortalityDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyExpectedMortality)
+                        .toFixed(2);
+
+                /*
+                 * UI Update | Weekly Calculations
+                 * Displays the calculation preview generated
+                 * by WeeklyCheckService.
+                 */
+                document.getElementById(
+                    "AverageWeeklyWeightDisplay")
+                    .textContent =
+                    Number(
+                        data.averageWeeklyWeight)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyRealConsumptionDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyRealConsumption)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyConsumptionDifferenceDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyConsumptionDifference)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyWeightDifferenceDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyWeightDifference)
+                        .toFixed(3);
+
+                document.getElementById(
+                    "WeeklyRealConversionDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyRealConversion)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "WeeklyConversionDifferenceDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyConversionDifference)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "WeeklyRealMortalityDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyRealMortality)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "WeeklyMortalityDifferenceDisplay")
+                    .textContent =
+                    Number(
+                        data.weeklyMortalityDifference)
+                        .toFixed(2);
+
+                /*
+                 * UI Update | Daily Check Table
+                 * Rebuilds the Daily Check table using the seven records
+                 * returned for the selected Brood and week.
+                 */
+                updateDailyChecksTable(
+                    data.dailyChecks);
+            }
+
+            catch (error) {
+                console.error(
+                    "Error loading Weekly Check information:",
+                    error);
+
+                showWeeklyCheckMessage(
+                    error.message,
+                    "danger");
+            }
+
+        }
+
+
+        /*
+        * UI Support | Daily Check Table
+        * Displays the seven Daily Check records used
+        * as the operational source of the Weekly Check.
+        */
+        function updateDailyChecksTable(
+            dailyChecks) {
+
+            const tableBody =
+                document.getElementById(
+                    "dailyChecksTableBody");
+
+            tableBody.innerHTML = "";
+
+            if (!dailyChecks ||
+                dailyChecks.length === 0) {
+
+                tableBody.innerHTML =
+                    '<tr>' +
+                    '<td colspan="10" ' +
+                    'class="text-center text-muted">' +
+                    'No existen controles diarios para mostrar.' +
+                    '</td>' +
+                    '</tr>';
+
+                return;
+            }
+
+            dailyChecks.forEach(
+                function (dailyCheck) {
+
+                    const row =
+                        document.createElement(
+                            "tr");
+
+                    row.classList.add(
+                        "table-active");
+
+                    /*
+                     * Converts the date received from ASP.NET Core
+                     * into the dd/MM/yyyy format used by the application.
+                     */
+                    const date =
+                        new Date(
+                            dailyCheck.dailyCheckDate);
+
+                    const formattedDate =
+                        date.toLocaleDateString(
+                            "es-CR");
+
+                    /*
+                     * UI Update | Daily Check Row
+                     * Displays the operational information associated
+                     * with each Daily Check in the selected week.
+                     */
+                    row.innerHTML =
+
+                        '<td class="text-center">' +
+                        formattedDate +
+                        '</td>' +
+
+                        '<td class="text-center">' +
+                        dailyCheck.dailyCheckDay +
+                        '</td>' +
+
+                        '<td class="text-center">' +
+                        dailyCheck.dailyCheckWeek +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        dailyCheck.totalDailyMortality +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        dailyCheck.accumulatedMortality +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        dailyCheck.dailyBirdBalance +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        Number(
+                            dailyCheck.incomeAccumulated)
+                            .toFixed(2) +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        Number(
+                            dailyCheck.consumptionKilos)
+                            .toFixed(2) +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        Number(
+                            dailyCheck.accumulatedConsumption)
+                            .toFixed(2) +
+                        '</td>' +
+
+                        '<td class="text-end">' +
+                        Number(
+                            dailyCheck.concentrateBalance)
+                            .toFixed(2) +
+                        '</td>';
+
+                    tableBody.appendChild(
+                        row);
+                });
+        }
+
+        /*
+        * UI Support | Weekly Check Message
+        * Displays asynchronous validation and informational messages
+        * using the same Bootstrap alert style used by the application.
+        */
+        function showWeeklyCheckMessage(
+            message,
+            type = "danger") {
+
+            const messageContainer =
+                document.getElementById(
+                    "weeklyCheckMessage");
+
+            messageContainer.className =
+                "alert alert-" +
+                type;
+
+            messageContainer.textContent =
+                message;
+
+            messageContainer.classList.remove(
+                "d-none");
+        }
+
+        /*
+        * UI Support | Clear Weekly Check Message
+        * Hides the previous asynchronous message before
+        * processing a new Weekly Check request.
+        */
+        function clearWeeklyCheckMessage() {
+
+            const messageContainer =
+                document.getElementById(
+                    "weeklyCheckMessage");
+
+            messageContainer.textContent = "";
+
+            messageContainer.className =
+                "alert d-none";
+        }
+
+
+        /*
+        * UI Event | Obtain Weekly Information
+        * Retrieves the Weekly Check information after
+        * the user selects the required values.
+        */
+        document
+            .getElementById(
+                "btnLoadInformation")
+            .addEventListener(
+                "click",
+                loadWeeklyCheckInformation);
+
+
+        /*
+        * UI Support | Clear Weekly Check Information
+        * Clears the previously obtained and calculated Weekly Check
+        * information when the Broiler House, Brood or week changes.
+        *
+        * This prevents information from a previous selection from
+        * remaining visible after the user selects different criteria.
+        */
+        function clearWeeklyCheckInformation() {
+
+            /*
+             * Clears information obtained from the Brood,
+             * Daily Checks and Expected Values.
+             */
+            document.getElementById(
+                "BroodBirdInitialNumDisplay")
+                .textContent = "0";
+
+            document.getElementById(
+                "FinalDailyBirdBalanceDisplay")
+                .textContent = "0";
+
+            document.getElementById(
+                "FinalAccumulatedConsumptionDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "FinalConcentrateBalanceDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "FinalAccumulatedMortalityDisplay")
+                .textContent = "0";
+
+            document.getElementById(
+                "SampleBirdQuantityDisplay")
+                .textContent = "0";
+
+            document.getElementById(
+                "WeeklyExpectedConsumptionDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyExpectedWeightDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyExpectedConversionDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "WeeklyExpectedMortalityDisplay")
+                .textContent = "0.00";
+
+            /*
+             * Clears the user-entered sample weight because
+             * it belongs to the previous selection.
+             */
+            document.getElementById(
+                "TotalBirdWeight")
+                .value = "";
+
+            /*
+             * Clears calculated Weekly Check values.
+             */
+            document.getElementById(
+                "AverageWeeklyWeightDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyRealConsumptionDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyConsumptionDifferenceDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyWeightDifferenceDisplay")
+                .textContent = "0.000";
+
+            document.getElementById(
+                "WeeklyRealConversionDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "WeeklyConversionDifferenceDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "WeeklyRealMortalityDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "WeeklyMortalityDifferenceDisplay")
+                .textContent = "0.00";
+
+            /*
+             * Clears the Daily Check table.
+             */
+            const tableBody =
+                document.getElementById(
+                    "dailyChecksTableBody");
+
+            tableBody.innerHTML =
+                '<tr>' +
+                '<td colspan="10" ' +
+                'class="text-center text-muted">' +
+                'Seleccione una pollera, camada y semana ' +
+                'para obtener los controles diarios.' +
+                '</td>' +
+                '</tr>';
+        }
+
+        /*
+        * UI Event | Weekly Check Selection Change
+        * Clears information obtained for the previous Brood
+        * or production week.
+        */
+        document
+            .getElementById(
+                "BroodId")
+            .addEventListener(
+                "change",
+                function () {
+
+                    clearWeeklyCheckMessage();
+                    clearWeeklyCheckInformation();
+                });
+
+        document
+            .getElementById(
+                "WeeklyCheckWeek")
+            .addEventListener(
+                "change",
+                function () {
+
+                    clearWeeklyCheckMessage();
+                    clearWeeklyCheckInformation();
+                });
+        /*
+        * UI Support | Weight-Dependent Weekly Calculations
+        * Recalculates the Weekly Check values that depend on
+        * the total weight entered for the bird sample.
+        *
+        * These calculations are displayed only as a preview.
+        * WeeklyCheckService recalculates the official values
+        * before saving the record.
+        */
+        function calculateWeightValues() {
+
+            const totalBirdWeight =
+                parseFloat(
+                    document.getElementById(
+                        "TotalBirdWeight").value) || 0;
+
+            const sampleBirdQuantity =
+                parseInt(
+                    document.getElementById(
+                        "SampleBirdQuantityDisplay")
+                        .textContent) || 0;
+
+            const weeklyExpectedWeight =
+                parseFloat(
+                    document.getElementById(
+                        "WeeklyExpectedWeightDisplay")
+                        .textContent) || 0;
+
+            const weeklyRealConsumption =
+                parseFloat(
+                    document.getElementById(
+                        "WeeklyRealConsumptionDisplay")
+                        .textContent) || 0;
+
+            const weeklyExpectedConversion =
+                parseFloat(
+                    document.getElementById(
+                        "WeeklyExpectedConversionDisplay")
+                        .textContent) || 0;
+
+            /*
+             * UI Validation | Weight Calculation
+             * Prevents calculations until the Weekly Check information
+             * and a valid total sample weight are available.
+             */
+            if (totalBirdWeight <= 0 ||
+                sampleBirdQuantity <= 0) {
+
+                document.getElementById(
+                    "AverageWeeklyWeightDisplay")
+                    .textContent = "0.000";
+
+                document.getElementById(
+                    "WeeklyWeightDifferenceDisplay")
+                    .textContent = "0.000";
+
+                document.getElementById(
+                    "WeeklyRealConversionDisplay")
+                    .textContent = "0.00";
+
+                document.getElementById(
+                    "WeeklyConversionDifferenceDisplay")
+                    .textContent = "0.00";
+
+                return;
+            }
+
+            /*
+             * Business Calculation Preview | Average Weekly Weight
+             * Divides the total sample weight by the number
+             * of birds included in the sample.
+             */
+            const averageWeeklyWeight =
+                totalBirdWeight /
+                sampleBirdQuantity;
+
+            /*
+             * Business Calculation Preview | Weekly Weight Difference
+             * Calculates real average weight minus expected weight.
+             */
+            const weeklyWeightDifference =
+                averageWeeklyWeight -
+                weeklyExpectedWeight;
+
+            /*
+             * Business Calculation Preview | Real Weekly Conversion
+             * Divides real consumption per bird by the
+             * real average weekly weight.
+             */
+            const weeklyRealConversion =
+                weeklyRealConsumption /
+                averageWeeklyWeight;
+
+            /*
+             * Business Calculation Preview | Conversion Difference
+             * Calculates real conversion minus expected conversion.
+             */
+            const weeklyConversionDifference =
+                weeklyRealConversion -
+                weeklyExpectedConversion;
+
+            document.getElementById(
+                "AverageWeeklyWeightDisplay")
+                .textContent =
+                averageWeeklyWeight.toFixed(3);
+
+            document.getElementById(
+                "WeeklyWeightDifferenceDisplay")
+                .textContent =
+                weeklyWeightDifference.toFixed(3);
+
+            document.getElementById(
+                "WeeklyRealConversionDisplay")
+                .textContent =
+                weeklyRealConversion.toFixed(2);
+
+            document.getElementById(
+                "WeeklyConversionDifferenceDisplay")
+                .textContent =
+                weeklyConversionDifference.toFixed(2);
+        }
+
+        /*
+        * UI Event | Total Sample Weight
+        * Updates the weight-dependent calculation preview
+        * whenever the user modifies the total sample weight.
+        */
+        document
+            .getElementById(
+                "TotalBirdWeight")
+            .addEventListener(
+                "input",
+                calculateWeightValues);
+
+
+
+    </script>
 }

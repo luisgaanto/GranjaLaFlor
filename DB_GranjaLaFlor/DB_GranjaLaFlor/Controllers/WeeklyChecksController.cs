@@ -592,7 +592,179 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
+        /*
+ * POST: WeeklyChecks/Edit/5
+ * Receives the modified Weekly Check information and delegates
+ * its validation, recalculation and persistence to the Service layer.
+ */
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            WeeklyCheckFormViewModel model)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Edit() POST. " +
+                "WeeklyCheckId: {WeeklyCheckId}, " +
+                "BroilerHouseId: {BroilerHouseId}, " +
+                "BroodId: {BroodId}, " +
+                "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                model.WeeklyCheckId,
+                model.BroilerHouseId,
+                model.BroodId,
+                model.WeeklyCheckWeek);
 
+            /*
+             * Model Validation | Edit Form
+             */
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning(
+                    "Weekly Check Edit form contains invalid information. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    model.WeeklyCheckId);
+
+                try
+                {
+                    model =
+                        await _weeklyCheckService
+                            .ReloadEditFormAsync(
+                                model);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "Weekly Check Edit information could not be completely " +
+                        "reloaded after ModelState validation failure. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        model.WeeklyCheckId);
+
+                    await _weeklyCheckService
+                        .PopulateFormOptionsAsync(
+                            model);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error while reloading Weekly Check Edit form " +
+                        "after ModelState validation failure. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        model.WeeklyCheckId);
+
+                    await _weeklyCheckService
+                        .PopulateFormOptionsAsync(
+                            model);
+                }
+
+                return View(
+                    model);
+            }
+
+            try
+            {
+                /*
+                 * Business Operation | Update Weekly Check
+                 */
+                await _weeklyCheckService
+                    .UpdateAsync(
+                        model);
+
+                _logger.LogInformation(
+                    "Weekly Check updated successfully. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    model.WeeklyCheckId);
+
+                TempData["SuccessMessage"] =
+                    "El control semanal fue actualizado correctamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while updating Weekly Check. " +
+                    "WeeklyCheckId: {WeeklyCheckId}, " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    model.WeeklyCheckId,
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                try
+                {
+                    model =
+                        await _weeklyCheckService
+                            .ReloadEditFormAsync(
+                                model);
+                }
+                catch (InvalidOperationException reloadException)
+                {
+                    _logger.LogWarning(
+                        reloadException,
+                        "Weekly Check Edit information could not be completely " +
+                        "reloaded after business validation failure. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        model.WeeklyCheckId);
+
+                    await _weeklyCheckService
+                        .PopulateFormOptionsAsync(
+                            model);
+                }
+
+                return View(
+                    model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while updating Weekly Check. " +
+                    "WeeklyCheckId: {WeeklyCheckId}, " +
+                    "BroilerHouseId: {BroilerHouseId}, " +
+                    "BroodId: {BroodId}, " +
+                    "WeeklyCheckWeek: {WeeklyCheckWeek}",
+                    model.WeeklyCheckId,
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo actualizar el control semanal. " +
+                    "Intente nuevamente.";
+
+                try
+                {
+                    model =
+                        await _weeklyCheckService
+                            .ReloadEditFormAsync(
+                                model);
+                }
+                catch (Exception reloadException)
+                {
+                    _logger.LogError(
+                        reloadException,
+                        "Unexpected error while reloading Weekly Check Edit form. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        model.WeeklyCheckId);
+
+                    await _weeklyCheckService
+                        .PopulateFormOptionsAsync(
+                            model);
+                }
+
+                return View(
+                    model);
+            }
+        }
 
 
 

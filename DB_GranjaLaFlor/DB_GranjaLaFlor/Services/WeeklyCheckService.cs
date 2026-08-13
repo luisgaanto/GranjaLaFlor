@@ -1611,8 +1611,257 @@ namespace DB_GranjaLaFlor.Services
             return model;
         }
 
+        /*
+ * UI Data | Reload Weekly Check Edit Form
+ * Rebuilds the automatically obtained and calculated
+ * information required by the Edit view after a validation
+ * or business rule error.
+ *
+ * User-entered values such as the Weekly Check identifier,
+ * total sample weight and description are preserved.
+ */
+        public async Task<WeeklyCheckFormViewModel>
+            ReloadEditFormAsync(
+                WeeklyCheckFormViewModel model)
+        {
+            /*
+             * UI Data | Weekly Check Information
+             * Attempts to regenerate the operational information,
+             * Expected Values, calculations and Daily Check records
+             * using the values currently selected by the user.
+             */
+            var reloadedModel =
+                await GetWeeklyCheckInformationAsync(
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek,
+                    model.TotalBirdWeight);
 
+            /*
+             * When the selected Brood is no longer available,
+             * the submitted model is preserved and only its
+             * dropdown options are loaded again.
+             */
+            if (reloadedModel == null)
+            {
+                await PopulateFormOptionsAsync(
+                    model);
 
+                return model;
+            }
+
+            /*
+             * User Input | Preserve Edit Information
+             * Values entered directly by the user are restored
+             * because GetWeeklyCheckInformationAsync generates
+             * only operational and calculated information.
+             */
+            reloadedModel.WeeklyCheckId =
+                model.WeeklyCheckId;
+
+            reloadedModel.WeeklyCheckDescription =
+                model.WeeklyCheckDescription;
+
+            /*
+             * UI Data | Form Options
+             * Reloads the dropdown options while preserving
+             * the current Broiler House, Brood and week selections.
+             */
+            await PopulateFormOptionsAsync(
+                reloadedModel);
+
+            return reloadedModel;
+        }
+
+        /*
+         * Business Operation | Update Weekly Check
+         * Validates the existing Weekly Check, the submitted form
+         * information and the current operational data before updating
+         * the record.
+         *
+         * Obtained and calculated values submitted by the browser are
+         * not trusted. They are generated again using the current Brood,
+         * Expected Value and Daily Check information before saving.
+         */
+        public async Task UpdateAsync(WeeklyCheckFormViewModel model)
+        {
+            /*
+             * Business Validation | Weekly Check ID
+             * Confirms that the submitted record identifier is valid.
+             */
+            if (model.WeeklyCheckId <= 0)
+            {
+                throw new InvalidOperationException(
+                    "El identificador del control semanal no es válido.");
+            }
+
+            /*
+             * Business Validation | Total Bird Weight
+             * Confirms that the total weight entered for the
+             * weekly bird sample is greater than zero.
+             */
+            if (model.TotalBirdWeight <= 0)
+            {
+                throw new InvalidOperationException(
+                    "El peso total de la muestra debe ser mayor que cero.");
+            }
+
+            /*
+             * Data Query | Existing Weekly Check
+             * Retrieves the Weekly Check as a tracked entity because
+             * its values will be updated and persisted.
+             */
+            var weeklyCheck =
+                await _context.WeeklyChecks
+                    .FirstOrDefaultAsync(
+                        weeklyCheck =>
+                            weeklyCheck.WeeklyCheckId ==
+                                model.WeeklyCheckId);
+
+            if (weeklyCheck == null)
+            {
+                throw new InvalidOperationException(
+                    "El control semanal seleccionado no existe.");
+            }
+
+            /*
+             * Business Validation | Weekly Check State
+             * Only active Weekly Checks can be modified.
+             */
+            if (!weeklyCheck.WeeklyCheckState)
+            {
+                throw new InvalidOperationException(
+                    "El control semanal seleccionado no está disponible para edición.");
+            }
+
+            /*
+             * Business Validation | Duplicate Weekly Check
+             * Prevents another active Weekly Check from using the
+             * same Brood and production week.
+             *
+             * The current record is excluded from the validation.
+             */
+            var duplicateExists =
+                await _context.WeeklyChecks
+                    .AsNoTracking()
+                    .AnyAsync(existingWeeklyCheck =>
+                        existingWeeklyCheck.WeeklyCheckId !=
+                            model.WeeklyCheckId &&
+                        existingWeeklyCheck.BroodId ==
+                            model.BroodId &&
+                        existingWeeklyCheck.WeeklyCheckWeek ==
+                            model.WeeklyCheckWeek &&
+                        existingWeeklyCheck.WeeklyCheckState);
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException(
+                    "Ya existe otro control semanal activo para la camada y semana seleccionadas.");
+            }
+
+            /*
+             * Business Calculation | Weekly Check Information
+             * Reuses the Weekly Check calculation process to validate
+             * the submitted Broiler House, Brood and week and to
+             * regenerate all operational and calculated values.
+             */
+            var calculatedInformation =
+                await GetWeeklyCheckInformationAsync(
+                    model.BroilerHouseId,
+                    model.BroodId,
+                    model.WeeklyCheckWeek,
+                    model.TotalBirdWeight);
+
+            if (calculatedInformation == null)
+            {
+                throw new InvalidOperationException(
+                    "La camada seleccionada no pertenece a la pollera indicada o no está disponible.");
+            }
+
+            /*
+             * Entity Mapping | Weekly Check Update
+             * Updates user-entered values and replaces every obtained
+             * or calculated value with the information generated
+             * again by the Service layer.
+             */
+            weeklyCheck.SampleBirdQuantity =
+                calculatedInformation.SampleBirdQuantity;
+
+            weeklyCheck.TotalBirdWeight =
+                model.TotalBirdWeight;
+
+            weeklyCheck.AverageWeeklyWeight =
+                calculatedInformation.AverageWeeklyWeight;
+
+            /*
+             * Weekly Consumption.
+             */
+            weeklyCheck.WeeklyRealConsumption =
+                calculatedInformation.WeeklyRealConsumption;
+
+            weeklyCheck.WeeklyExpectedConsumption =
+                calculatedInformation.WeeklyExpectedConsumption;
+
+            weeklyCheck.WeeklyConsumptionDifference =
+                calculatedInformation.WeeklyConsumptionDifference;
+
+            /*
+             * Weekly Weight.
+             */
+            weeklyCheck.WeeklyExpectedWeight =
+                calculatedInformation.WeeklyExpectedWeight;
+
+            weeklyCheck.WeeklyWeightDifference =
+                calculatedInformation.WeeklyWeightDifference;
+
+            /*
+             * Weekly Conversion.
+             */
+            weeklyCheck.WeeklyRealConversion =
+                calculatedInformation.WeeklyRealConversion;
+
+            weeklyCheck.WeeklyExpectedConversion =
+                calculatedInformation.WeeklyExpectedConversion;
+
+            weeklyCheck.WeeklyConversionDifference =
+                calculatedInformation.WeeklyConversionDifference;
+
+            /*
+             * Weekly Mortality.
+             */
+            weeklyCheck.WeeklyRealMortality =
+                calculatedInformation.WeeklyRealMortality;
+
+            weeklyCheck.WeeklyExpectedMortality =
+                calculatedInformation.WeeklyExpectedMortality;
+
+            weeklyCheck.WeeklyMortalityDifference =
+                calculatedInformation.WeeklyMortalityDifference;
+
+            /*
+             * Editable Weekly Check information.
+             */
+            weeklyCheck.WeeklyCheckDescription =
+                string.IsNullOrWhiteSpace(
+                    model.WeeklyCheckDescription)
+                    ? null
+                    : model.WeeklyCheckDescription.Trim();
+
+            weeklyCheck.WeeklyCheckWeek =
+                model.WeeklyCheckWeek;
+
+            weeklyCheck.BroodId =
+                model.BroodId;
+
+            weeklyCheck.ExpectedValueId =
+                calculatedInformation.ExpectedValueId;
+
+            /*
+             * Database Operation | Update Weekly Check
+             * Persists the validated and recalculated Weekly Check.
+             */
+            await _context.SaveChangesAsync();
+        }
 
 
 

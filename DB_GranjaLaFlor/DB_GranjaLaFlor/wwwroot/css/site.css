@@ -487,18 +487,39 @@ body {
     }
 }
 
+/* =========================================================
+   Weekly Check | Main Section Heading
+   Provides visual separation between the main sections
+   without creating additional nested cards.
+   ========================================================= */
+.weekly-section-heading {
+    border-bottom: 2px solid #495057;
+    padding: 0.5rem 0.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
 
-/* ============================================================
-   Weekly Check | Details
-   ============================================================ */
+    .weekly-section-heading h5 {
+        color: #343a40;
+        font-weight: 600;
+    }
 
-/*
- * Secondary Card Header
- * Defines the dark gray header used by the internal information
- * cards displayed in the Weekly Check Details view.
- */
+
+/* =========================================================
+   Weekly Check | Internal Card Header
+   Defines the dark gray header used by the internal
+   information and calculation cards.
+   ========================================================= */
 .weekly-details-header {
-    background-color: #495057;
-    color: #ffffff;
+    background-color: #495057 !important;
+    color: #ffffff !important;
     text-align: center;
 }
+
+    .weekly-details-header h5,
+    .weekly-details-header h6 {
+        color: #ffffff !important;
+    }
+
+
+

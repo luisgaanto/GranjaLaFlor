@@ -90,6 +90,10 @@ namespace ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal FinalAccumulatedConsumption { get; set; }
 
+        [Display(Name = "Saldo Concentrado Final (kg)")]
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        public decimal FinalConcentrateBalance { get; set; }
+
         [Display(Name = "Mortalidad acumulada final")]
         public int FinalAccumulatedMortality { get; set; }
 

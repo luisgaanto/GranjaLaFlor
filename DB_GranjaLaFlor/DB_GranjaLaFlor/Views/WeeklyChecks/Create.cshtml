@@ -9,13 +9,23 @@
 
     <div class="card border-primary">
 
+        <!-- ================================================= -->
+        <!-- Main Header                                       -->
+        <!-- ================================================= -->
+
         <div class="card-header bg-primary text-white text-center">
+
             <h1 class="mb-0">
                 Registrar Control Semanal
             </h1>
+
         </div>
 
         <div class="card-body">
+
+            <!-- ================================================= -->
+            <!-- Create Form                                       -->
+            <!-- ================================================= -->
 
             <form asp-action="Create"
                   method="post">
@@ -26,600 +36,728 @@
                      class="text-danger mb-3">
                 </div>
 
+
                 @*
-                * UI Feedback | Weekly Check Messages
-                * Displays validation or informational messages returned
-                * by asynchronous Weekly Check operations.
+                UI Feedback | Weekly Check Messages
+                Displays validation or informational messages returned
+                by asynchronous Weekly Check operations.
                 *@
                 <div id="weeklyCheckMessage"
                      class="alert d-none"
                      role="alert">
                 </div>
 
+
                 <!-- ===================================================== -->
-                <!-- Card 1 | General Information                          -->
+                <!-- Section 1 | General Information                       -->
                 <!-- ===================================================== -->
 
-                <div class="card border-primary mb-4">
+                <div class="weekly-section-heading">
 
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            ℹ️ Información General
-                        </h5>
-                    </div>
+                    <h5 class="mb-0">
+                        ℹ️ Información General
+                    </h5>
 
-                    <div class="card-body">
-
-                        <div class="row">
-
-                            <div class="col-md-4 mb-3">
-
-                                <label asp-for="BroilerHouseId"
-                                       class="form-label">
-                                </label>
-
-                                <select asp-for="BroilerHouseId"
-                                        asp-items="Model.BroilerHouseOptions"
-                                        class="form-select"
-                                        id="BroilerHouseId">
-
-                                    <option value="">
-                                        Seleccione una pollera
-                                    </option>
-
-                                </select>
-
-                                <span asp-validation-for="BroilerHouseId"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-
-                                <label asp-for="BroodId"
-                                       class="form-label">
-                                </label>
-
-                                <select asp-for="BroodId"
-                                        asp-items="Model.BroodOptions"
-                                        class="form-select"
-                                        id="BroodId">
-
-                                    <option value="">
-                                        Seleccione una camada
-                                    </option>
-
-                                </select>
-
-                                <span asp-validation-for="BroodId"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-
-                                <label asp-for="WeeklyCheckWeek"
-                                       class="form-label">
-                                </label>
-
-                                <select asp-for="WeeklyCheckWeek"
-                                        asp-items="Model.WeeklyCheckWeekOptions"
-                                        class="form-select"
-                                        id="WeeklyCheckWeek">
-
-                                    <option value="">
-                                        Seleccione una semana
-                                    </option>
-
-                                </select>
-
-                                <span asp-validation-for="WeeklyCheckWeek"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div class="text-end">
-
-                            <button type="button"
-                                    id="btnLoadInformation"
-                                    class="btn btn-outline-primary">
-                                Obtener información
-                            </button>
-
-                        </div>
-
-                    </div>
                 </div>
 
+                <div class="mb-4">
+
+                    <div class="row g-3">
+
+                        <!-- ============================================= -->
+                        <!-- Broiler House                                 -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-4">
+
+                            <label asp-for="BroilerHouseId"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="BroilerHouseId"
+                                    asp-items="Model.BroilerHouseOptions"
+                                    class="form-select"
+                                    id="BroilerHouseId">
+
+                                <option value="">
+                                    Seleccione una pollera
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="BroilerHouseId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Brood                                         -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-4">
+
+                            <label asp-for="BroodId"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="BroodId"
+                                    asp-items="Model.BroodOptions"
+                                    class="form-select"
+                                    id="BroodId">
+
+                                <option value="">
+                                    Seleccione una camada
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="BroodId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Week                                          -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-4">
+
+                            <label asp-for="WeeklyCheckWeek"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="WeeklyCheckWeek"
+                                    asp-items="Model.WeeklyCheckWeekOptions"
+                                    class="form-select"
+                                    id="WeeklyCheckWeek">
+
+                                <option value="">
+                                    Seleccione una semana
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="WeeklyCheckWeek"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================================= -->
+                    <!-- Obtain Information Button                     -->
+                    <!-- ============================================= -->
+
+                    <div class="text-end mt-3">
+
+                        <button type="button"
+                                id="btnLoadInformation"
+                                class="btn btn-outline-primary">
+
+                            Obtener información
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
                 <!-- ===================================================== -->
-                <!-- Cards 2 and 3                                         -->
+                <!-- Section 2 | Automatically Obtained Information        -->
                 <!-- ===================================================== -->
 
-                <div class="row">
+                <div class="weekly-section-heading">
 
-                    <!-- ================================================= -->
-                    <!-- Card 2 | Obtained Information                     -->
-                    <!-- ================================================= -->
+                    <h5 class="mb-0">
+                        📥 Información obtenida automáticamente
+                    </h5>
 
-                    <div class="col-md-6 mb-4">
+                </div>
 
-                        <div class="card border-primary h-100">
+                <div class="mb-4">
 
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">
-                                    📥 Información obtenida automáticamente
-                                </h5>
-                            </div>
-                             
-                            <div class="card-body">
+                    <div class="row g-4">
 
-                                <div class="row g-3">
+                        <!-- ============================================= -->
+                        <!-- Base Information                              -->
+                        <!-- ============================================= -->
 
-                                    <!-- ============================================= -->
-                                    <!-- Operational Information                       -->
-                                    <!-- ============================================= -->
+                        <div class="col-md-6">
 
-                                    <div class="col-12">
+                            <div class="card bg-light border-secondary h-100">
 
-                                        <div class="card bg-light border-secondary">
+                                <div class="card-header weekly-details-header">
 
-                                            <div class="card-header bg-secondary text-white">
-                                                <h6 class="mb-0">
-                                                    Datos operativos
-                                                </h6>
-                                            </div>
+                                    <h5 class="mb-0">
+                                        Información Base
+                                    </h5>
 
-                                            <div class="card-body">
+                                </div>
 
-                                                <div class="mb-3">
-                                                    <label asp-for="BroodBirdInitialNum"
-                                                           class="form-label">
-                                                    </label>
+                                <div class="card-body">
 
-                                                    <div id="BroodBirdInitialNumDisplay"
-                                                         class="form-control-plaintext fw-semibold">
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:60%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.BroodBirdInitialNum)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="BroodBirdInitialNumDisplay">
                                                         @Model.BroodBirdInitialNum
-                                                    </div>
-                                                </div>
+                                                    </span>
 
-                                                <div class="mb-3">
-                                                    <label asp-for="FinalAccumulatedMortality"
-                                                           class="form-label">
-                                                    </label>
+                                                </td>
 
-                                                    <div id="FinalAccumulatedMortalityDisplay"
-                                                         class="form-control-plaintext fw-semibold">
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalAccumulatedMortality)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalAccumulatedMortalityDisplay">
                                                         @Model.FinalAccumulatedMortality
-                                                    </div>
-                                                </div>
+                                                    </span>
 
-                                                <div class="mb-3">
-                                                    <label asp-for="FinalDailyBirdBalance"
-                                                           class="form-label">
-                                                    </label>
+                                                </td>
 
-                                                    <div id="FinalDailyBirdBalanceDisplay"
-                                                         class="form-control-plaintext fw-semibold">
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalDailyBirdBalance)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalDailyBirdBalanceDisplay">
                                                         @Model.FinalDailyBirdBalance
-                                                    </div>
-                                                </div>
+                                                    </span>
 
-                                                <div class="mb-3">
-                                                    <label asp-for="FinalAccumulatedConsumption"
-                                                           class="form-label">
-                                                    </label>
+                                                </td>
 
-                                                    <div id="FinalAccumulatedConsumptionDisplay"
-                                                         class="form-control-plaintext fw-semibold">
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalAccumulatedConsumption)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="FinalAccumulatedConsumptionDisplay">
                                                         @Model.FinalAccumulatedConsumption.ToString("N2")
-                                                    </div>
-                                                </div>
+                                                    </span>
 
-                                            </div>
+                                                </td>
 
-                                        </div>
+                                            </tr>
 
-                                    </div>
+                                            <tr class="table-active">
 
-                                    <!-- ============================================= -->
-                                    <!-- Reference Values                               -->
-                                    <!-- ============================================= -->
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.FinalConcentrateBalance)
+                                                </th>
 
-                                    <div class="col-12">
+                                                <td class="fw-semibold">
 
-                                        <div class="card bg-light border-secondary">
+                                                    <span id="FinalConcentrateBalanceDisplay">
+                                                        @Model.FinalConcentrateBalance.ToString("N2")
+                                                    </span>
 
-                                            <div class="card-header bg-secondary text-white">
-                                                <h6 class="mb-0">
-                                                    Valores de referencia
-                                                </h6>
-                                            </div>
+                                                </td>
 
-                                            <div class="card-body">
+                                            </tr>
 
-                                                <div class="mb-3">
-                                                    <label asp-for="SampleBirdQuantity"
-                                                           class="form-label">
-                                                    </label>
+                                        </tbody>
 
-                                                    <div id="SampleBirdQuantityDisplay"
-                                                         class="form-control-plaintext fw-semibold">
-                                                        @Model.SampleBirdQuantity
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label asp-for="WeeklyExpectedConsumption"
-                                                           class="form-label">
-                                                    </label>
-
-                                                    <div id="WeeklyExpectedConsumptionDisplay"
-                                                         class="form-control-plaintext fw-semibold">
-                                                        @Model.WeeklyExpectedConsumption.ToString("N3")
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label asp-for="WeeklyExpectedWeight"
-                                                           class="form-label">
-                                                    </label>
-
-                                                    <div id="WeeklyExpectedWeightDisplay"
-                                                         class="form-control-plaintext fw-semibold">
-                                                        @Model.WeeklyExpectedWeight.ToString("N3")
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label asp-for="WeeklyExpectedConversion"
-                                                           class="form-label">
-                                                    </label>
-
-                                                    <div id="WeeklyExpectedConversionDisplay"
-                                                         class="form-control-plaintext fw-semibold">
-                                                        @Model.WeeklyExpectedConversion.ToString("N2")
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label asp-for="WeeklyExpectedMortality"
-                                                           class="form-label">
-                                                    </label>
-
-                                                    <div id="WeeklyExpectedMortalityDisplay"
-                                                         class="form-control-plaintext fw-semibold">
-                                                        @Model.WeeklyExpectedMortality.ToString("N2")
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
+                                    </table>
 
                                 </div>
 
                             </div>
+
                         </div>
 
-                    </div>
 
-                    <!-- ================================================= -->
-                    <!-- Card 3 | Calculated Information                   -->
-                    <!-- ================================================= -->
-                     
-                    <div class="col-md-6 mb-4">
+                        <!-- ============================================= -->
+                        <!-- Reference Values                              -->
+                        <!-- ============================================= -->
 
-                        <div class="card border-primary h-100">
+                        <div class="col-md-6">
 
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">
-                                    🧮 Información calculada
-                                </h5>
-                            </div>
+                            <div class="card bg-light border-secondary h-100">
 
-                            <div class="card-body">
+                                <div class="card-header weekly-details-header">
 
-                                <div class="card bg-light border-secondary">
+                                    <h5 class="mb-0">
+                                        Valores de Referencia
+                                    </h5>
 
-                                    <div class="card-body">
+                                </div>
 
-                                        <!-- ========================================= -->
-                                        <!-- User-entered Information                  -->
-                                        <!-- ========================================= -->
+                                <div class="card-body">
 
-                                        <h6 class="fw-semibold mb-3">
-                                            Datos ingresados
-                                        </h6>
+                                    <table class="table table-hover table-bordered align-middle mb-0">
 
-                                        <div class="mb-4">
+                                        <tbody>
 
-                                            <label asp-for="TotalBirdWeight"
-                                                   class="form-label">
-                                            </label>
+                                            <tr class="table-active">
 
-                                            <input asp-for="TotalBirdWeight"
-                                                   class="form-control"
-                                                   type="number"
-                                                   min="0.001"
-                                                   step="0.001"
-                                                   id="TotalBirdWeight" />
+                                                <th style="width:60%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.SampleBirdQuantity)
+                                                </th>
 
-                                            <span asp-validation-for="TotalBirdWeight"
-                                                  class="text-danger">
-                                            </span>
+                                                <td class="fw-semibold">
 
-                                        </div>
+                                                    <span id="SampleBirdQuantityDisplay">
+                                                        @Model.SampleBirdQuantity
+                                                    </span>
 
-                                        <!-- ========================================= -->
-                                        <!-- Calculated Result Cards                   -->
-                                        <!-- ========================================= -->
+                                                </td>
 
-                                        <div class="row g-3">
+                                            </tr>
 
-                                            <!-- Weight -->
+                                            <tr class="table-active">
 
-                                            <div class="col-md-6">
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedConsumption)
+                                                </th>
 
-                                                <div class="card bg-light border-secondary h-100">
+                                                <td class="fw-semibold">
 
-                                                    <div class="card-header bg-secondary text-white">
-                                                        <h6 class="mb-0">
-                                                            ⚖️ Peso
-                                                        </h6>
-                                                    </div>
+                                                    <span id="WeeklyExpectedConsumptionDisplay">
+                                                        @Model.WeeklyExpectedConsumption.ToString("N3")
+                                                    </span>
 
-                                                    <div class="card-body">
+                                                </td>
 
-                                                        <div class="mb-3">
+                                            </tr>
 
-                                                            <small class="text-muted">
-                                                                Real
-                                                            </small>
+                                            <tr class="table-active">
 
-                                                            <label asp-for="AverageWeeklyWeight"
-                                                                   class="form-label d-block">
-                                                            </label>
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedWeight)
+                                                </th>
 
-                                                            <div id="AverageWeeklyWeightDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.AverageWeeklyWeight.ToString("N3")
-                                                            </div>
+                                                <td class="fw-semibold">
 
-                                                        </div>
+                                                    <span id="WeeklyExpectedWeightDisplay">
+                                                        @Model.WeeklyExpectedWeight.ToString("N3")
+                                                    </span>
 
-                                                        <hr />
+                                                </td>
 
-                                                        <div>
+                                            </tr>
 
-                                                            <small class="text-muted">
-                                                                Diferencia
-                                                            </small>
+                                            <tr class="table-active">
 
-                                                            <label asp-for="WeeklyWeightDifference"
-                                                                   class="form-label d-block">
-                                                            </label>
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedConversion)
+                                                </th>
 
-                                                            <div id="WeeklyWeightDifferenceDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyWeightDifference.ToString("N3")
-                                                            </div>
+                                                <td class="fw-semibold">
 
-                                                        </div>
+                                                    <span id="WeeklyExpectedConversionDisplay">
+                                                        @Model.WeeklyExpectedConversion.ToString("N2")
+                                                    </span>
 
-                                                    </div>
+                                                </td>
 
-                                                </div>
+                                            </tr>
 
-                                            </div>
+                                            <tr class="table-active">
 
-                                            <!-- Consumption -->
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyExpectedMortality)
+                                                </th>
 
-                                            <div class="col-md-6">
+                                                <td class="fw-semibold">
 
-                                                <div class="card bg-light border-secondary h-100">
+                                                    <span id="WeeklyExpectedMortalityDisplay">
+                                                        @Model.WeeklyExpectedMortality.ToString("N2")
+                                                    </span>
 
-                                                    <div class="card-header bg-secondary text-white">
-                                                        <h6 class="mb-0">
-                                                            🌾 Consumo
-                                                        </h6>
-                                                    </div>
+                                                </td>
 
-                                                    <div class="card-body">
+                                            </tr>
 
-                                                        <div class="mb-3">
+                                        </tbody>
 
-                                                            <small class="text-muted">
-                                                                Real
-                                                            </small>
-
-                                                            <label asp-for="WeeklyRealConsumption"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyRealConsumptionDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyRealConsumption.ToString("N3")
-                                                            </div>
-
-                                                        </div>
-
-                                                        <hr />
-
-                                                        <div>
-
-                                                            <small class="text-muted">
-                                                                Diferencia
-                                                            </small>
-
-                                                            <label asp-for="WeeklyConsumptionDifference"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyConsumptionDifferenceDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyConsumptionDifference.ToString("N3")
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                            <!-- Conversion -->
-
-                                            <div class="col-md-6">
-
-                                                <div class="card bg-light border-secondary h-100">
-
-                                                    <div class="card-header bg-secondary text-white">
-                                                        <h6 class="mb-0">
-                                                            🔄 Conversión
-                                                        </h6>
-                                                    </div>
-
-                                                    <div class="card-body">
-
-                                                        <div class="mb-3">
-
-                                                            <small class="text-muted">
-                                                                Real
-                                                            </small>
-
-                                                            <label asp-for="WeeklyRealConversion"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyRealConversionDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyRealConversion.ToString("N2")
-                                                            </div>
-
-                                                        </div>
-
-                                                        <hr />
-
-                                                        <div>
-
-                                                            <small class="text-muted">
-                                                                Diferencia
-                                                            </small>
-
-                                                            <label asp-for="WeeklyConversionDifference"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyConversionDifferenceDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyConversionDifference.ToString("N2")
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                            <!-- Mortality -->
-
-                                            <div class="col-md-6">
-
-                                                <div class="card bg-light border-secondary h-100">
-
-                                                    <div class="card-header bg-secondary text-white">
-                                                        <h6 class="mb-0">
-                                                            📉 Mortalidad
-                                                        </h6>
-                                                    </div>
-
-                                                    <div class="card-body">
-
-                                                        <div class="mb-3">
-
-                                                            <small class="text-muted">
-                                                                Real
-                                                            </small>
-
-                                                            <label asp-for="WeeklyRealMortality"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyRealMortalityDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyRealMortality.ToString("N2")
-                                                            </div>
-
-                                                        </div>
-
-                                                        <hr />
-
-                                                        <div>
-
-                                                            <small class="text-muted">
-                                                                Diferencia
-                                                            </small>
-
-                                                            <label asp-for="WeeklyMortalityDifference"
-                                                                   class="form-label d-block">
-                                                            </label>
-
-                                                            <div id="WeeklyMortalityDifferenceDisplay"
-                                                                 class="form-control-plaintext fw-semibold">
-                                                                @Model.WeeklyMortalityDifference.ToString("N2")
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- ========================================= -->
-                                        <!-- Description                               -->
-                                        <!-- ========================================= -->
-
-                                        <div class="mt-4">
-
-                                            <h6 class="fw-semibold mb-3">
-                                                Descripción
-                                            </h6>
-
-                                            <textarea asp-for="WeeklyCheckDescription"
-                                                      class="form-control"
-                                                      rows="3">
-                                            </textarea>
-
-                                            <span asp-validation-for="WeeklyCheckDescription"
-                                                  class="text-danger">
-                                            </span>
-
-                                        </div>
-
-                                    </div>
+                                    </table>
 
                                 </div>
 
                             </div>
+
                         </div>
 
                     </div>
 
                 </div>
+
+
+                <!-- ===================================================== -->
+                <!-- Section 3 | Calculated Information                    -->
+                <!-- ===================================================== -->
+
+                <div class="weekly-section-heading">
+
+                    <h5 class="mb-0">
+                        🧮 Información calculada
+                    </h5>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <div class="row g-4">
+
+                        <!-- ============================================= -->
+                        <!-- Weight                                        -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        ⚖️ Peso
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.TotalBirdWeight)
+                                                </th>
+
+                                                <td>
+
+                                                    <input asp-for="TotalBirdWeight"
+                                                           class="form-control form-control-sm"
+                                                           type="number"
+                                                           min="0.001"
+                                                           step="0.001"
+                                                           id="TotalBirdWeight" />
+
+                                                    <span asp-validation-for="TotalBirdWeight"
+                                                          class="text-danger">
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.AverageWeeklyWeight)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="AverageWeeklyWeightDisplay">
+                                                        @Model.AverageWeeklyWeight.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyWeightDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyWeightDifferenceDisplay">
+                                                        @Model.WeeklyWeightDifference.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Consumption                                   -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        🌾 Consumo
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealConsumption)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealConsumptionDisplay">
+                                                        @Model.WeeklyRealConsumption.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyConsumptionDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyConsumptionDifferenceDisplay">
+                                                        @Model.WeeklyConsumptionDifference.ToString("N3")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Conversion                                    -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        🔄 Conversión
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealConversion)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealConversionDisplay">
+                                                        @Model.WeeklyRealConversion.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyConversionDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyConversionDifferenceDisplay">
+                                                        @Model.WeeklyConversionDifference.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- Mortality                                     -->
+                        <!-- ============================================= -->
+
+                        <div class="col-md-6">
+
+                            <div class="card bg-light border-secondary h-100">
+
+                                <div class="card-header weekly-details-header">
+
+                                    <h5 class="mb-0">
+                                        📉 Mortalidad
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                                        <tbody>
+
+                                            <tr class="table-active">
+
+                                                <th style="width:55%">
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyRealMortality)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyRealMortalityDisplay">
+                                                        @Model.WeeklyRealMortality.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    @Html.DisplayNameFor(
+                                                             model => model.WeeklyMortalityDifference)
+                                                </th>
+
+                                                <td class="fw-semibold">
+
+                                                    <span id="WeeklyMortalityDifferenceDisplay">
+                                                        @Model.WeeklyMortalityDifference.ToString("N2")
+                                                    </span>
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================================= -->
+                    <!-- Description                                   -->
+                    <!-- ============================================= -->
+
+                    <div class="mt-4">
+
+                        <label asp-for="WeeklyCheckDescription"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <textarea asp-for="WeeklyCheckDescription"
+                                  class="form-control"
+                                  rows="3">
+                        </textarea>
+
+                        <span asp-validation-for="WeeklyCheckDescription"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
 
                 <!-- ===================================================== -->
                 <!-- Card 4 | Daily Checks                                 -->
@@ -628,16 +766,18 @@
                 <div class="card border-primary mb-4">
 
                     <div class="card-header bg-primary text-white">
+
                         <h5 class="mb-0">
                             📋 Controles diarios
                         </h5>
+
                     </div>
 
                     <div class="card-body">
 
                         <div class="table-responsive">
 
-                            <table class="table table-hover table-bordered align-middle">
+                            <table class="table table-hover table-bordered align-middle mb-0">
 
                                 <thead class="table-primary text-center">
 
@@ -656,66 +796,87 @@
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Mortalidad
                                             </span>
+
                                             <span class="d-block">
                                                 Diaria
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Mortalidad
                                             </span>
+
                                             <span class="d-block">
                                                 Acumulada
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Saldo
                                             </span>
+
                                             <span class="d-block">
                                                 Aves
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Ingreso Concentrado
                                             </span>
+
                                             <span class="d-block">
                                                 Acumulado (kg)
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Consumo
                                             </span>
+
                                             <span class="d-block">
                                                 Diario (kg)
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Consumo
                                             </span>
+
                                             <span class="d-block">
                                                 Acumulado (kg)
                                             </span>
+
                                         </th>
 
                                         <th>
+
                                             <span class="d-block">
                                                 Saldo
                                             </span>
+
                                             <span class="d-block">
                                                 Concentrado (kg)
                                             </span>
+
                                         </th>
 
                                     </tr>
@@ -798,20 +959,25 @@
 
                 </div>
 
+
                 <!-- ===================================================== -->
-                <!-- Form Actions                                           -->
+                <!-- Form Actions                                          -->
                 <!-- ===================================================== -->
 
                 <div class="d-flex justify-content-end mt-4">
 
                     <a asp-action="Index"
                        class="btn btn-outline-secondary me-2">
+
                         Cancelar
+
                     </a>
 
                     <button type="submit"
                             class="btn btn-success">
+
                         Guardar
+
                     </button>
 
                 </div>
@@ -1027,6 +1193,13 @@
                     .textContent =
                     Number(
                         data.finalAccumulatedConsumption)
+                        .toFixed(2);
+
+                document.getElementById(
+                    "FinalConcentrateBalanceDisplay")
+                    .textContent =
+                    Number(
+                        data.finalConcentrateBalance)
                         .toFixed(2);
 
                 document.getElementById(
@@ -1344,6 +1517,10 @@
 
             document.getElementById(
                 "FinalAccumulatedConsumptionDisplay")
+                .textContent = "0.00";
+
+            document.getElementById(
+                "FinalConcentrateBalanceDisplay")
                 .textContent = "0.00";
 
             document.getElementById(

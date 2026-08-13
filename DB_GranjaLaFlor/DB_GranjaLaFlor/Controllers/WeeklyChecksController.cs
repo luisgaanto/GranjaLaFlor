@@ -247,6 +247,7 @@ namespace DB_GranjaLaFlor.Controllers
                     weeklyCheckInformation.BroodBirdInitialNum,
                     weeklyCheckInformation.FinalDailyBirdBalance,
                     weeklyCheckInformation.FinalAccumulatedConsumption,
+                    weeklyCheckInformation.FinalConcentrateBalance,
                     weeklyCheckInformation.FinalAccumulatedMortality,
 
                     weeklyCheckInformation.ExpectedValueId,
@@ -487,7 +488,109 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
+        /*
+         * GET: WeeklyChecks/Edit/5
+         * Retrieves the selected Weekly Check and prepares
+         * the form required by the Edit view.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Edit(). " +
+                "WeeklyCheckId: {WeeklyCheckId}",
+                id);
 
+            /*
+             * Request Validation | Weekly Check ID
+             * Confirms that a valid identifier was provided
+             * before loading the Edit form.
+             */
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Weekly Check Edit request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido para editar el control semanal.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+
+            try
+            {
+                /*
+                 * UI Data | Weekly Check Edit Form
+                 * Retrieves the Weekly Check information and
+                 * prepares the form model required by Edit.
+                 */
+                var model =
+                    await _weeklyCheckService
+                        .GetFormByIdAsync(
+                            id.Value);
+
+                if (model == null)
+                {
+                    _logger.LogWarning(
+                        "Weekly Check was not found while loading Edit. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control semanal seleccionado no existe.";
+
+                    return RedirectToAction(
+                        nameof(Index));
+                }
+
+                /*
+                 * Business Validation | Weekly Check State
+                 * Only active Weekly Checks can be edited.
+                 */
+                var weeklyCheck =
+                    await _weeklyCheckService
+                        .GetByIdAsync(
+                            id.Value);
+
+                if (weeklyCheck == null ||
+                    !weeklyCheck.WeeklyCheckState)
+                {
+                    _logger.LogWarning(
+                        "Inactive Weekly Check cannot be edited. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control semanal seleccionado no está disponible para edición.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _logger.LogInformation(
+                    "Weekly Check Edit form loaded successfully. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id.Value);
+
+                return View(
+                    model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Weekly Check Edit form. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar el control semanal para edición. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+        }
 
 
 

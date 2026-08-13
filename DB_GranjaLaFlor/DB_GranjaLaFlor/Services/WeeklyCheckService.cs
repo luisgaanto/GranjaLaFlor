@@ -855,49 +855,28 @@ namespace DB_GranjaLaFlor.Services
             return new WeeklyCheckFormViewModel
             {
                 BroilerHouseId = broilerHouseId,
-
                 BroodId = broodId,
-
                 WeeklyCheckWeek = weeklyCheckWeek,
-
                 TotalBirdWeight = totalBirdWeight,
-
                 ExpectedValueId = expectedValue.ExpectedValueId,
-
                 BroodBirdInitialNum = brood.BroodBirdInitialNum,
-
                 FinalDailyBirdBalance = finalDailyCheck.DailyBirdBalance,
-
                 FinalAccumulatedConsumption = finalDailyCheck.AccumulatedConsumption,
-
+                FinalConcentrateBalance =finalDailyCheck.ConcentrateBalance,
                 FinalAccumulatedMortality = finalDailyCheck.AccumulatedMortality,
-
                 WeeklyExpectedConsumption = expectedValue.ExpectedConsumption,
-
                 WeeklyExpectedWeight = expectedValue.ExpectedWeight,
-
                 WeeklyExpectedConversion = expectedValue.ExpectedConversion,
-
                 WeeklyExpectedMortality = expectedValue.ExpectedMortality,
-
                 SampleBirdQuantity = sampleBirdQuantity,
-
                 AverageWeeklyWeight = averageWeeklyWeight,
-
                 WeeklyRealConsumption = weeklyRealConsumption,
-
                 WeeklyConsumptionDifference = weeklyConsumptionDifference,
-
                 WeeklyWeightDifference = weeklyWeightDifference,
-
                 WeeklyRealConversion = weeklyRealConversion,
-
                 WeeklyConversionDifference = weeklyConversionDifference,
-
                 WeeklyRealMortality = weeklyRealMortality,
-
                 WeeklyMortalityDifference = weeklyMortalityDifference,
-
                 DailyChecks = dailyChecks
             };
         }
@@ -1434,7 +1413,8 @@ namespace DB_GranjaLaFlor.Services
                     {
                         dailyCheck.AccumulatedMortality,
                         dailyCheck.DailyBirdBalance,
-                        dailyCheck.AccumulatedConsumption
+                        dailyCheck.AccumulatedConsumption,
+                        dailyCheck.ConcentrateBalance
                     })
                     .FirstOrDefaultAsync();
 
@@ -1453,6 +1433,9 @@ namespace DB_GranjaLaFlor.Services
 
                 weeklyCheck.FinalAccumulatedConsumption =
                     finalDailyCheck.AccumulatedConsumption;
+
+                weeklyCheck.FinalConcentrateBalance =
+                    finalDailyCheck.ConcentrateBalance;
             }
 
             /*
@@ -1490,6 +1473,146 @@ namespace DB_GranjaLaFlor.Services
 
             return weeklyCheck;
         }
+
+        /*
+         * UI Data | Weekly Check Edit Form
+         * Retrieves the selected Weekly Check and prepares the
+         * WeeklyCheckFormViewModel required by the Edit view.
+         *
+         * The method reuses GetByIdAsync() to obtain the complete
+         * Weekly Check information and then loads the dropdown options
+         * required by the form.
+         */
+        public async Task<WeeklyCheckFormViewModel?>GetFormByIdAsync(int weeklyCheckId)
+        {
+            /*
+             * Data Query | Weekly Check
+             * Retrieves the complete Weekly Check information
+             * using the shared GetByIdAsync method.
+             */
+            var weeklyCheck =
+                await GetByIdAsync(weeklyCheckId);
+
+            if (weeklyCheck == null)
+            {
+                return null;
+            }
+
+            /*
+             * ViewModel Mapping | Edit Form
+             * Maps the stored, obtained and calculated Weekly Check
+             * information into the form model used by Edit.
+             */
+            var model =
+                new WeeklyCheckFormViewModel
+                {
+                    WeeklyCheckId =
+                        weeklyCheck.WeeklyCheckId,
+
+                    BroilerHouseId =
+                        weeklyCheck.BroilerHouseId,
+
+                    BroodId =
+                        weeklyCheck.BroodId,
+
+                    WeeklyCheckWeek =
+                        weeklyCheck.WeeklyCheckWeek,
+
+                    TotalBirdWeight =
+                        weeklyCheck.TotalBirdWeight,
+
+                    WeeklyCheckDescription =
+                        weeklyCheck.WeeklyCheckDescription,
+
+                    /*
+                     * Operational information.
+                     */
+                    BroodBirdInitialNum =
+                        weeklyCheck.BroodBirdInitialNum,
+
+                    FinalAccumulatedMortality =
+                        weeklyCheck.FinalAccumulatedMortality,
+
+                    FinalDailyBirdBalance =
+                        weeklyCheck.FinalDailyBirdBalance,
+
+                    FinalAccumulatedConsumption =
+                        weeklyCheck.FinalAccumulatedConsumption,
+                    FinalConcentrateBalance =
+                        weeklyCheck.FinalConcentrateBalance,
+
+                    /*
+                     * Expected Values.
+                     */
+                    WeeklyExpectedConsumption =
+                        weeklyCheck.WeeklyExpectedConsumption,
+
+                    WeeklyExpectedWeight =
+                        weeklyCheck.WeeklyExpectedWeight,
+
+                    WeeklyExpectedConversion =
+                        weeklyCheck.WeeklyExpectedConversion,
+
+                    WeeklyExpectedMortality =
+                        weeklyCheck.WeeklyExpectedMortality,
+
+                    /*
+                     * Calculated Weekly Check information.
+                     */
+                    SampleBirdQuantity =
+                        weeklyCheck.SampleBirdQuantity,
+
+                    AverageWeeklyWeight =
+                        weeklyCheck.AverageWeeklyWeight,
+
+                    WeeklyRealConsumption =
+                        weeklyCheck.WeeklyRealConsumption,
+
+                    WeeklyConsumptionDifference =
+                        weeklyCheck.WeeklyConsumptionDifference,
+
+                    WeeklyWeightDifference =
+                        weeklyCheck.WeeklyWeightDifference,
+
+                    WeeklyRealConversion =
+                        weeklyCheck.WeeklyRealConversion,
+
+                    WeeklyConversionDifference =
+                        weeklyCheck.WeeklyConversionDifference,
+
+                    WeeklyRealMortality =
+                        weeklyCheck.WeeklyRealMortality,
+
+                    WeeklyMortalityDifference =
+                        weeklyCheck.WeeklyMortalityDifference,
+
+                    /*
+                     * Related Daily Check records displayed
+                     * in the Weekly Check form.
+                     */
+                    DailyChecks =
+                        weeklyCheck.DailyChecks,
+
+                    /*
+                     * Internal Expected Value identifier.
+                     */
+                    ExpectedValueId =
+                        weeklyCheck.ExpectedValueId
+                };
+
+            /*
+             * UI Data | Form Options
+             * Loads the Broiler House, Brood and week dropdown options
+             * while preserving the current selections.
+             */
+            await PopulateFormOptionsAsync(
+                model);
+
+            return model;
+        }
+
+
+
 
 
 

@@ -1,0 +1,337 @@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.WeeklyCheck.WeeklyCheckGetByIdViewModel
+
+@{
+    ViewData["Title"] = "Desactivar Control Semanal";
+}
+
+<div class="container mt-4 col-md-7">
+
+    <div class="card border-primary">
+
+        <!-- ================================================= -->
+        <!-- Header                                            -->
+        <!-- ================================================= -->
+
+        <div class="card-header bg-primary text-white text-center">
+
+            <h1 class="mb-0">
+                Desactivar Control Semanal
+            </h1>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- ================================================= -->
+            <!-- Confirmation Message                              -->
+            <!-- ================================================= -->
+
+            <div class="alert alert-danger text-center">
+
+                ¿Está seguro de que desea desactivar
+                este control semanal?
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- General Information                               -->
+            <!-- ================================================= -->
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-header weekly-details-header">
+
+                    <h5 class="mb-0">
+                        Información General
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                        <tbody>
+
+                            <tr class="table-active">
+
+                                <th style="width:35%">
+                                    @Html.DisplayNameFor(
+                                             model => model.BroilerHouseName)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroilerHouseName)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroodName)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroodName)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroodDate)
+                                </th>
+
+                                <td>
+                                    @Model.BroodDate.ToString("dd/MM/yyyy")
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyCheckWeek)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.WeeklyCheckWeek)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyCheckState)
+                                </th>
+
+                                <td>
+
+                                    @if (Model.WeeklyCheckState)
+                                    {
+                                        <span class="badge bg-success">
+                                            Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Inactivo
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Weekly Results                                    -->
+            <!-- ================================================= -->
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-header weekly-details-header">
+
+                    <h5 class="mb-0">
+                        Resultados del Control Semanal
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                        <tbody>
+
+                            <tr class="table-active">
+
+                                <th style="width:35%">
+                                    @Html.DisplayNameFor(
+                                             model => model.AverageWeeklyWeight)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.AverageWeeklyWeight)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyRealConsumption)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.WeeklyRealConsumption)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyRealConversion)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.WeeklyRealConversion)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyRealMortality)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.WeeklyRealMortality)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.FinalConcentrateBalance)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.FinalConcentrateBalance)
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Description                                       -->
+            <!-- ================================================= -->
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-header weekly-details-header">
+
+                    <h5 class="mb-0">
+                        Descripción
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                        <tbody>
+
+                            <tr class="table-active">
+
+                                <th style="width:35%">
+                                    @Html.DisplayNameFor(
+                                             model => model.WeeklyCheckDescription)
+                                </th>
+
+                                <td>
+
+                                    @if (string.IsNullOrWhiteSpace(
+                                    Model.WeeklyCheckDescription))
+                                    {
+                                        <span class="text-muted">
+                                            Sin descripción
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @Model.WeeklyCheckDescription
+                                    }
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Delete Form                                       -->
+            <!-- ================================================= -->
+
+            <form asp-action="Delete"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.WeeklyCheckId" />
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        Volver
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

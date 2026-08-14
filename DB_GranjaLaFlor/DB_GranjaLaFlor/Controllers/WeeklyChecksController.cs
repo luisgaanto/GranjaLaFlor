@@ -593,14 +593,13 @@ namespace DB_GranjaLaFlor.Controllers
         }
 
         /*
- * POST: WeeklyChecks/Edit/5
- * Receives the modified Weekly Check information and delegates
- * its validation, recalculation and persistence to the Service layer.
- */
+         * POST: WeeklyChecks/Edit/5
+         * Receives the modified Weekly Check information and delegates
+         * its validation, recalculation and persistence to the Service layer.
+         */
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            WeeklyCheckFormViewModel model)
+        public async Task<IActionResult> Edit(WeeklyCheckFormViewModel model)
         {
             _logger.LogInformation(
                 "Entering WeeklyChecksController.Edit() POST. " +
@@ -763,6 +762,165 @@ namespace DB_GranjaLaFlor.Controllers
 
                 return View(
                     model);
+            }
+        }
+
+        /*
+         * GET: WeeklyChecks/Delete/5
+         * Retrieves and displays the Weekly Check information
+         * required to confirm its logical deactivation.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Delete() GET. " +
+                "WeeklyCheckId: {WeeklyCheckId}",
+                id);
+
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Weekly Check Delete request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido " +
+                    "para desactivar el control semanal.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+
+            try
+            {
+                /*
+                 * Data Query | Weekly Check
+                 * Retrieves the complete Weekly Check information
+                 * required by the Delete confirmation view.
+                 */
+                var weeklyCheck =
+                    await _weeklyCheckService
+                        .GetByIdAsync(
+                            id.Value);
+
+                if (weeklyCheck == null)
+                {
+                    _logger.LogWarning(
+                        "Weekly Check was not found while loading Delete. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El control semanal seleccionado no existe.";
+
+                    return RedirectToAction(
+                        nameof(Index));
+                }
+
+                /*
+                 * Business Validation | Weekly Check State
+                 * Prevents an inactive Weekly Check from being
+                 * displayed for deactivation.
+                 */
+                if (!weeklyCheck.WeeklyCheckState)
+                {
+                    _logger.LogWarning(
+                        "Inactive Weekly Check received while loading Delete. " +
+                        "WeeklyCheckId: {WeeklyCheckId}",
+                        id.Value);
+
+                    TempData["WarningMessage"] =
+                        "El control semanal seleccionado ya se encuentra inactivo.";
+
+                    return RedirectToAction(
+                        nameof(Index));
+                }
+
+                return View(
+                    weeklyCheck);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while loading Weekly Check Delete. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo cargar la información del control semanal. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+        }
+
+        /*
+         * POST: WeeklyChecks/Delete/5
+         * Delegates the logical deactivation of the selected
+         * Weekly Check to the Service layer.
+         */
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            _logger.LogInformation(
+                "Entering WeeklyChecksController.Delete() POST. " +
+                "WeeklyCheckId: {WeeklyCheckId}",
+                id);
+
+            try
+            {
+                /*
+                 * Business Operation | Soft Delete Weekly Check
+                 * Delegates the logical deactivation to the
+                 * Weekly Check Service.
+                 */
+                await _weeklyCheckService
+                    .SoftDeleteAsync(id);
+
+                _logger.LogInformation(
+                    "Weekly Check deactivated successfully. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id);
+
+                TempData["SuccessMessage"] =
+                    "El control semanal fue eliminado correctamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            //validations in service layer
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating " +
+                    "Weekly Check. WeeklyCheckId: {WeeklyCheckId}",
+                    id);
+
+                TempData["WarningMessage"] =
+                    ex.Message;
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while deactivating Weekly Check. " +
+                    "WeeklyCheckId: {WeeklyCheckId}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo desactivar el control semanal. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(
+                    nameof(Index));
             }
         }
 

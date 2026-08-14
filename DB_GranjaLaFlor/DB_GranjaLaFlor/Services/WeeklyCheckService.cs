@@ -1863,6 +1863,63 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
+        /*
+         * Business Operation | Soft Delete Weekly Check
+         * Logically deactivates an active Weekly Check record.
+         *
+         * The record remains stored in the database with its state
+         * set to false.
+         */
+        public async Task SoftDeleteAsync(int id)
+        {
+            /*
+             * Business Validation | Existing Weekly Check
+             * Confirms that the Weekly Check exists.
+             */
+            var weeklyCheck =
+                await _context.WeeklyChecks
+                    .FirstOrDefaultAsync(
+                        weeklyCheck =>
+                            weeklyCheck.WeeklyCheckId ==
+                                id);
+
+            if (weeklyCheck == null)
+            {
+                throw new InvalidOperationException(
+                    "El control semanal seleccionado no existe.");
+            }
+
+            /*
+             * Business Validation | Weekly Check State
+             * Prevents an inactive Weekly Check from being
+             * deactivated again.
+             */
+            if (!weeklyCheck.WeeklyCheckState)
+            {
+                throw new InvalidOperationException(
+                    "El control semanal seleccionado ya se encuentra inactivo.");
+            }
+
+            /*
+             * Logical Deletion | Weekly Check State
+             * Changes the record state to false without removing
+             * the Weekly Check physically from the database.
+             */
+            weeklyCheck.WeeklyCheckState =
+                false;
+
+            /*
+             * Database Operation | Save Changes
+             * Persists the logical deletion.
+             */
+            await _context.SaveChangesAsync();
+        }
+
+
+
+
+
+
 
 
 

@@ -684,6 +684,90 @@ finalDailyCheck.AccumulatedConsumption
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+Models/ViewModels/BroodReport/
+│
+├── BroodReportFormViewModel
+│      ↓
+│    GENERAR
+│
+├── BroodReportListViewModel
+│      ↓
+│     INDEX
+│
+├── BroodReportGetByIdViewModel
+│      ↓
+│    DETAILS
+│
+├── BroodReportSnapshotViewModel
+│      ↓
+│   SNAPSHOT COMPLETO
+│
+├── BroodReportHeaderViewModel
+│      ↓
+│   ENCABEZADO PDF
+│
+├── BroodReportDailyRowViewModel
+│      ↓
+│   FILAS DIARIAS PDF
+│
+└── BroodReportWeeklyViewModel
+       ↓
+   CONTROL SEMANAL PDF
+
+
+
+
+   BroodReport generado
+        ↓
+Snapshot guardado en brood_reports
+        ↓
+Usuario abre Details
+        ↓
+Presiona "Generar PDF"
+        ↓
+BroodReportsController
+        ↓
+BroodReportService
+        ↓
+Lee BroodReportData
+        ↓
+Deserializa Snapshot
+        ↓
+Construye PDF
+        ↓
+Controller devuelve archivo PDF
+        ↓
+Navegador
+   ├── Visualizar
+   ├── Imprimir
+   └── Guardar
+
+
+brood_reports
+├── brood_report_id
+├── report_number
+├── generated_at
+├── brood_report_version
+├── brood_report_data      ← JSON histórico
+└── brood_id
+
+GeneratePdfAsync(id)
+        ↓
+Buscar BroodReport
+        ↓
+Obtener BroodReportData
+        ↓
+JsonSerializer.Deserialize
+        ↓
+BroodReportSnapshotViewModel
+        ↓
+Construir:
+├── Header
+├── 45 filas
+├── 6 controles semanales
+└── Footer vacío
+        ↓
+byte[]
 
 
 

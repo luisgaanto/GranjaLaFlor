@@ -34,5 +34,10 @@ namespace DB_GranjaLaFlor.Data.Context
 
         public DbSet<WeeklyCheck> WeeklyChecks { get; set; }
 
+        /*
+         * Represents the generated Brood Reports stored in the database.
+         */
+        public DbSet<BroodReport> BroodReports { get; set; }
+
     }
 }

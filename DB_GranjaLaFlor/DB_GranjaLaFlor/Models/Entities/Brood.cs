@@ -80,5 +80,16 @@ namespace DB_GranjaLaFlor.Models.Entities
          * One Brood can contain multiple Daily Checks.
         */
         public ICollection<DailyCheck> DailyChecks { get; set; } = new List<DailyCheck>();
+
+        /*
+         * Navigation property that represents all
+         * Brood Reports associated with the current Brood.
+         *
+         * One Brood can contain multiple historical
+         * Brood Reports generated over time.
+         */
+        public ICollection<BroodReport> BroodReports { get; set; }
+            = new List<BroodReport>();
+
     }
 }

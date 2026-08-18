@@ -15,14 +15,33 @@ namespace DB_GranjaLaFlor.Controllers
      */
     public class BroodReportsController : Controller
     {
+        /*
+          * Service Layer | Brood Report
+          *
+          * Provides the business operations required to generate,
+          * retrieve and manage the historical Brood Report information.
+          */
         private readonly BroodReportService _broodReportService;
+
+        /*
+         * Service Layer | Brood Report PDF
+         *
+         * Provides the PDF generation functionality required to
+         * transform a historical Brood Report snapshot into a
+         * printable PDF document.
+         */
+        private readonly BroodReportPdfService _broodReportPdfService;
+
+
         private readonly ILogger<BroodReportsController> _logger;
 
         public BroodReportsController(
             BroodReportService broodReportService,
+            BroodReportPdfService broodReportPdfService,
             ILogger<BroodReportsController> logger)
         {
             _broodReportService = broodReportService;
+            _broodReportPdfService = broodReportPdfService;
             _logger = logger;
         }
 
@@ -353,5 +372,159 @@ namespace DB_GranjaLaFlor.Controllers
                     });
             }
         }
+
+        /*
+         * GET: BroodReports/Pdf/5
+         *
+         * Generates and returns the printable PDF representation
+         * of the selected historical Brood Report.
+         *
+         * The PDF is generated from the historical snapshot stored
+         * in brood_reports and does not query the original operational
+         * records again.
+         */
+        [HttpGet]
+        public async Task<IActionResult> Pdf(int? id)
+        {
+            _logger.LogInformation(
+                "Entering BroodReportsController.Pdf(). " +
+                "BroodReportId: {BroodReportId}",
+                id);
+
+            /*
+             * Request Validation | Brood Report ID
+             */
+            if (!id.HasValue)
+            {
+                _logger.LogWarning(
+                    "Brood Report PDF request received without an identifier.");
+
+                TempData["ErrorMessage"] =
+                    "No se proporcionó un identificador válido " +
+                    "para generar el PDF del reporte de camada.";
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+
+            try
+            {
+                /*
+                 * Historical Data | Brood Report
+                 *
+                 * Retrieves the stored Brood Report and deserializes
+                 * its historical snapshot through BroodReportService.
+                 */
+                var broodReport =
+                    await _broodReportService
+                        .GetByIdAsync(
+                            id.Value);
+
+                if (broodReport == null)
+                {
+                    _logger.LogWarning(
+                        "Brood Report was not found while generating PDF. " +
+                        "BroodReportId: {BroodReportId}",
+                        id.Value);
+
+                    TempData["ErrorMessage"] =
+                        "El reporte de camada seleccionado no existe.";
+
+                    return RedirectToAction(
+                        nameof(Index));
+                }
+
+                /*
+                 * PDF Generation | Historical Snapshot
+                 *
+                 * Generates the PDF completely in memory using
+                 * the historical information stored in the snapshot.
+                 */
+                var pdfBytes =
+                    _broodReportPdfService
+                        .GeneratePdf(
+                            broodReport);
+
+                /*
+                 * File Name | Brood Report
+                 *
+                 * The file name includes the Brood name, production
+                 * year, report number and historical version.
+                 */
+                var broodName =
+                    broodReport.BroodName
+                        .Replace(
+                            " ",
+                            "-");
+
+                var broodYear =
+                    broodReport.BroodDate.Year;
+
+                var fileName =
+                    $"reporte-camada-" +
+                    $"{broodName}-" +
+                    $"{broodYear}-" +
+                    $"N{broodReport.ReportNumber}-" +
+                    $"V{broodReport.BroodReportVersion}.pdf";
+
+                _logger.LogInformation(
+                    "Brood Report PDF generated successfully. " +
+                    "BroodReportId: {BroodReportId}, " +
+                    "FileName: {FileName}",
+                    broodReport.BroodReportId,
+                    fileName);
+
+                /*
+                 * HTTP Response | PDF File
+                 *
+                 * Returns the generated PDF byte array to the browser.
+                 * The PDF is not stored physically on the server.
+                 */
+                return File(
+                    pdfBytes,
+                    "application/pdf",
+                    fileName);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business validation failed while generating Brood Report PDF. " +
+                    "BroodReportId: {BroodReportId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    ex.Message;
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        id = id.Value
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unexpected error while generating Brood Report PDF. " +
+                    "BroodReportId: {BroodReportId}",
+                    id.Value);
+
+                TempData["ErrorMessage"] =
+                    "No se pudo generar el PDF del reporte de camada. " +
+                    "Intente nuevamente.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        id = id.Value
+                    });
+            }
+        }
+
+
+
     }
 }

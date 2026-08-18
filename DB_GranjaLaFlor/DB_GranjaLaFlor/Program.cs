@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using DB_GranjaLaFlor.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +65,10 @@ builder.Services.AddScoped<DailyCheckService>();
 builder.Services.AddScoped<ExpectedValueService>();
 builder.Services.AddScoped<WeeklyCheckService>();
 builder.Services.AddScoped<BroodReportService>();
+builder.Services.AddScoped<BroodReportPdfService>();
+
+QuestPDF.Settings.License =
+    LicenseType.Community;
 
 var app = builder.Build();
 

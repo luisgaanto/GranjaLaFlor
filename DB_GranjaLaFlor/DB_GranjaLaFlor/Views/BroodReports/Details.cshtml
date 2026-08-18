@@ -1,0 +1,958 @@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.BroodReport.BroodReportGetByIdViewModel
+
+@{
+    ViewData["Title"] = "Detalle Reporte de Camada";
+
+    var dailyRows =
+        Model.Snapshot.DailyRows
+            .OrderBy(row => row.DayNumber)
+            .ToList();
+
+    var weeklyChecks =
+        Model.Snapshot.WeeklyChecks
+            .OrderBy(week => week.Week)
+            .ToList();
+}
+
+<div class="container mt-4">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+
+            <h1 class="mb-0">
+                Detalle Reporte de Camada
+            </h1>
+
+        </div>
+
+        <div class="card-body">
+
+
+            <!-- ================================================= -->
+            <!-- Información del Reporte                           -->
+            <!-- ================================================= -->
+
+            <div class="weekly-section-heading">
+
+                <h5 class="mb-0">
+                    ℹ️ Información del Reporte
+                </h5>
+
+            </div>
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-header weekly-details-header">
+
+                    <h5 class="mb-0">
+                        Historial
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-hover table-bordered align-middle mb-0">
+
+                        <tbody>
+
+                            <tr class="table-active">
+
+                                <th style="width:35%">
+                                    @Html.DisplayNameFor(
+                                             model => model.ReportNumber)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.ReportNumber)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroodName)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroodName)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroilerHouseName)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroilerHouseName)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroodReportGeneratedAt)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroodReportGeneratedAt)
+                                </td>
+
+                            </tr>
+
+                            <tr class="table-active">
+
+                                <th>
+                                    @Html.DisplayNameFor(
+                                             model => model.BroodReportVersion)
+                                </th>
+
+                                <td>
+                                    @Html.DisplayFor(
+                                             model => model.BroodReportVersion)
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Tarjeta de Control de Aves                        -->
+            <!-- ================================================= -->
+
+            <div class="weekly-section-heading">
+
+                <h5 class="mb-0">
+                    📄 Tarjeta de Control de Aves
+                </h5>
+
+            </div>
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-header weekly-details-header">
+
+                    <h5 class="mb-0">
+                        Encabezado
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+
+                    <!-- ============================================= -->
+                    <!-- Company Information                           -->
+                    <!-- ============================================= -->
+
+                    <div class="row align-items-start mb-3">
+
+                        <div class="col-md-9 text-center">
+
+                            <h4 class="mb-1">
+                                Ganadera Cariblanco AJ Limitada
+                            </h4>
+
+                            <div>
+                                Cédula Jurídica 3-102-712633
+                            </div>
+
+                            <div class="fw-bold mt-2">
+                                Tarjeta de Control de Aves
+                            </div>
+
+                            <div>
+                                RE-PE-003
+                                &nbsp; | &nbsp;
+                                VERSIÓN 04
+                            </div>
+
+                        </div>
+
+
+                        <!-- Nº -->
+
+                        <div class="col-md-3">
+
+                            <table class="table table-bordered mb-0">
+
+                                <tbody>
+
+                                    <tr class="table-active">
+
+                                        <th style="width:45%">
+                                            Nº
+                                        </th>
+
+                                        <td>
+                                            @Model.Snapshot.Header.ReportNumber
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================================= -->
+                    <!-- Original Empty Fields                         -->
+                    <!-- ============================================= -->
+
+                    <div class="row g-3 mb-3">
+
+                        <div class="col-md-6">
+
+                            <table class="table table-bordered mb-0">
+
+                                <tbody>
+
+                                    <tr class="table-active">
+                                        <th style="width:50%">
+                                            QQ PIP
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr class="table-active">
+                                        <th>
+                                            QQ Desarrollo
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr class="table-active">
+                                        <th>
+                                            QQ Final
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <table class="table table-bordered mb-0">
+
+                                <tbody>
+
+                                    <tr class="table-active">
+                                        <th style="width:50%">
+                                            PDJ
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr class="table-active">
+                                        <th>
+                                            M²
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr class="table-active">
+                                        <th>
+                                            Densidad
+                                        </th>
+                                        <td></td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================================= -->
+                    <!-- Variable Header Information                   -->
+                    <!-- ============================================= -->
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered align-middle mb-0">
+
+                            <thead class="table-secondary text-center">
+
+                                <tr>
+
+                                    <th>
+                                        Fecha
+                                    </th>
+
+                                    <th>
+                                        Granja
+                                    </th>
+
+                                    <th>
+                                        Nº Aves
+                                    </th>
+
+                                    <th>
+                                        Galera
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr class="table-active text-center">
+
+                                    <td>
+                                        @Model.Snapshot.Header.Date.ToString("dd/MM/yyyy")
+                                    </td>
+
+                                    <td>
+                                        @Model.Snapshot.Header.FarmName
+                                    </td>
+
+                                    <td>
+                                        @Model.Snapshot.Header.BirdQuantity.ToString("N0")
+                                    </td>
+
+                                    <td>
+                                        @Model.Snapshot.Header.BroilerHouseName
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Control de Aves / Control de Alimento              -->
+            <!-- ================================================= -->
+
+            <div class="weekly-section-heading">
+
+                <h5 class="mb-0">
+                    📋 Control de Aves / Control de Alimento
+                </h5>
+
+            </div>
+
+            <div class="card bg-light border-secondary mb-4">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-sm align-middle mb-0">
+
+                            <thead class="table-secondary text-center align-middle">
+
+                                <tr>
+
+                                    <th rowspan="3">
+                                        Día
+                                    </th>
+
+                                    <th rowspan="3">
+                                        Fecha
+                                    </th>
+
+                                    <th colspan="4">
+                                        Control de Aves
+                                    </th>
+
+                                    <th colspan="5">
+                                        Control de Alimento
+                                    </th>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th colspan="3">
+                                        Mortalidad
+                                    </th>
+
+                                    <th rowspan="2">
+                                        Saldo Aves
+                                    </th>
+
+                                    <th colspan="2">
+                                        Ingreso
+                                    </th>
+
+                                    <th colspan="2">
+                                        Gasto
+                                    </th>
+
+                                    <th rowspan="2">
+                                        Saldo
+                                        <br />
+                                        (qq)
+                                    </th>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th>
+                                        Nat.
+                                    </th>
+
+                                    <th>
+                                        Selec.
+                                    </th>
+
+                                    <th>
+                                        Acum.
+                                    </th>
+
+                                    <th>
+                                        Día
+                                        <br />
+                                        (qq)
+                                    </th>
+
+                                    <th>
+                                        Acum.
+                                        <br />
+                                        (qq)
+                                    </th>
+
+                                    <th>
+                                        Día
+                                        <br />
+                                        (qq)
+                                    </th>
+
+                                    <th>
+                                        Acum.
+                                        <br />
+                                        (qq)
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @for (var rowNumber = 1;
+                                rowNumber <= 45;
+                                rowNumber++)
+                                {
+                                    var row =
+                                    dailyRows.FirstOrDefault(
+                                    item =>
+                                    item.DayNumber ==
+                                    rowNumber);
+
+                                    if (row != null)
+                                    {
+                                        <tr class="table-active text-center">
+
+                                            <td>
+                                                @row.DayNumber
+                                            </td>
+
+                                            <td>
+                                                @row.Date.ToString("dd/MM/yyyy")
+                                            </td>
+
+                                            <td>
+                                                @row.NaturalMortality
+                                            </td>
+
+                                            <td>
+                                                @row.SelectQuantity
+                                            </td>
+
+                                            <td>
+                                                @row.AccumulatedMortality
+                                            </td>
+
+                                            <td>
+                                                @row.BirdBalance.ToString("N0")
+                                            </td>
+
+                                            <td>
+                                                @if (row.IncomeDailyQuintals.HasValue)
+                                                {
+                                                    @row.IncomeDailyQuintals.Value.ToString("N2")
+                                                }
+                                            </td>
+
+                                            <td>
+                                                @if (row.IncomeAccumulatedQuintals.HasValue)
+                                                {
+                                                    @row.IncomeAccumulatedQuintals.Value.ToString("N2")
+                                                }
+                                            </td>
+
+                                            <td>
+                                                @row.ConsumptionDailyQuintals.ToString("N2")
+                                            </td>
+
+                                            <td>
+                                                @row.ConsumptionAccumulatedQuintals.ToString("N2")
+                                            </td>
+
+                                            <td>
+                                                @row.ConcentrateBalanceQuintals.ToString("N2")
+                                            </td>
+
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+
+                                            <td class="text-center">
+                                                @rowNumber
+                                            </td>
+
+                                            <td>&nbsp;</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Control Semanal                                   -->
+            <!-- ================================================= -->
+
+            <div class="weekly-section-heading">
+
+                <h5 class="mb-0">
+                    📊 Control Semanal
+                </h5>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                @foreach (var weeklyCheck in weeklyChecks)
+                {
+                    <div class="col-lg-6">
+
+                        <div class="card bg-light border-secondary h-100">
+
+                            <div class="card-header weekly-details-header">
+
+                                <h5 class="mb-0">
+                                    @weeklyCheck.Week
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-bordered align-middle mb-0">
+
+                                        <thead class="table-secondary text-center">
+
+                                            <tr>
+
+                                                <th style="width:25%">
+                                                </th>
+
+                                                <th>
+                                                    Esp.
+                                                </th>
+
+                                                <th>
+                                                    Real
+                                                </th>
+
+                                                <th>
+                                                    Diferencia
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody class="text-center">
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    Cons.
+                                                </th>
+
+                                                <td>
+                                                    @weeklyCheck.ExpectedConsumption.ToString("N3")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.RealConsumption.ToString("N3")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.ConsumptionDifference.ToString("N3")
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    Peso
+                                                </th>
+
+                                                <td>
+                                                    @weeklyCheck.ExpectedWeight.ToString("N3")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.RealWeight.ToString("N3")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.WeightDifference.ToString("N3")
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    Conv.
+                                                </th>
+
+                                                <td>
+                                                    @weeklyCheck.ExpectedConversion.ToString("N2")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.RealConversion.ToString("N2")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.ConversionDifference.ToString("N2")
+                                                </td>
+
+                                            </tr>
+
+                                            <tr class="table-active">
+
+                                                <th>
+                                                    % Mort.
+                                                </th>
+
+                                                <td>
+                                                    @weeklyCheck.ExpectedMortality.ToString("N2")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.RealMortality.ToString("N2")
+                                                </td>
+
+                                                <td>
+                                                    @weeklyCheck.MortalityDifference.ToString("N2")
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Información de Cierre                             -->
+            <!-- ================================================= -->
+
+            <div class="weekly-section-heading">
+
+                <h5 class="mb-0">
+                    📝 Información de Cierre
+                </h5>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Conditions -->
+
+                <div class="col-lg-7">
+
+                    <div class="card bg-light border-secondary h-100">
+
+                        <div class="card-header weekly-details-header">
+
+                            <h5 class="mb-0">
+                                Condiciones de las aves ingresadas
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-sm mb-0">
+
+                                    <thead class="table-secondary text-center">
+
+                                        <tr>
+
+                                            <th>Lote</th>
+                                            <th>Cantidad</th>
+                                            <th>Peso</th>
+                                            <th>% Nac.</th>
+                                            <th>Edad Reprod.</th>
+                                            <th>Incubadora</th>
+                                            <th>Huevo</th>
+                                            <th>Raza</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Final Closure -->
+
+                <div class="col-lg-5">
+
+                    <div class="card bg-light border-secondary h-100">
+
+                        <div class="card-header weekly-details-header">
+
+                            <h5 class="mb-0">
+                                Cierre Final
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <table class="table table-bordered table-sm mb-0">
+
+                                <tbody>
+
+                                    <tr>
+                                        <th>Aves entregadas a planta</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Kg entregados/planta</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Peso promedio/ave</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>% Mortalidad</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Q.Q. Ingresados</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Q.Q. Consumidos</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Q.Q. Sobrantes</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Consumo ave</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Conversión alimenticia</th>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Índice de productividad</th>
+                                        <td></td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Signatures                                        -->
+            <!-- ================================================= -->
+
+            <div class="row mt-4">
+
+                <div class="col-md-6">
+
+                    <strong>
+                        Nombre del Granjero:
+                    </strong>
+
+                    <hr />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <strong>
+                        Nombre del Supervisor:
+                    </strong>
+
+                    <hr />
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Actions                                           -->
+            <!-- ================================================= -->
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+
+                    VOLVER
+
+                </a>
+
+                <a asp-action="Pdf"
+                   asp-route-id="@Model.BroodReportId"
+                   class="btn btn-success">
+
+                    PDF
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

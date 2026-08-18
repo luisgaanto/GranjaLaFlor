@@ -1,5 +1,172 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<ProjectGranjaLaFlor.Models.ViewModels.BroodReport.BroodReportListViewModel>
+
 @{
+    ViewData["Title"] = "Reportes de Camada";
 }
+
+<div class="container mt-4">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+
+            <h1 class="mb-0">
+                Reportes de Camada
+            </h1>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- ================================================= -->
+            <!-- Actions                                           -->
+            <!-- ================================================= -->
+
+            <div class="mb-3">
+
+                <a asp-action="Create"
+                   class="btn btn-outline-primary">
+
+                    NUEVO REPORTE DE CAMADA
+
+                </a>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Brood Report History                              -->
+            <!-- ================================================= -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered align-middle">
+
+                    <thead class="table-primary">
+
+                        <tr>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.ReportNumber)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.BroilerHouseName)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.BroodName)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.BroodYear)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.BroodReportGeneratedAt)
+                            </th>
+
+                            <th>
+                                @Html.DisplayNameFor(
+                                         model => model.BroodReportVersion)
+                            </th>
+
+                            <th class="text-center">
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr class="table-active">
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem => item.ReportNumber)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem => item.BroilerHouseName)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem => item.BroodName)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem => item.BroodYear)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(
+                                                 modelItem => item.BroodReportGeneratedAt)
+                                    </td>
+
+                                    <td class="text-center">
+                                        @Html.DisplayFor(
+                                                 modelItem => item.BroodReportVersion)
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.BroodReportId"
+                                           class="btn btn-outline-info btn-sm me-1">
+
+                                            DETALLES
+
+                                        </a>
+
+                                        <a asp-action="Pdf"
+                                           asp-route-id="@item.BroodReportId"
+                                           class="btn btn-outline-success btn-sm">
+
+                                            PDF
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="7"
+                                    class="text-center text-muted">
+
+                                    No existen reportes de camada generados.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

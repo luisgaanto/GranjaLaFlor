@@ -1,5 +1,290 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ProjectGranjaLaFlor.Models.ViewModels.BroodReport.BroodReportFormViewModel
+
 @{
+    ViewData["Title"] = "Generar Reporte de Camada";
+}
+
+<div class="container mt-4 col-md-10">
+
+    <div class="card border-primary">
+
+        <div class="card-header bg-primary text-white text-center">
+
+            <h1 class="mb-0">
+                Generar Reporte de Camada
+            </h1>
+
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- Información General                               -->
+                <!-- ================================================= -->
+
+                <div class="weekly-section-heading">
+
+                    <h5 class="mb-0">
+                        ℹ️ Información General
+                    </h5>
+
+                </div>
+
+
+                <div class="row g-3">
+
+                    <!-- ================================================= -->
+                    <!-- Pollera                                           -->
+                    <!-- ================================================= -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="BroilerHouseId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroilerHouseId"
+                                asp-items="Model.BroilerHouseOptions"
+                                class="form-select"
+                                id="broilerHouseSelect">
+
+                            <option value="">
+                                Seleccione una pollera
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="BroilerHouseId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- Camada                                            -->
+                    <!-- ================================================= -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="BroodId"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="BroodId"
+                                asp-items="Model.BroodOptions"
+                                class="form-select"
+                                id="broodSelect">
+
+                            <option value="">
+                                Seleccione una camada
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="BroodId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- Número de Reporte                                 -->
+                    <!-- ================================================= -->
+
+                    <div class="col-md-4">
+
+                        <label asp-for="ReportNumber"
+                               class="form-label">
+                        </label>
+
+                        <input asp-for="ReportNumber"
+                               class="form-control"
+                               min="1" />
+
+                        <span asp-validation-for="ReportNumber"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- Información del proceso                           -->
+                <!-- ================================================= -->
+
+                <div class="mt-4">
+
+                    <div class="alert alert-info mb-0">
+
+                        El reporte se generará utilizando la información
+                        existente de la camada seleccionada, incluyendo
+                        los controles diarios, ingresos de concentrado
+                        y los 6 controles semanales.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- Actions                                           -->
+                <!-- ================================================= -->
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        CANCELAR
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        GENERAR REPORTE
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const broilerHouseSelect =
+                    document.getElementById(
+                        "broilerHouseSelect");
+
+                const broodSelect =
+                    document.getElementById(
+                        "broodSelect");
+
+
+                /*
+                 * UI Interaction | Broiler House Selection
+                 *
+                 * Reloads the Brood dropdown whenever the
+                 * selected Broiler House changes.
+                 */
+                broilerHouseSelect.addEventListener(
+                    "change",
+                    async function () {
+
+                        const broilerHouseId =
+                            this.value;
+
+
+                        /*
+                         * UI State | Reset Brood Dropdown
+                         */
+                        broodSelect.innerHTML =
+                            '<option value="">' +
+                            'Seleccione una camada' +
+                            '</option>';
+
+
+                        if (!broilerHouseId) {
+                            return;
+                        }
+
+
+                        try {
+
+                            /*
+                             * HTTP Request | Broods
+                             *
+                             * Requests the active Broods associated
+                             * with the selected Broiler House.
+                             */
+                            const response =
+                                await fetch(
+                                    '@Url.Action(
+                            "GetBroodsByBroilerHouse",
+                "BroodReports")' +
+                                            '?broilerHouseId=' +
+                                    encodeURIComponent(
+                                        broilerHouseId));
+
+
+                            if (!response.ok) {
+
+                                throw new Error(
+                                    "Error loading Broods.");
+                            }
+
+
+                            const broods =
+                                await response.json();
+
+
+                            /*
+                             * UI Data | Brood Options
+                             */
+                            broods.forEach(
+                                function (brood) {
+
+                                    const option =
+                                        document.createElement(
+                                            "option");
+
+                                    option.value =
+                                        brood.value;
+
+                                    option.textContent =
+                                        brood.text;
+
+                                    broodSelect.appendChild(
+                                        option);
+                                });
+
+                        }
+                        catch (error) {
+
+                            console.error(
+                                "Error loading Broods:",
+                                error);
+
+                            alert(
+                                "No se pudieron cargar las camadas.");
+                        }
+
+                    });
+
+            });
+
+    </script>
+
 }

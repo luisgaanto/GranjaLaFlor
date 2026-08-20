@@ -14,18 +14,15 @@ namespace DB_GranjaLaFlor.Controllers
     {
         private readonly UserService _userService;
         private readonly IPasswordHasher<User> _passwordHasher;
-        private readonly DashboardService _dashboardService;
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserService userService,
             IPasswordHasher<User> passwordHasher,
-            DashboardService dashboardService,
             ILogger<AccountController> logger)
         {
             _userService = userService;
             _passwordHasher = passwordHasher;
-            _dashboardService = dashboardService;
             _logger = logger;
         }
 
@@ -146,37 +143,12 @@ namespace DB_GranjaLaFlor.Controllers
                 user.UserEmail);
 
             TempData["SuccessMessage"] = "Inicio de sesión exitoso.";
-            return RedirectToAction(nameof(Dashboard));
+            return RedirectToAction(
+                "Index",
+                "Dashboard");
         }
 
-        /*
-         * GET: Account/Dashboard
-         *
-         * Displays the current production information for
-         * every active Broiler House.
-         */
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> Dashboard()
-        {
-            _logger.LogInformation(
-                "Entering AccountController.Dashboard(). " +
-                "User: {UserName}",
-                User.Identity?.Name);
-
-            /*
-             * UI Data | Dashboard
-             *
-             * Delegates the retrieval of current production
-             * information to DashboardService.
-             */
-            var model =
-                await _dashboardService
-                    .GetDashboardAsync();
-
-            return View(model);
-        }
-
+        
         /*
          * Signs out the current user by removing the authentication cookie.
          * After Logout, ASP.NET Core no longer recognizes the user as authenticated.

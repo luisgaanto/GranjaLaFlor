@@ -50,8 +50,8 @@
 
                 <a class="navbar-brand active"
                    asp-area=""
-                   asp-controller="Account"
-                   asp-action="Dashboard">
+                   asp-controller="Dashboard"
+                   asp-action="Index">
 
                     Granja La Flor
 
@@ -78,7 +78,7 @@
                         * Dashboard is only displayed for authenticated users.
                         * The public Landing Page remains available through
                         * the navbar brand.
-                        *@
+                        
                         @if (User.Identity != null &&
                         User.Identity.IsAuthenticated)
                         {
@@ -95,7 +95,7 @@
 
                             </li>
                         }
-
+                        *@
                         @*
                         * Access and Users is only available for Propietario.
                         * Administrador and Operario do not have access

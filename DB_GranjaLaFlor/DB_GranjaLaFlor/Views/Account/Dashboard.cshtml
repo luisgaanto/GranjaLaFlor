@@ -368,13 +368,13 @@
 
                     <div class="card dashboard-module-card h-100">
 
-                        <div class="dashboard-card-strip bg-success"></div>
+                        <div class="dashboard-card-strip bg-primary"></div>
 
                         <div class="card-body dashboard-card-body">
 
                             <div class="dashboard-icon-container">
 
-                                <i class="bi bi-people-fill dashboard-icon text-success"></i>
+                                <i class="bi bi-people-fill dashboard-icon text-primary"></i>
 
                             </div>
 
@@ -390,7 +390,7 @@
 
                                 <a asp-controller="Users"
                                    asp-action="Index"
-                                   class="btn btn-outline-success">
+                                   class="btn btn-outline-primary">
 
                                     Ver usuarios
 
@@ -450,13 +450,13 @@
 
                 <div class="card dashboard-module-card h-100">
 
-                    <div class="dashboard-card-strip bg-info"></div>
+                    <div class="dashboard-card-strip bg-primary"></div>
 
                     <div class="card-body dashboard-card-body">
 
                         <div class="dashboard-icon-container">
 
-                            <i class="bi bi-diagram-3-fill dashboard-icon text-info"></i>
+                            <i class="bi bi-diagram-3-fill dashboard-icon text-primary"></i>
 
                         </div>
 
@@ -473,7 +473,7 @@
 
                             <a asp-controller="Broods"
                                asp-action="Index"
-                               class="btn btn-outline-info">
+                               class="btn btn-outline-primary">
 
                                 Ver camadas
 
@@ -491,59 +491,18 @@
 
                 <div class="card dashboard-module-card h-100">
 
-                    <div class="dashboard-card-strip bg-danger"></div>
+                    <div class="dashboard-card-strip bg-primary"></div>
 
                     <div class="card-body dashboard-card-body">
 
                         <div class="dashboard-icon-container">
 
-                            <i class="bi bi-clipboard2-pulse-fill dashboard-icon text-danger"></i>
+                            <i class="bi bi-box-seam-fill dashboard-icon text-primary"></i>
 
                         </div>
 
                         <h5 class="dashboard-card-title">
-                            Mortalidad
-                        </h5>
-
-                        <p class="dashboard-card-text">
-                            Registro y control de mortalidad natural,
-                            selección de aves y acumulados por camada.
-                        </p>
-
-                        <div class="dashboard-card-action">
-
-                            <button type="button"
-                                    class="btn btn-outline-danger"
-                                    disabled>
-
-                                Próximamente
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-xl-4 col-md-6 mb-4">
-
-                <div class="card dashboard-module-card h-100">
-
-                    <div class="dashboard-card-strip bg-warning"></div>
-
-                    <div class="card-body dashboard-card-body">
-
-                        <div class="dashboard-icon-container">
-
-                            <i class="bi bi-box-seam-fill dashboard-icon text-warning"></i>
-
-                        </div>
-
-                        <h5 class="dashboard-card-title">
-                            Alimento
+                            Ingreso Alimento
                         </h5>
 
                         <p class="dashboard-card-text">
@@ -555,7 +514,7 @@
 
                             <a asp-controller="IncomeConcentrates"
                                asp-action="Index"
-                               class="btn btn-outline-warning">
+                               class="btn btn-outline-primary">
 
                                 Ver ingresos
 
@@ -573,34 +532,75 @@
 
                 <div class="card dashboard-module-card h-100">
 
-                    <div class="dashboard-card-strip bg-secondary"></div>
+                    <div class="dashboard-card-strip bg-primary"></div>
 
                     <div class="card-body dashboard-card-body">
 
                         <div class="dashboard-icon-container">
 
-                            <i class="bi bi-thermometer-half dashboard-icon text-secondary"></i>
+                            <i class="bi bi-clipboard2-pulse-fill dashboard-icon text-primary"></i>
 
                         </div>
 
                         <h5 class="dashboard-card-title">
-                            Monitoreo
+                            Control Diario
                         </h5>
 
                         <p class="dashboard-card-text">
-                            Monitoreo de temperatura, alertas ambientales
-                            y estimulación temprana.
+                            Registro diario de la operación avícola,
+                            control de mortalidad y acumulados.
                         </p>
 
                         <div class="dashboard-card-action">
 
-                            <button type="button"
-                                    class="btn btn-outline-secondary"
-                                    disabled>
+                            <a asp-controller="DailyChecks"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
 
-                                Próximamente
+                                Ver Control Diario
 
-                            </button>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-clipboard2-pulse-fill dashboard-icon text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Control Semanal
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro semanal de la operación avícola, control real
+                            y esperado de consumo, peso, conversion, Mortalidad.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="WeeklyChecks"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver Control Semanal
+
+                            </a>
 
                         </div>
 

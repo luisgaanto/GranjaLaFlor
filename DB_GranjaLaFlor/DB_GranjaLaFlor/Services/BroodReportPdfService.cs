@@ -276,7 +276,8 @@ namespace DB_GranjaLaFlor.Services
                                 "Nº",
                                 header.ReportNumber.ToString(),
                                 true,
-                                24);
+                                24,
+                                true);
                         });
 
 
@@ -395,61 +396,69 @@ namespace DB_GranjaLaFlor.Services
         /*
          * PDF Helper | Header Line Field
          *
-         * Displays a label followed by a value positioned
-         * above a horizontal line.
+         * Displays a label followed by its value over a
+         * horizontal line.
          *
-         * The label width can be adjusted when a more compact
-         * field is required, such as the report number.
+         * The optional redLabel parameter is used by the
+         * report number field to reproduce the visual style
+         * of the original printed document.
          */
         private void AddHeaderLineField(
             ColumnDescriptor column,
             string label,
             string value,
             bool boldValue = false,
-            float labelWidth = 82)
+            float labelWidth = 40,
+            bool redLabel = false)
         {
             column.Item()
-                .PaddingVertical(2)
                 .Row(row =>
                 {
                     /*
                      * Field Label
                      */
-                    row.ConstantItem(labelWidth)
-                        .AlignMiddle()
-                        .Text(label)
-                        .FontSize(8);
+                    var labelContainer =
+                        row.ConstantItem(labelWidth)
+                            .AlignBottom();
+
+                    if (redLabel)
+                    {
+                        labelContainer
+                            .Text(label)
+                            .FontSize(8)
+                            .Bold()
+                            .FontColor(Colors.Red.Medium);
+                    }
+                    else
+                    {
+                        labelContainer
+                            .Text(label)
+                            .FontSize(8);
+                    }
 
 
                     /*
-                     * Field Value + Line
+                     * Field Value + Bottom Line
                      */
-                    row.RelativeItem()
-                        .Column(valueColumn =>
-                        {
-                            valueColumn.Item()
-                                .MinHeight(11)
-                                .AlignCenter()
-                                .Element(container =>
-                                {
-                                    if (boldValue)
-                                    {
-                                        container
-                                            .Text(value)
-                                            .Bold()
-                                            .FontSize(8);
-                                    }
-                                    else
-                                    {
-                                        container
-                                            .Text(value)
-                                            .FontSize(8);
-                                    }
-                                });
+                    var valueContainer =
+                        row.RelativeItem()
+                            .BorderBottom(0.7f)
+                            .PaddingBottom(1)
+                            .AlignCenter();
 
-                            valueColumn.Item()
-                                .BorderBottom(0.7f);
-                        });
+                    if (boldValue)
+                    {
+                        valueContainer
+                            .Text(value)
+                            .FontSize(8)
+                            .Bold();
+                    }
+                    else
+                    {
+                        valueContainer
+                            .Text(value)
+                            .FontSize(8);
+                    }
                 });
         }
 

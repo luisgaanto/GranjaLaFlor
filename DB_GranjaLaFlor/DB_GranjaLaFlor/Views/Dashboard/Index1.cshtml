@@ -1,0 +1,653 @@
+﻿@using System.Security.Claims
+@model ProjectGranjaLaFlor.Models.ViewModels.Dashboard.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var roleName =
+        User.FindFirst(ClaimTypes.Role)?.Value
+        ?? "Sin rol asignado";
+}
+
+<div class="dashboard-page">
+
+    <div class="container-fluid dashboard-container">
+
+        <!--
+            Dashboard Header
+
+            Displays the authenticated user's information
+            obtained from the authentication Claims.
+        -->
+        <div class="card dashboard-hero mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="row align-items-center">
+
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+
+                        <img src="~/imagenes/LogoGranjaLaFlor.png"
+                             alt="Logo Granja La Flor"
+                             class="img-fluid dashboard-logo" />
+
+                    </div>
+
+                    <div class="col-md-9">
+
+                        <h2 class="dashboard-title mb-2">
+                            Dashboard
+                        </h2>
+
+                        <h5 class="dashboard-subtitle text-muted mb-3">
+                            Bienvenido, @User.Identity?.Name
+                        </h5>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <span class="badge bg-primary dashboard-badge">
+                                Usuario: @User.Identity?.Name
+                            </span>
+
+                            <span class="badge bg-info dashboard-badge">
+                                Rol: @roleName
+                            </span>
+
+                        </div>
+
+                        <p class="dashboard-system-name mt-3 mb-0">
+                            Sistema de Gestión Operativa - Granja La Flor
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!--
+            Current Production Status
+
+            Displays the current operational information
+            for every active Broiler House.
+
+            Each Broiler House uses information from its
+            most recent active Brood.
+        -->
+        <div class="card dashboard-production-card mb-4">
+
+            <div class="dashboard-card-strip bg-primary"></div>
+
+            <div class="card-body p-4">
+
+                <div class="d-flex flex-column flex-md-row
+                            justify-content-between
+                            align-items-md-center mb-4">
+
+                    <div>
+
+                        <h4 class="dashboard-production-title mb-1">
+                            Estado Actual de Producción
+                        </h4>
+
+                        <p class="dashboard-production-subtitle mb-0">
+                            Resumen operativo de las polleras activas.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!--
+                    Broiler Houses
+
+                    Generates one production card for every
+                    active Broiler House returned by DashboardService.
+                -->
+                <div class="row g-4">
+
+                    @foreach (var broilerHouse in Model.BroilerHouses)
+                    {
+                        <div class="col-xl-6">
+
+                            <div class="dashboard-broiler-house-card">
+
+                                <div class="dashboard-broiler-house-layout">
+
+
+                                    <!--
+                                        Broiler House Information
+                                    -->
+                                    <div class="dashboard-broiler-house-sidebar">
+
+                                        <div class="dashboard-production-icon-container mb-3">
+
+                                            <i class="bi bi-house-door-fill text-primary"></i>
+
+                                        </div>
+
+                                        <h5 class="dashboard-broiler-house-name">
+                                            @broilerHouse.BroilerHouseName
+                                        </h5>
+
+                                        <span class="badge bg-info mb-3">
+                                            Activa
+                                        </span>
+
+                                        <p class="dashboard-broiler-house-description mb-0">
+
+                                            @if (!string.IsNullOrWhiteSpace(
+                                           broilerHouse.BroodName))
+                                            {
+                                                <span>
+                                                    @broilerHouse.BroodName
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    Sin camada activa
+                                                </span>
+                                            }
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <!--
+                                        Current Production Metrics
+
+                                        Information is obtained from the
+                                        most recent active Brood associated
+                                        with this Broiler House.
+                                    -->
+                                    <div class="dashboard-broiler-house-metrics">
+
+
+                                        <!--
+                                            Current Week
+                                        -->
+                                        <div class="dashboard-metric-row">
+
+                                            <div class="dashboard-metric-icon
+                                                        bg-danger
+                                                        bg-opacity-10">
+
+                                                <i class="bi bi-calendar-week-fill
+                                                        text-danger"></i>
+
+                                            </div>
+
+                                            <div class="dashboard-metric-content">
+
+                                                <span class="dashboard-metric-label">
+                                                    Semana
+                                                </span>
+
+                                                <span class="dashboard-metric-value">
+
+                                                    @if (!string.IsNullOrWhiteSpace(
+                                                   broilerHouse.CurrentWeek))
+                                                    {
+                                                        @broilerHouse.CurrentWeek
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Sin registro</span>
+                                                    }
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!--
+                                            Current Day
+                                        -->
+                                        <div class="dashboard-metric-row">
+
+                                            <div class="dashboard-metric-icon
+                                                        bg-secondary
+                                                        bg-opacity-10">
+
+                                                <i class="bi bi-calendar-check-fill
+                                                          text-secondary"></i>
+
+                                            </div>
+
+                                            <div class="dashboard-metric-content">
+
+                                                <span class="dashboard-metric-label">
+                                                    Día
+                                                </span>
+
+                                                <span class="dashboard-metric-value">
+
+                                                    @if (!string.IsNullOrWhiteSpace(
+                                                   broilerHouse.CurrentDay))
+                                                    {
+                                                        @broilerHouse.CurrentDay
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Sin registro</span>
+                                                    }
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!--
+                                            Current Accumulated Concentrate
+                                        -->
+                                        <div class="dashboard-metric-row">
+
+                                            <div class="dashboard-metric-icon
+                                                        bg-warning
+                                                        bg-opacity-10">
+
+                                                <i class="bi bi-box-seam-fill
+                                                          text-warning"></i>
+
+                                            </div>
+
+                                            <div class="dashboard-metric-content">
+
+                                                <span class="dashboard-metric-label">
+                                                    Saldo Concentrado
+                                                </span>
+
+                                                <span class="dashboard-metric-value">
+
+                                                    @if (broilerHouse.CurrentConcentrateBalance.HasValue)
+                                                    {
+                                                        @($"{broilerHouse.CurrentConcentrateBalance.Value:N2} kg")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Sin registro</span>
+                                                    }
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!--
+                                            Current Bird Balance
+                                        -->
+                                        <div class="dashboard-metric-row">
+
+                                            <div class="dashboard-metric-icon
+                                                        bg-primary
+                                                        bg-opacity-10">
+
+                                                <i class="bi bi-egg-fill
+                                                          text-primary"></i>
+
+                                            </div>
+
+                                            <div class="dashboard-metric-content">
+
+                                                <span class="dashboard-metric-label">
+                                                    Saldo Aves
+                                                </span>
+
+                                                <span class="dashboard-metric-value">
+
+                                                    @if (broilerHouse.CurrentBirdBalance.HasValue)
+                                                    {
+                                                        @broilerHouse.CurrentBirdBalance.Value.ToString("N0")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Sin registro</span>
+                                                    }
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!--
+            System Modules
+        -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div>
+
+                <h4 class="dashboard-section-title mb-1">
+                    Módulos del Sistema
+                </h4>
+
+                <p class="dashboard-section-subtitle mb-0">
+                    Acceso rápido a las funciones de gestión operativa.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+
+            <!--
+                Users Module
+
+                Available only for users with
+                the Propietario role.
+            -->
+            @if (User.IsInRole("Propietario"))
+            {
+                <div class="col-xl-4 col-md-6 mb-4">
+
+                    <div class="card dashboard-module-card h-100">
+
+                        <div class="dashboard-card-strip bg-primary"></div>
+
+                        <div class="card-body dashboard-card-body">
+
+                            <div class="dashboard-icon-container">
+
+                                <i class="bi bi-people-fill
+                                          dashboard-icon
+                                          text-primary"></i>
+
+                            </div>
+
+                            <h5 class="dashboard-card-title">
+                                Acceso y Usuarios
+                            </h5>
+
+                            <p class="dashboard-card-text">
+                                Administración de roles, usuarios y permisos del sistema.
+                            </p>
+
+                            <div class="dashboard-card-action">
+
+                                <a asp-controller="Users"
+                                   asp-action="Index"
+                                   class="btn btn-outline-primary">
+
+                                    Ver usuarios
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+
+            <!--
+                Broiler Houses Module
+            -->
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-house-door-fill
+                                      dashboard-icon
+                                      text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Polleras
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Consulta y administración de las polleras disponibles
+                            para la gestión de camadas.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="BroilerHouses"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver polleras
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                Broods Module
+            -->
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-diagram-3-fill
+                                      dashboard-icon
+                                      text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Camadas
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro y seguimiento de camadas asociadas
+                            a cada pollera activa.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="Broods"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver camadas
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                Concentrate Income Module
+            -->
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-box-seam-fill
+                                      dashboard-icon
+                                      text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Ingreso Alimento
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Control de ingreso de concentrado, kilos,
+                            quintales y acumulados por camada.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="IncomeConcentrates"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver ingresos
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                Daily Checks Module
+            -->
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-clipboard2-pulse-fill
+                                      dashboard-icon
+                                      text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Control Diario
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro diario de la operación avícola,
+                            control de mortalidad y acumulados.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="DailyChecks"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver Control Diario
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                Weekly Checks Module
+            -->
+            <div class="col-xl-4 col-md-6 mb-4">
+
+                <div class="card dashboard-module-card h-100">
+
+                    <div class="dashboard-card-strip bg-primary"></div>
+
+                    <div class="card-body dashboard-card-body">
+
+                        <div class="dashboard-icon-container">
+
+                            <i class="bi bi-clipboard2-pulse-fill
+                                      dashboard-icon
+                                      text-primary"></i>
+
+                        </div>
+
+                        <h5 class="dashboard-card-title">
+                            Control Semanal
+                        </h5>
+
+                        <p class="dashboard-card-text">
+                            Registro semanal de la operación avícola, control real
+                            y esperado de consumo, peso, conversión y mortalidad.
+                        </p>
+
+                        <div class="dashboard-card-action">
+
+                            <a asp-controller="WeeklyChecks"
+                               asp-action="Index"
+                               class="btn btn-outline-primary">
+
+                                Ver Control Semanal
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -14,15 +14,18 @@ namespace DB_GranjaLaFlor.Controllers
     {
         private readonly UserService _userService;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly DashboardService _dashboardService;
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserService userService,
             IPasswordHasher<User> passwordHasher,
+            DashboardService dashboardService,
             ILogger<AccountController> logger)
         {
             _userService = userService;
             _passwordHasher = passwordHasher;
+            _dashboardService = dashboardService;
             _logger = logger;
         }
 
@@ -146,15 +149,32 @@ namespace DB_GranjaLaFlor.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
+        /*
+         * GET: Account/Dashboard
+         *
+         * Displays the current production information for
+         * every active Broiler House.
+         */
         [HttpGet]
         [Authorize]
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
             _logger.LogInformation(
-                "Entering AccountController.Dashboard(). User: {UserName}",
+                "Entering AccountController.Dashboard(). " +
+                "User: {UserName}",
                 User.Identity?.Name);
 
-            return View();
+            /*
+             * UI Data | Dashboard
+             *
+             * Delegates the retrieval of current production
+             * information to DashboardService.
+             */
+            var model =
+                await _dashboardService
+                    .GetDashboardAsync();
+
+            return View(model);
         }
 
         /*

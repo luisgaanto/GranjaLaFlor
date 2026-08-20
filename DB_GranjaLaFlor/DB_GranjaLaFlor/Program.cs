@@ -58,6 +58,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<BroilerHouseService>();
 builder.Services.AddScoped<BroodService>();
 builder.Services.AddScoped<IncomeConcentrateService>();

@@ -1381,6 +1381,36 @@ namespace DB_GranjaLaFlor.Services
             }
 
             /*
+             * Business Validation | Weekly Check Dependency
+             *
+             * Prevents the Daily Check from being deactivated when an
+             * active Weekly Check has already been generated for the
+             * same Brood and production week.
+             *
+             * Weekly Checks are calculated from the seven active Daily
+             * Checks belonging to the same Brood and week. Deactivating
+             * one of those records would invalidate the operational
+             * information used by the existing Weekly Check.
+             */
+            var weeklyCheckExists =
+                await _context.WeeklyChecks
+                    .AsNoTracking()
+                    .AnyAsync(weeklyCheck =>
+                        weeklyCheck.BroodId ==
+                            dailyCheck.BroodId &&
+                        weeklyCheck.WeeklyCheckWeek ==
+                            dailyCheck.DailyCheckWeek &&
+                        weeklyCheck.WeeklyCheckState);
+
+            if (weeklyCheckExists)
+            {
+                throw new InvalidOperationException(
+                    "El control diario no puede ser desactivado porque " +
+                    "ya existe un control semanal activo asociado " +
+                    "a la misma camada y semana.");
+            }
+
+            /*
              * Stores the Brood identifier before changing the record state.
              * The identifier is required to recalculate the remaining
              * active Daily Checks associated with the same Brood.

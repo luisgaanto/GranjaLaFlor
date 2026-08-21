@@ -96,12 +96,24 @@
                             </li>
                         }
                         *@
+                        
+
+
                         @*
-                        * Access and Users is only available for Propietario.
-                        * Administrador and Operario do not have access
-                        * to Roles or Users.
+                        * Access and Users
+                        *
+                        * SuperAdmin:
+                        * - Roles
+                        * - Users
+                        *
+                        * Propietario:
+                        * - Users only
+                        *
+                        * Operario and Administrador:
+                        * - No access to this menu.
                         *@
-                        @if (User.IsInRole("Propietario"))
+                        @if (User.IsInRole("SuperAdmin") ||
+                        User.IsInRole("Propietario"))
                         {
                             <li class="nav-item dropdown">
 
@@ -119,36 +131,51 @@
                                 <ul class="dropdown-menu"
                                     aria-labelledby="accessDropdown">
 
-                                    <li>
+                                    @*
+                                * Roles Management
+                                *
+                                * Available only for SuperAdmin.
+                                *@
+                                    @if (User.IsInRole("SuperAdmin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Roles"
+                                               asp-action="Index">
 
-                                        <a class="dropdown-item"
-                                           asp-area=""
-                                           asp-controller="Roles"
-                                           asp-action="Index">
+                                                Roles
 
-                                            Roles
+                                            </a>
+                                        </li>
+                                    }
 
-                                        </a>
 
-                                    </li>
+                                    @*
+                                * Users Management
+                                *
+                                * Available for SuperAdmin and Propietario.
+                                *@
+                                    @if (User.IsInRole("SuperAdmin") ||
+                                   User.IsInRole("Propietario"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-area=""
+                                               asp-controller="Users"
+                                               asp-action="Index">
 
-                                    <li>
+                                                Usuarios
 
-                                        <a class="dropdown-item"
-                                           asp-area=""
-                                           asp-controller="Users"
-                                           asp-action="Index">
-
-                                            Usuarios
-
-                                        </a>
-
-                                    </li>
+                                            </a>
+                                        </li>
+                                    }
 
                                 </ul>
 
                             </li>
                         }
+
 
                         @*
                         * Gestión is displayed for all authenticated users.

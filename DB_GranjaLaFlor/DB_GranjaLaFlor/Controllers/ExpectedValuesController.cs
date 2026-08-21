@@ -11,7 +11,18 @@ namespace DB_GranjaLaFlor.Controllers
      * Business rules and database operations are delegated
      * to the Service layer.
      */
-    [Authorize]
+
+
+    /*
+     * Authorization | Expected Values Module
+     *
+     * All operational roles can access the Expected Values
+     * module for consultation.
+     *
+     * Modification actions are restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class ExpectedValuesController : Controller
     {
         private readonly ExpectedValueService _expectedValueService;
@@ -55,6 +66,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Retrieves and displays the selected Expected Value
          * record required by the Edit form.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -108,6 +120,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Receives the updated values and delegates their validation
          * and persistence to the Service layer.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ExpectedValueFormViewModel model)

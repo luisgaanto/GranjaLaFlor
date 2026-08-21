@@ -11,7 +11,18 @@ namespace DB_GranjaLaFlor.Controllers
      * Business rules, calculations and database operations are delegated
      * to the Service layer.
      */
-    [Authorize]
+
+    /*
+     * Authorization | Weekly Checks Module
+     *
+     * All operational roles can access the Weekly Checks
+     * module for consultation.
+     *
+     * Modification actions are restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(
+        Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class WeeklyChecksController : Controller
     {
         private readonly WeeklyCheckService _weeklyCheckService;
@@ -80,6 +91,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Displays the Create view and loads the information
          * required to register a new Weekly Check.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -330,6 +342,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Receives the Weekly Check information and delegates its
          * validation, calculations and persistence to the Service layer.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WeeklyCheckFormViewModel model)
@@ -493,6 +506,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Retrieves the selected Weekly Check and prepares
          * the form required by the Edit view.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -597,6 +611,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Receives the modified Weekly Check information and delegates
          * its validation, recalculation and persistence to the Service layer.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(WeeklyCheckFormViewModel model)

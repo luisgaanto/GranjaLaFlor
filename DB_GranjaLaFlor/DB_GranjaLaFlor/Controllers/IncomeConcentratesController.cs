@@ -12,7 +12,17 @@ namespace DB_GranjaLaFlor.Controllers
      * Business rules, calculations and database operations are delegated
      * to the Service layer.
      */
-    [Authorize]
+
+    /*
+     * Authorization | Income Concentrates Module
+     *
+     * All operational roles can access the Income Concentrates
+     * module for consultation.
+     *
+     * Modification actions are restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class IncomeConcentratesController : Controller
     {
         private readonly IncomeConcentrateService _incomeConcentrateService;
@@ -96,6 +106,7 @@ namespace DB_GranjaLaFlor.Controllers
             return Json(accumulated);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -111,6 +122,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IncomeConcentrateFormViewModel model)
@@ -162,7 +174,7 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -183,6 +195,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, IncomeConcentrateFormViewModel model)
@@ -245,7 +258,7 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -260,6 +273,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(income);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]

@@ -16,7 +16,17 @@ namespace DB_GranjaLaFlor.Controllers
      * Business rules, calculations and database operations are delegated
      * to the Service layer.
      */
-    [Authorize]
+
+    /*
+     * Authorization | Daily Checks Module
+     *
+     * All operational roles can access the Daily Checks
+     * module for consultation.
+     *
+     * Modification actions are restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class DailyChecksController : Controller
     {
         private readonly DailyCheckService _dailyCheckService;
@@ -75,6 +85,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Displays the Create view and loads the information
          * required to register a new Daily Check.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -94,6 +105,7 @@ namespace DB_GranjaLaFlor.Controllers
  * and delegates business validation, calculations and
  * persistence to the Service layer.
  */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -205,8 +217,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Broiler House and returns them to the Create or Edit view.
          */
         [HttpGet]
-        public async Task<IActionResult> GetBroodsByBroilerHouse(
-            int broilerHouseId)
+        public async Task<IActionResult> GetBroodsByBroilerHouse(int broilerHouseId)
         {
             _logger.LogInformation(
                 "Entering DailyChecksController.GetBroodsByBroilerHouse(). " +
@@ -442,6 +453,7 @@ namespace DB_GranjaLaFlor.Controllers
  * Retrieves and displays the Daily Check information
  * required to confirm its logical deactivation.
  */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Delete(
             int? id)
@@ -515,9 +527,9 @@ namespace DB_GranjaLaFlor.Controllers
         /*
          * GET: DailyChecks/Edit: Retrieves and displays the active Daily Check information required to update the selected record.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
-        public async Task<IActionResult> Edit(
-            int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             _logger.LogInformation("Entering DailyChecksController.Edit() GET. " + "DailyCheckId: {DailyCheckId}", id);
 
@@ -570,10 +582,10 @@ namespace DB_GranjaLaFlor.Controllers
         /*
          * POST: DailyChecks/Edit: Receives the updated Daily Check information and delegates validation, persistence and recalculation to the Service layer.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            DailyCheckFormViewModel model)
+        public async Task<IActionResult> Edit(DailyCheckFormViewModel model)
         {
             _logger.LogInformation("Entering DailyChecksController.Edit() POST. " + "DailyCheckId: {DailyCheckId}, " + "BroilerHouseId: {BroilerHouseId}, " +
                 "BroodId: {BroodId}, " + "DailyCheckWeek: {DailyCheckWeek}, " + "DailyCheckDay: {DailyCheckDay}",
@@ -655,11 +667,11 @@ namespace DB_GranjaLaFlor.Controllers
          * Delegates the logical deactivation of the selected Daily Check
          * and the recalculation of the remaining active records to the Service.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(
-            int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             _logger.LogInformation(
                 "Entering DailyChecksController.Delete() POST. " +

@@ -11,13 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace DB_GranjaLaFlor.Controllers
 {
     /*
-     * Enables/enforces authentication/authentication to controllers that need to be proteced.
-     * Authorize requires the user to be authenticated before accessing any action inside the
-     * controller. Unauthenticated users are automatically redirected to the Login page.
-     * Only authenticated users with the Administrador role can access this controller. ASP.NET Core validates
-     * the role using the Role claim created during Login.
-    */
-    [Authorize(Roles = "Propietario")]
+     * Authorization | Roles Management:  Enables/enforces authentication/authentication to controllers that need to be proteced.
+     * Only users with the SuperAdmin role can access the Roles management module.
+     * ASP.NET Core validates the role using the Role Claim created during the authentication process.
+     */
+    [Authorize(Roles = "SuperAdmin")]
 
     /*
      * RolesController inherits from Controller --> ASP.NET Core MVC. --> provides features such as methods: view(), 

@@ -7,8 +7,16 @@ using System.Security.Claims;
 
 namespace DB_GranjaLaFlor.Controllers
 {
-    // Enables/enforces authentication/authentication to controllers that need to be proteced.  
-    [Authorize(Roles = "Propietario")]
+    /*
+     * Authorization | Users Management
+     *
+     * Only users with the Propietario or SuperAdmin roles
+     * can access the Users management module.
+     *
+     * ASP.NET Core validates the role using the Role Claim
+     * created during the authentication process.
+     */
+    [Authorize(Roles = "Propietario,SuperAdmin")]
     public class UsersController : Controller
     {
         private readonly UserService _userService;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DB_GranjaLaFlor.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class BroilerHousesController : Controller
     {
         private readonly BroilerHouseService _broilerHouseService;

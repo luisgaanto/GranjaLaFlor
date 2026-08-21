@@ -1,4 +1,5 @@
 ﻿using DB_GranjaLaFlor.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGranjaLaFlor.Models.ViewModels.BroodReport;
 
@@ -13,6 +14,17 @@ namespace DB_GranjaLaFlor.Controllers
      * Business validations, snapshot generation and database
      * access are delegated to BroodReportService.
      */
+
+    /*
+     * Authorization | Brood Reports Module
+     *
+     * All operational roles can access the Brood Reports
+     * module for consultation and PDF generation.
+     *
+     * Report creation is restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class BroodReportsController : Controller
     {
         /*
@@ -89,6 +101,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Displays the form used to generate
          * a new historical Brood Report.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -126,6 +139,7 @@ namespace DB_GranjaLaFlor.Controllers
          * and report number and delegates the historical
          * report generation to BroodReportService.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BroodReportFormViewModel model)
@@ -383,6 +397,7 @@ namespace DB_GranjaLaFlor.Controllers
          * in brood_reports and does not query the original operational
          * records again.
          */
+        [Authorize(Roles = "Propietario,Operario,Administrador,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Pdf(int? id)
         {

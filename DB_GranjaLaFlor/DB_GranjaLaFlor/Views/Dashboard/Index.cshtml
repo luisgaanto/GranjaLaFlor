@@ -359,14 +359,18 @@
 
         <div class="row">
 
-
             <!--
-                Users Module
+                Access and Users Module
 
-                Available only for users with
-                the Propietario role.
+                Available for:
+                - SuperAdmin
+                - Propietario
+
+                SuperAdmin can manage Roles and Users.
+                Propietario can manage Users only.
             -->
-            @if (User.IsInRole("Propietario"))
+            @if (User.IsInRole("SuperAdmin") ||
+            User.IsInRole("Propietario"))
             {
                 <div class="col-xl-4 col-md-6 mb-4">
 
@@ -379,8 +383,8 @@
                             <div class="dashboard-icon-container">
 
                                 <i class="bi bi-people-fill
-                                          dashboard-icon
-                                          text-primary"></i>
+                              dashboard-icon
+                              text-primary"></i>
 
                             </div>
 
@@ -389,10 +393,34 @@
                             </h5>
 
                             <p class="dashboard-card-text">
-                                Administración de roles, usuarios y permisos del sistema.
+
+                                @if (User.IsInRole("SuperAdmin"))
+                                {
+                                    <span>
+                                        Administración de roles y usuarios del sistema.
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        Administración de usuarios del sistema.
+                                    </span>
+                                }
+
                             </p>
 
                             <div class="dashboard-card-action">
+
+                                @if (User.IsInRole("SuperAdmin"))
+                                {
+                                    <a asp-controller="Roles"
+                                       asp-action="Index"
+                                       class="btn btn-outline-primary me-2">
+
+                                        Ver roles
+
+                                    </a>
+                                }
 
                                 <a asp-controller="Users"
                                    asp-action="Index"

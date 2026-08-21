@@ -12,7 +12,17 @@ namespace DB_GranjaLaFlor.Controllers
      * Reference:
      * https://learn.microsoft.com/aspnet/core/mvc/controllers/actions
      */
-    [Authorize]
+    /*
+     * Authorization | Broods Module
+     *
+     * All authenticated operational roles can access the
+     * Broods module for consultation.
+     *
+     * Modification actions are restricted individually
+     * to Propietario, Operario and SuperAdmin.
+     */
+    [Authorize(
+        Roles = "Propietario,Operario,Administrador,SuperAdmin")]
     public class BroodsController : Controller
     {
         private readonly BroodService _broodService;
@@ -40,6 +50,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(activeBroods);
         }
 
+        [Authorize( Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -56,6 +67,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BroodFormViewModel model)
@@ -147,6 +159,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(brood);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -171,6 +184,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BroodFormViewModel model)
@@ -246,6 +260,7 @@ namespace DB_GranjaLaFlor.Controllers
             }
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -263,6 +278,7 @@ namespace DB_GranjaLaFlor.Controllers
             return View(brood);
         }
 
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

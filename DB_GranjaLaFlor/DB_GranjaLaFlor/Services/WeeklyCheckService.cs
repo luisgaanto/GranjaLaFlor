@@ -881,6 +881,284 @@ namespace DB_GranjaLaFlor.Services
             };
         }
 
+
+        /*
+         * Business Calculation | Recalculate Existing Weekly Checks
+         *
+         * Recalculates every active Weekly Check associated with the
+         * specified Brood using the current Daily Check information.
+         *
+         * This method is used when operational Daily Check information
+         * changes after a Weekly Check has already been generated.
+         *
+         * The user-entered TotalBirdWeight is preserved because it
+         * belongs to the Weekly Check registration.
+         */
+        public async Task RecalculateAffectedWeeklyChecksAsync(
+            int broodId)
+        {
+            /*
+             * Data Query | Active Weekly Checks
+             *
+             * Retrieves tracked Weekly Check entities because their
+             * calculated values will be updated and saved.
+             */
+            var weeklyChecks =
+                await _context.WeeklyChecks
+                    .Where(weeklyCheck =>
+                        weeklyCheck.BroodId == broodId &&
+                        weeklyCheck.WeeklyCheckState)
+                    .ToListAsync();
+
+            if (weeklyChecks.Count == 0)
+            {
+                return;
+            }
+
+            /*
+             * Data Query | Brood
+             *
+             * Retrieves the initial bird population required for
+             * mortality calculations.
+             */
+            var brood =
+                await _context.Broods
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(brood =>
+                        brood.BroodId == broodId &&
+                        brood.BroodState);
+
+            if (brood == null)
+            {
+                throw new InvalidOperationException(
+                    "La camada asociada al control semanal no existe o está inactiva.");
+            }
+
+            if (brood.BroodBirdInitialNum <= 0)
+            {
+                throw new InvalidOperationException(
+                    "La cantidad inicial de aves debe ser mayor que cero.");
+            }
+
+            foreach (var weeklyCheck in weeklyChecks)
+            {
+                /*
+                 * Data Query | Weekly Daily Checks
+                 *
+                 * Retrieves the active Daily Checks associated with
+                 * the Weekly Check production week.
+                 */
+                var dailyChecks =
+                    await _context.DailyChecks
+                        .AsNoTracking()
+                        .Where(dailyCheck =>
+                            dailyCheck.BroodId == broodId &&
+                            dailyCheck.DailyCheckWeek ==
+                                weeklyCheck.WeeklyCheckWeek &&
+                            dailyCheck.DailyCheckState)
+                        .OrderBy(dailyCheck =>
+                            dailyCheck.DailyCheckDate)
+                        .ThenBy(dailyCheck =>
+                            dailyCheck.DailyCheckId)
+                        .ToListAsync();
+
+                /*
+                 * Business Validation | Complete Week
+                 */
+                if (dailyChecks.Count !=
+                    ValidDailyCheckDays.Length)
+                {
+                    throw new InvalidOperationException(
+                        $"No se puede recalcular {weeklyCheck.WeeklyCheckWeek} " +
+                        "porque no existen exactamente 7 controles diarios activos.");
+                }
+
+                /*
+                 * Business Validation | Required Days
+                 */
+                var containsAllRequiredDays =
+                    ValidDailyCheckDays.All(requiredDay =>
+                        dailyChecks.Count(dailyCheck =>
+                            dailyCheck.DailyCheckDay ==
+                                requiredDay) == 1);
+
+                if (!containsAllRequiredDays)
+                {
+                    throw new InvalidOperationException(
+                        $"No se puede recalcular {weeklyCheck.WeeklyCheckWeek} " +
+                        "porque deben existir los controles desde Día 1 hasta Día 7.");
+                }
+
+                /*
+                 * Data Selection | Final Daily Check
+                 *
+                 * Día 7 contains the final accumulated operational
+                 * values used by the Weekly Check.
+                 */
+                var finalDailyCheck =
+                    dailyChecks.Single(dailyCheck =>
+                        dailyCheck.DailyCheckDay ==
+                            "Día 7");
+
+                if (finalDailyCheck.DailyBirdBalance <= 0)
+                {
+                    throw new InvalidOperationException(
+                        "El saldo final de aves debe ser mayor que cero.");
+                }
+
+                /*
+                 * Business Calculation | Sample Bird Quantity
+                 *
+                 * Calculates two percent of the final active population.
+                 */
+                var sampleBirdQuantity =
+                    (int)decimal.Ceiling(
+                        finalDailyCheck.DailyBirdBalance *
+                        SamplePercentage);
+
+                if (sampleBirdQuantity <= 0)
+                {
+                    throw new InvalidOperationException(
+                        "La cantidad de aves de la muestra debe ser mayor que cero.");
+                }
+
+                /*
+                 * Business Calculation | Average Weekly Weight
+                 *
+                 * TotalBirdWeight is preserved from the existing
+                 * Weekly Check because it was entered by the user.
+                 */
+                var averageWeeklyWeight =
+                    weeklyCheck.TotalBirdWeight /
+                    sampleBirdQuantity;
+
+                averageWeeklyWeight =
+                    RoundToThreeDecimals(
+                        averageWeeklyWeight);
+
+                if (averageWeeklyWeight <= 0)
+                {
+                    throw new InvalidOperationException(
+                        "El peso promedio semanal debe ser mayor que cero.");
+                }
+
+                /*
+                 * Business Calculation | Real Weekly Consumption
+                 */
+                var weeklyRealConsumption =
+                    finalDailyCheck.AccumulatedConsumption /
+                    finalDailyCheck.DailyBirdBalance;
+
+                weeklyRealConsumption =
+                    RoundToThreeDecimals(
+                        weeklyRealConsumption);
+
+                /*
+                 * Business Calculation | Consumption Difference
+                 */
+                var weeklyConsumptionDifference =
+                    weeklyRealConsumption -
+                    weeklyCheck.WeeklyExpectedConsumption;
+
+                weeklyConsumptionDifference =
+                    RoundToThreeDecimals(
+                        weeklyConsumptionDifference);
+
+                /*
+                 * Business Calculation | Weight Difference
+                 */
+                var weeklyWeightDifference =
+                    averageWeeklyWeight -
+                    weeklyCheck.WeeklyExpectedWeight;
+
+                weeklyWeightDifference =
+                    RoundToThreeDecimals(
+                        weeklyWeightDifference);
+
+                /*
+                 * Business Calculation | Real Weekly Conversion
+                 */
+                var weeklyRealConversion =
+                    weeklyRealConsumption /
+                    averageWeeklyWeight;
+
+                weeklyRealConversion =
+                    RoundToTwoDecimals(
+                        weeklyRealConversion);
+
+                /*
+                 * Business Calculation | Conversion Difference
+                 */
+                var weeklyConversionDifference =
+                    weeklyRealConversion -
+                    weeklyCheck.WeeklyExpectedConversion;
+
+                weeklyConversionDifference =
+                    RoundToTwoDecimals(
+                        weeklyConversionDifference);
+
+                /*
+                 * Business Calculation | Real Weekly Mortality
+                 */
+                var weeklyRealMortality =
+                    ((decimal)finalDailyCheck.AccumulatedMortality /
+                        brood.BroodBirdInitialNum) *
+                    100;
+
+                weeklyRealMortality =
+                    RoundToTwoDecimals(
+                        weeklyRealMortality);
+
+                /*
+                 * Business Calculation | Mortality Difference
+                 */
+                var weeklyMortalityDifference =
+                    weeklyRealMortality -
+                    weeklyCheck.WeeklyExpectedMortality;
+
+                weeklyMortalityDifference =
+                    RoundToTwoDecimals(
+                        weeklyMortalityDifference);
+
+                /*
+                 * Entity Update | Weekly Check Calculated Values
+                 */
+                weeklyCheck.SampleBirdQuantity =
+                    sampleBirdQuantity;
+
+                weeklyCheck.AverageWeeklyWeight =
+                    averageWeeklyWeight;
+
+                weeklyCheck.WeeklyRealConsumption =
+                    weeklyRealConsumption;
+
+                weeklyCheck.WeeklyConsumptionDifference =
+                    weeklyConsumptionDifference;
+
+                weeklyCheck.WeeklyWeightDifference =
+                    weeklyWeightDifference;
+
+                weeklyCheck.WeeklyRealConversion =
+                    weeklyRealConversion;
+
+                weeklyCheck.WeeklyConversionDifference =
+                    weeklyConversionDifference;
+
+                weeklyCheck.WeeklyRealMortality =
+                    weeklyRealMortality;
+
+                weeklyCheck.WeeklyMortalityDifference =
+                    weeklyMortalityDifference;
+            }
+
+            /*
+             * Database Operation | Save Recalculated Weekly Checks
+             */
+            await _context.SaveChangesAsync();
+        }
+
+
+
         /*
          * Business Operation | Create Weekly Check
          * Validates the selected Brood, Broiler House, week, Expected Values

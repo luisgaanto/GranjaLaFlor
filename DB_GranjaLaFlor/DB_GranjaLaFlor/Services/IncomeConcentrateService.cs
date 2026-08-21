@@ -523,11 +523,17 @@ namespace DB_GranjaLaFlor.Services
         }
 
 
-        public async Task CreateAsync(
-    IncomeConcentrateFormViewModel model)
+        /*
+         * Business Operation | Create Income Concentrate
+         *
+         * Creates a new Income Concentrate and recalculates
+         * all operational information affected by the new entry.
+         */
+        public async Task CreateAsync(IncomeConcentrateFormViewModel model)
         {
             /*
              * Business Rule | Income Quintals
+             *
              * Concentrate income must be greater than zero.
              */
             if (model.IncomeQuintals <= 0)
@@ -536,19 +542,23 @@ namespace DB_GranjaLaFlor.Services
                     "La cantidad de quintales debe ser mayor que cero.");
             }
 
+
             /*
              * Business Rule | Active Brood Validation
+             *
              * The selected Brood must exist, remain active,
              * and belong to an active Broiler House.
              */
             var broodExists =
                 await _context.Broods
                     .AsNoTracking()
-                    .AnyAsync(brood =>
-                        brood.BroodId == model.BroodId &&
-                        brood.BroodState &&
-                        brood.BroilerHouse != null &&
-                        brood.BroilerHouse.BroilerHouseState);
+                    .AnyAsync(
+                        brood =>
+                            brood.BroodId ==
+                                model.BroodId &&
+                            brood.BroodState &&
+                            brood.BroilerHouse != null &&
+                            brood.BroilerHouse.BroilerHouseState);
 
             if (!broodExists)
             {
@@ -556,8 +566,10 @@ namespace DB_GranjaLaFlor.Services
                     "Camada no disponible.");
             }
 
+
             /*
-             * Business Rule | Automatic Kilogram Calculation
+             * Business Calculation | Income Kilos
+             *
              * Converts the entered quintals into kilograms using
              * the project's standard conversion factor.
              */
@@ -565,15 +577,16 @@ namespace DB_GranjaLaFlor.Services
                 model.IncomeQuintals *
                 KilosPerQuintal;
 
+
             /*
              * Entity Mapping | Income Concentrate
              *
              * IncomeAccumulated is initialized temporarily because
-             * the official running accumulated value is calculated
-             * after the new record has been saved.
+             * its official running value is calculated after the
+             * new record has been saved.
              */
-            //creates (rewrites) a new object (income) to update IncomeAccumulated.
-            var income = new IncomeConcentrate
+            var income =
+                new IncomeConcentrate
                 {
                     IncomeConcentrateDate =
                         model.IncomeConcentrateDate,
@@ -581,8 +594,8 @@ namespace DB_GranjaLaFlor.Services
                     IncomeQuintals =
                         model.IncomeQuintals,
 
-                    IncomeKilos = incomeKilos,
-
+                    IncomeKilos =
+                        incomeKilos,
 
                     IncomeAccumulated =
                         0,
@@ -601,13 +614,13 @@ namespace DB_GranjaLaFlor.Services
                         model.BroodId
                 };
 
+
             /*
              * Database Transaction | Create and Recalculate
              *
              * Ensures that the Income Concentrate creation,
-             * accumulated concentrate recalculation and affected
-             * Daily Check recalculation are completed as a single
-             * operation.
+             * accumulated concentrate recalculation and complete
+             * operational recalculation are performed as one operation.
              */
             await using var transaction =
                 await _context.Database
@@ -618,65 +631,66 @@ namespace DB_GranjaLaFlor.Services
                 _context.IncomeConcentrates.Add(
                     income);
 
+
                 /*
-                 * Saves the new Income Concentrate so it can be
-                 * included in the accumulated recalculation.
+                 * Database Operation | Save New Income
+                 *
+                 * Saves the record so it can participate in the
+                 * accumulated concentrate recalculation.
                  */
                 await _context.SaveChangesAsync();
+
 
                 /*
                  * Business Calculation | Running Accumulated
                  *
-                 * Recalculates the accumulated concentrate for
-                 * every active Income Concentrate belonging to
-                 * the selected Brood.
+                 * Recalculates IncomeAccumulated for every active
+                 * Income Concentrate associated with the Brood.
                  */
                 await RecalculateAccumulatedAsync(
                     model.BroodId);
 
+
                 /*
-                 * Business Calculation | Daily Check Recalculation
+                 * Business Calculation | Operational Chain
                  *
-                 * Income Concentrate changes may modify the
-                 * accumulated concentrate used by existing
-                 * Daily Checks.
+                 * A new Income Concentrate may affect existing
+                 * Daily Checks and their related Weekly Checks.
                  *
-                 * Recalculating the Daily Checks keeps their
-                 * Concentrate Balance synchronized.
+                 * Income Concentrate
+                 *      ↓
+                 * Daily Checks
+                 *      ↓
+                 * Weekly Checks
                  */
                 await _dailyCheckService
-                    .RecalculateDailyChecksAsync(
+                    .RecalculateOperationalChainAsync(
                         model.BroodId);
+
 
                 /*
                  * Database Transaction | Commit
-                 *
-                 * Confirms the Income Concentrate creation and
-                 * all related recalculations.
                  */
-                await transaction.CommitAsync();
+                await transaction
+                    .CommitAsync();
             }
             catch
             {
                 /*
                  * Database Transaction | Rollback
                  *
-                 * Reverts the Income Concentrate creation and
-                 * every related recalculation if any operation
-                 * inside the transaction fails.
+                 * Reverts the new Income Concentrate and every
+                 * related recalculation when any operation fails.
                  */
-                await transaction.RollbackAsync();
+                await transaction
+                    .RollbackAsync();
 
                 /*
                  * Error Propagation | Original Exception
-                 *
-                 * Sends the original exception to the Controller
-                 * for logging and user interface handling.
                  */
                 throw;
             }
         }
-
 
 
 
@@ -704,18 +718,17 @@ namespace DB_GranjaLaFlor.Services
          * Business Operation | Update Income Concentrate
          *
          * Updates an active Income Concentrate and recalculates
-         * all accumulated concentrate values affected by the change.
+         * all accumulated and operational information affected
+         * by the modification.
          *
-         * Existing Daily Checks are also recalculated because changes
-         * in concentrate quantity, date or Brood may modify their
-         * Income Concentrate relationship and Concentrate Balance.
+         * Changes in quantity, date or Brood may affect both
+         * Daily Checks and existing Weekly Checks.
          */
-        public async Task UpdateAsync(IncomeConcentrateFormViewModel model)
+        public async Task UpdateAsync(
+            IncomeConcentrateFormViewModel model)
         {
             /*
              * Business Validation | Income Quintals
-             *
-             * Concentrate income must be greater than zero.
              */
             if (model.IncomeQuintals <= 0)
             {
@@ -726,16 +739,14 @@ namespace DB_GranjaLaFlor.Services
 
             /*
              * Business Validation | Existing Income Concentrate
-             *
-             * Confirms that the selected Income Concentrate exists
-             * and is currently active.
              */
             var income =
                 await _context.IncomeConcentrates
-                    .FirstOrDefaultAsync(income =>
-                        income.IncomeConcentrateId ==
-                            model.IncomeConcentrateId &&
-                        income.IncomeState);
+                    .FirstOrDefaultAsync(
+                        income =>
+                            income.IncomeConcentrateId ==
+                                model.IncomeConcentrateId &&
+                            income.IncomeState);
 
             if (income == null)
             {
@@ -747,29 +758,29 @@ namespace DB_GranjaLaFlor.Services
             /*
              * Brood Tracking | Previous Brood
              *
-             * Stores the original Brood before updating the record.
-             *
-             * If the Income Concentrate is moved to another Brood,
-             * both Broods must be recalculated.
+             * Stores the original Brood because changing the
+             * relationship may require recalculating both Broods.
              */
-            var previousBroodId = income.BroodId;
+            var previousBroodId =
+                income.BroodId;
 
 
             /*
              * Business Validation | Brood Availability
              *
-             * Confirms that the selected Brood and its Broiler House
-             * are currently active.
+             * Confirms that the selected Brood and its
+             * Broiler House are currently active.
              */
             var broodExists =
                 await _context.Broods
                     .AsNoTracking()
-                    .AnyAsync(brood =>
-                        brood.BroodId ==
-                            model.BroodId &&
-                        brood.BroodState &&
-                        brood.BroilerHouse != null &&
-                        brood.BroilerHouse.BroilerHouseState);
+                    .AnyAsync(
+                        brood =>
+                            brood.BroodId ==
+                                model.BroodId &&
+                            brood.BroodState &&
+                            brood.BroilerHouse != null &&
+                            brood.BroilerHouse.BroilerHouseState);
 
             if (!broodExists)
             {
@@ -780,9 +791,6 @@ namespace DB_GranjaLaFlor.Services
 
             /*
              * Business Calculation | Income Kilos
-             *
-             * Converts the entered quintals into kilograms using
-             * the project's standard conversion factor.
              */
             var incomeKilos =
                 model.IncomeQuintals *
@@ -793,10 +801,8 @@ namespace DB_GranjaLaFlor.Services
              * Database Transaction | Update and Recalculate
              *
              * Ensures that the Income Concentrate update,
-             * accumulated concentrate recalculation and Daily Check
-             * recalculation are completed as one operation.
-             *
-             * If any recalculation fails, all changes are rolled back.
+             * accumulated values, Daily Checks and Weekly Checks
+             * remain synchronized as one operation.
              */
             await using var transaction =
                 await _context.Database
@@ -817,10 +823,10 @@ namespace DB_GranjaLaFlor.Services
                     incomeKilos;
 
                 /*
-                 * Temporary value.
+                 * Temporary accumulated value.
                  *
-                 * The official accumulated value is generated by
-                 * RecalculateAccumulatedAsync().
+                 * RecalculateAccumulatedAsync() generates the
+                 * official value after the update is saved.
                  */
                 income.IncomeAccumulated =
                     0;
@@ -838,71 +844,59 @@ namespace DB_GranjaLaFlor.Services
 
                 /*
                  * Database Operation | Save Updated Income
-                 *
-                 * Saves the edited information before executing
-                 * the accumulated recalculations.
                  */
                 await _context.SaveChangesAsync();
 
 
                 /*
-                 * Business Calculation | Current Brood
+                 * Business Calculation | Current Brood Concentrate
                  *
-                 * Recalculates the accumulated concentrate of the
-                 * Brood currently associated with the edited record.
+                 * Recalculates the running accumulated concentrate
+                 * after the Income Concentrate modification.
                  */
                 await RecalculateAccumulatedAsync(
                     model.BroodId);
 
 
                 /*
-                 * Business Calculation | Current Brood Daily Checks
+                 * Business Calculation | Current Brood Operational Chain
                  *
-                 * Recalculates all active Daily Checks because the
-                 * edited Income Concentrate may change:
+                 * Propagates the Income Concentrate modification through
+                 * all dependent operational information.
                  *
-                 * - IncomeConcentrateId
-                 * - IncomeAccumulated available by date
-                 * - ConcentrateBalance
+                 * Income Concentrate
+                 *      ↓
+                 * Daily Checks
+                 *      ↓
+                 * Weekly Checks
                  */
                 await _dailyCheckService
-                    .RecalculateDailyChecksAsync(
+                    .RecalculateOperationalChainAsync(
                         model.BroodId);
 
 
                 /*
-                 * Previous Brood Recalculation
+                 * Business Calculation | Previous Brood
                  *
-                 * If the Income Concentrate was moved to another
-                 * Brood, the original Brood must also be recalculated.
+                 * When the Income Concentrate is moved to another
+                 * Brood, the accumulated concentrate and complete
+                 * operational chain of the original Brood must
+                 * also be recalculated.
                  */
                 if (previousBroodId !=
                     model.BroodId)
                 {
-                    /*
-                     * Recalculates accumulated concentrate after
-                     * removing the Income Concentrate from the
-                     * previous Brood.
-                     */
                     await RecalculateAccumulatedAsync(
                         previousBroodId);
 
-
-                    /*
-                     * Recalculates Daily Checks belonging to the
-                     * previous Brood using its new concentrate data.
-                     */
                     await _dailyCheckService
-                        .RecalculateDailyChecksAsync(
+                        .RecalculateOperationalChainAsync(
                             previousBroodId);
                 }
 
 
                 /*
                  * Database Transaction | Commit
-                 *
-                 * Confirms the Income Concentrate update and every
-                 * related recalculation.
                  */
                 await transaction
                     .CommitAsync();
@@ -912,32 +906,30 @@ namespace DB_GranjaLaFlor.Services
                 /*
                  * Database Transaction | Rollback
                  *
-                 * Reverts the Income Concentrate update and all
-                 * related recalculations if any operation fails.
+                 * Reverts the Income Concentrate update and every
+                 * related recalculation if any operation fails.
                  */
                 await transaction
                     .RollbackAsync();
 
                 /*
                  * Error Propagation | Original Exception
-                 *
-                 * Sends the original exception to the Controller
-                 * for logging and user interface handling.
                  */
                 throw;
             }
         }
 
+
         /*
-        * Business Operation | Soft Delete Income Concentrate
-        *
-        * Logically deactivates an active Income Concentrate
-        * only when it is not being used directly by an active
-        * Daily Check.
-        *
-        * After deactivation, the accumulated concentrate and
-        * affected Daily Check calculated values are recalculated.
-        */
+         * Business Operation | Soft Delete Income Concentrate
+         *
+         * Logically deactivates an active Income Concentrate
+         * only when it is not directly referenced by an active
+         * Daily Check.
+         *
+         * After deactivation, accumulated concentrate values,
+         * Daily Checks and existing Weekly Checks are recalculated.
+         */
         public async Task SoftDeleteAsync(
             int id)
         {
@@ -988,9 +980,9 @@ namespace DB_GranjaLaFlor.Services
             /*
              * Brood Tracking | Recalculation
              *
-             * Stores the Brood identifier because both the
-             * Income Concentrate and Daily Check accumulated
-             * values must be recalculated for the same Brood.
+             * Stores the Brood identifier because all accumulated
+             * and dependent operational information belongs to
+             * this Brood.
              */
             var broodId =
                 income.BroodId;
@@ -999,9 +991,8 @@ namespace DB_GranjaLaFlor.Services
             /*
              * Database Transaction | Soft Delete and Recalculate
              *
-             * Ensures that the Income Concentrate deactivation,
-             * accumulated concentrate recalculation and Daily Check
-             * recalculation are completed as a single operation.
+             * Ensures that the logical deactivation and every
+             * dependent recalculation are completed as one operation.
              */
             await using var transaction =
                 await _context.Database
@@ -1019,9 +1010,8 @@ namespace DB_GranjaLaFlor.Services
                 /*
                  * Database Operation | Save State
                  *
-                 * Saves the inactive state so the selected Income
-                 * Concentrate is excluded from the accumulated
-                 * concentrate recalculation.
+                 * Saves the inactive state before recalculation so
+                 * this Income Concentrate is excluded from active data.
                  */
                 await _context.SaveChangesAsync();
 
@@ -1037,16 +1027,16 @@ namespace DB_GranjaLaFlor.Services
 
 
                 /*
-                 * Business Calculation | Daily Checks
+                 * Business Calculation | Operational Chain
                  *
-                 * Recalculates Daily Check calculated values after
-                 * the accumulated concentrate information changes.
+                 * Propagates the new concentrate information through:
                  *
-                 * DailyCheckService remains responsible for the
-                 * Daily Check calculation formulas.
+                 * Daily Checks
+                 *      ↓
+                 * Weekly Checks
                  */
                 await _dailyCheckService
-                    .RecalculateDailyChecksAsync(
+                    .RecalculateOperationalChainAsync(
                         broodId);
 
 
@@ -1062,15 +1052,17 @@ namespace DB_GranjaLaFlor.Services
                  * Database Transaction | Rollback
                  *
                  * Reverts the Income Concentrate deactivation and
-                 * every recalculated value when any operation fails.
+                 * every related recalculation when any operation fails.
                  */
                 await transaction
                     .RollbackAsync();
 
+                /*
+                 * Error Propagation | Original Exception
+                 */
                 throw;
             }
         }
-
 
         public async Task<List<IncomeConcentrateListViewModel>> GetAllInactiveAsync()
         {

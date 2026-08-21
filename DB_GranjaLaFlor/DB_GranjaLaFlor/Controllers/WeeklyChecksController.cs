@@ -785,6 +785,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Retrieves and displays the Weekly Check information
          * required to confirm its logical deactivation.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -876,6 +877,7 @@ namespace DB_GranjaLaFlor.Controllers
          * Delegates the logical deactivation of the selected
          * Weekly Check to the Service layer.
          */
+        [Authorize(Roles = "Propietario,Operario,SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Delete")]

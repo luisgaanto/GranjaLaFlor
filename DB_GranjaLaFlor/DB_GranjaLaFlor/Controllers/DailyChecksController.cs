@@ -386,7 +386,7 @@ namespace DB_GranjaLaFlor.Controllers
                         "DailyCheckId: {DailyCheckId}",
                         id.Value);
 
-                    TempData["WarningMessage"] =
+                    TempData["ErrorMessage"] =
                         "El control diario seleccionado ya se encuentra inactivo.";
 
                     return RedirectToAction(nameof(Index));
@@ -582,7 +582,7 @@ namespace DB_GranjaLaFlor.Controllers
                     "Daily Check. DailyCheckId: {DailyCheckId}",
                     id);
 
-                TempData["WarningMessage"] =
+                TempData["ErrorMessage"] =
                     ex.Message;
 
                 return RedirectToAction(nameof(Index));

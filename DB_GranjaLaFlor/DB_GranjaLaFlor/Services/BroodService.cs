@@ -183,17 +183,106 @@ namespace DB_GranjaLaFlor.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task SoftDeleteAsync(int id)
+        /*
+ * Business Operation | Soft Delete Brood
+ *
+ * Logically deactivates an active Brood only when
+ * no active operational records depend on it.
+ */
+        public async Task SoftDeleteAsync(
+            int id)
         {
-            var brood = await _context.Broods
-                .FirstOrDefaultAsync(brood => brood.BroodId == id);
+            /*
+             * Business Validation | Existing Brood
+             */
+            var brood =
+                await _context.Broods
+                    .FirstOrDefaultAsync(
+                        brood =>
+                            brood.BroodId == id);
 
             if (brood == null)
             {
-                throw new InvalidOperationException("Camada no encontrada.");
+                throw new InvalidOperationException(
+                    "La camada seleccionada no existe.");
             }
 
-            brood.BroodState = false;
+
+            /*
+             * Business Validation | Brood State
+             */
+            if (!brood.BroodState)
+            {
+                throw new InvalidOperationException(
+                    "La camada seleccionada ya se encuentra inactiva.");
+            }
+
+
+            /*
+             * Business Validation | Income Concentrate Dependency
+             */
+            var hasActiveIncomeConcentrates =
+                await _context.IncomeConcentrates
+                    .AsNoTracking()
+                    .AnyAsync(
+                        income =>
+                            income.BroodId ==
+                                brood.BroodId &&
+                            income.IncomeState);
+
+            if (hasActiveIncomeConcentrates)
+            {
+                throw new InvalidOperationException(
+                    "La camada no puede ser desactivada porque " +
+                    "contiene ingresos de concentrado activos.");
+            }
+
+
+            /*
+             * Business Validation | Daily Check Dependency
+             */
+            var hasActiveDailyChecks =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .AnyAsync(
+                        dailyCheck =>
+                            dailyCheck.BroodId ==
+                                brood.BroodId &&
+                            dailyCheck.DailyCheckState);
+
+            if (hasActiveDailyChecks)
+            {
+                throw new InvalidOperationException(
+                    "La camada no puede ser desactivada porque " +
+                    "contiene controles diarios activos.");
+            }
+
+
+            /*
+             * Business Validation | Weekly Check Dependency
+             */
+            var hasActiveWeeklyChecks =
+                await _context.WeeklyChecks
+                    .AsNoTracking()
+                    .AnyAsync(
+                        weeklyCheck =>
+                            weeklyCheck.BroodId ==
+                                brood.BroodId &&
+                            weeklyCheck.WeeklyCheckState);
+
+            if (hasActiveWeeklyChecks)
+            {
+                throw new InvalidOperationException(
+                    "La camada no puede ser desactivada porque " +
+                    "contiene controles semanales activos.");
+            }
+
+
+            /*
+             * Logical Deletion | Brood State
+             */
+            brood.BroodState =
+                false;
 
             await _context.SaveChangesAsync();
         }

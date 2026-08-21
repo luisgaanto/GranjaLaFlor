@@ -759,22 +759,68 @@ namespace DB_GranjaLaFlor.Services
             }
         }
 
+         /*
+          * Business Operation | Soft Delete Income Concentrate
+          *
+          * Logically deactivates an active Income Concentrate
+          * only when it is not being used by an active Daily Check.
+          */
         public async Task SoftDeleteAsync(int id)
         {
-            var income = await _context.IncomeConcentrates
-                .FirstOrDefaultAsync(income =>
-                    income.IncomeConcentrateId == id &&
-                    income.IncomeState);
+            /*
+             * Business Validation | Existing Income Concentrate
+             */
+            var income =
+                await _context.IncomeConcentrates
+                    .FirstOrDefaultAsync(
+                        income =>
+                            income.IncomeConcentrateId ==
+                                id &&
+                            income.IncomeState);
 
             if (income == null)
             {
                 throw new InvalidOperationException(
-                    "Ingreso de concentrado no encontrado o ya se encuentra inactivo.");
+                    "Ingreso de concentrado no encontrado " +
+                    "o ya se encuentra inactivo.");
             }
 
-            var broodId = income.BroodId;
 
-            income.IncomeState = false;
+            /*
+             * Business Validation | Daily Check Dependency
+             *
+             * Prevents the Income Concentrate from being
+             * deactivated while an active Daily Check
+             * references it.
+             */
+            var incomeIsUsed =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .AnyAsync(
+                        dailyCheck =>
+                            dailyCheck.IncomeConcentrateId ==
+                                income.IncomeConcentrateId &&
+                            dailyCheck.DailyCheckState);
+
+            if (incomeIsUsed)
+            {
+                throw new InvalidOperationException(
+                    "El ingreso de concentrado no puede ser " +
+                    "desactivado porque está siendo utilizado " +
+                    "por uno o más controles diarios activos.");
+            }
+
+
+            /*
+             * Brood Tracking | Recalculation
+             */
+            var broodId =
+                income.BroodId;
+            /*
+             * Logical Deletion | Income Concentrate State
+             */
+            income.IncomeState =
+                false;
 
             await _context.SaveChangesAsync();
 
@@ -782,7 +828,8 @@ namespace DB_GranjaLaFlor.Services
              * Business Rule | Recalculate Accumulated After Delete: When an Income Concentrate is deactivated, it must no longer
              * be considered in accumulated calculations. The selected Brood is recalculated to keep all active records consistent.
              */
-            await RecalculateAccumulatedAsync(broodId);
+            await RecalculateAccumulatedAsync(
+                broodId);
         }
 
 

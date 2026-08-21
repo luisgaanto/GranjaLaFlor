@@ -130,20 +130,75 @@ namespace DB_GranjaLaFlor.Services
         }
 
 
+        /*
+         * Business Operation | Soft Delete Role
+         *
+         * Logically deactivates an active Role only when
+         * the Role is not assigned to any User.
+         */
         public async Task SoftDeleteAsync(int id)
         {
-            var role = await _context.Roles
-                .FirstOrDefaultAsync(role => role.RoleId == id);
+            /*
+             * Business Validation | Existing Role
+             */
+            var role =
+                await _context.Roles
+                    .FirstOrDefaultAsync(
+                        role =>
+                            role.RoleId == id);
 
             if (role == null)
             {
-                throw new InvalidOperationException("Rol no encontardo.");
+                throw new InvalidOperationException(
+                    "El rol seleccionado no existe.");
             }
 
-            role.RoleState = false;
+
+            /*
+             * Business Validation | Role State
+             */
+            if (!role.RoleState)
+            {
+                throw new InvalidOperationException(
+                    "El rol seleccionado ya se encuentra inactivo.");
+            }
+
+
+            /*
+             * Business Validation | User Dependency
+             *
+             * Prevents the Role from being deactivated when
+             * one or more Users are associated with it.
+             *
+             * Active and inactive Users are included because
+             * the Role relationship remains stored and an
+             * inactive User may later be reactivated.
+             */
+            var roleIsUsed =
+                await _context.Users
+                    .AsNoTracking()
+                    .AnyAsync(
+                        user =>
+                            user.RoleId ==
+                                role.RoleId);
+
+            if (roleIsUsed)
+            {
+                throw new InvalidOperationException(
+                    "El rol no puede ser desactivado porque " +
+                    "se encuentra asignado a uno o más usuarios.");
+            }
+
+
+            /*
+             * Logical Deletion | Role State
+             */
+            role.RoleState =
+                false;
 
             await _context.SaveChangesAsync();
         }
+
         public async Task ActivateAsync(int id)
         {
             var role = await _context.Roles

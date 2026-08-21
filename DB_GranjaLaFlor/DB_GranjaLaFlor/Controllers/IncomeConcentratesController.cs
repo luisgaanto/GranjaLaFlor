@@ -275,9 +275,15 @@ namespace DB_GranjaLaFlor.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating " +
+                    "Income Concentrate. IncomeConcentrateId: {IncomeConcentrateId}",
+                    id);
                 TempData["ErrorMessage"] = ex.Message;
 
-                return RedirectToAction(nameof(Delete), new { id });
+                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Delete), new { id });
             }
             catch (Exception ex)
             {

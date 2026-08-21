@@ -829,7 +829,7 @@ namespace DB_GranjaLaFlor.Controllers
                         "WeeklyCheckId: {WeeklyCheckId}",
                         id.Value);
 
-                    TempData["WarningMessage"] =
+                    TempData["ErrorMessage"] =
                         "El control semanal seleccionado ya se encuentra inactivo.";
 
                     return RedirectToAction(
@@ -901,7 +901,7 @@ namespace DB_GranjaLaFlor.Controllers
                     "Weekly Check. WeeklyCheckId: {WeeklyCheckId}",
                     id);
 
-                TempData["WarningMessage"] =
+                TempData["ErrorMessage"] =
                     ex.Message;
 
                 return RedirectToAction(

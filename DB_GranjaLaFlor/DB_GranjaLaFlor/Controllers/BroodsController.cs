@@ -267,22 +267,43 @@ namespace DB_GranjaLaFlor.Controllers
         {
             try
             {
-                await _broodService.SoftDeleteAsync(id);
+                await _broodService
+                    .SoftDeleteAsync(id);
 
-                TempData["SuccessMessage"] = "La camada fue desactivada correctamente.";
+                TempData["SuccessMessage"] =
+                    "La camada fue desactivada correctamente.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating " +
+                    "Brood. BroodId: {BroodId}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    ex.Message;
+
+                return RedirectToAction(
+                    nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "Unexpected error while deleting brood. BroodId: {BroodId}",
+                    "Unexpected error while deactivating Brood. " +
+                    "BroodId: {BroodId}",
                     id);
 
-                TempData["ErrorMessage"] = "No fue posible desactivar la camada. Intente nuevamente.";
+                TempData["ErrorMessage"] =
+                    "No fue posible desactivar la camada. " +
+                    "Intente nuevamente.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(
+                    nameof(Index));
             }
         }
 

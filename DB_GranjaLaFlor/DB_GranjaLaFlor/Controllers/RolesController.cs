@@ -293,39 +293,62 @@ namespace DB_GranjaLaFlor.Controllers
             return View(role);
         }
 
-        // POST: Roles/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         // ASP.NET Core MVC : Doc recommends to use "ActionName" when Post method contains same parameters as Get method. 
         [ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(
+    int id)
         {
             _logger.LogInformation(
-                "Entering RolesController.Delete() POST. RoleId: {RoleId}",
+                "Entering RolesController.Delete() POST. " +
+                "RoleId: {RoleId}",
                 id);
 
             try
             {
-                await _roleService.SoftDeleteAsync(id);
+                await _roleService
+                    .SoftDeleteAsync(id);
 
                 _logger.LogInformation(
-                    "Role deactivated successfully. RoleId: {RoleId}",
+                    "Role deactivated successfully. " +
+                    "RoleId: {RoleId}",
                     id);
 
-                TempData["SuccessMessage"] = "El rol fue desactivado correctamente.";
+                TempData["SuccessMessage"] =
+                    "El rol fue desactivado correctamente.";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Business rule validation failed while deactivating " +
+                    "Role. RoleId: {RoleId}",
+                    id);
+
+                TempData["ErrorMessage"] =
+                    ex.Message;
+
+                return RedirectToAction(
+                    nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "Unexpected error while deactivating role. RoleId: {RoleId}",
+                    "Unexpected error while deactivating Role. " +
+                    "RoleId: {RoleId}",
                     id);
 
-                TempData["ErrorMessage"] = "No fue posible desactivar el rol. Intente nuevamente.";
+                TempData["ErrorMessage"] =
+                    "No fue posible desactivar el rol. " +
+                    "Intente nuevamente.";
 
-                return RedirectToAction(nameof(Delete), new { id });
+                return RedirectToAction(
+                    nameof(Index));
             }
         }
 

@@ -590,119 +590,193 @@ namespace DB_GranjaLaFlor.Services
 
         /*
          * UI Data | Selected Brood Information
+         *
          * Retrieves the information displayed in the Daily Check form
-         * after the user selects a Brood.
+         * after the user selects a Brood and Daily Check date.
          *
          * The selected Brood must belong to the selected Broiler House.
-         * The latest active Income Concentrate record is used as the
-         * current concentrate reference for the selected Brood.
+         * The Income Concentrate used must be the most recent active
+         * record available on or before the selected Daily Check date.
          */
         public async Task<DailyCheckFormViewModel?> GetBroodInformationAsync(
             int broilerHouseId,
-            int broodId)
+            int broodId,
+            DateTime dailyCheckDate)
         {
-            var brood = await _context.Broods
-                .AsNoTracking()
-                .Where(brood =>
-                    brood.BroodId == broodId &&
-                    brood.BroilerHouseId == broilerHouseId &&
-                    brood.BroodState &&
-                    brood.BroilerHouse != null &&
-                    brood.BroilerHouse.BroilerHouseState)
-                .Select(brood => new
-                {
-                    brood.BroodId,
-                    brood.BroilerHouseId,
-                    brood.BroodBirdInitialNum
-                })
-                .FirstOrDefaultAsync();
+            /*
+             * Business Validation | Brood Availability
+             *
+             * Confirms that the selected Brood exists, is active,
+             * belongs to the selected Broiler House and that the
+             * Broiler House is also active.
+             */
+            var brood =
+                await _context.Broods
+                    .AsNoTracking()
+                    .Where(brood =>
+                        brood.BroodId ==
+                            broodId &&
+                        brood.BroilerHouseId ==
+                            broilerHouseId &&
+                        brood.BroodState &&
+                        brood.BroilerHouse != null &&
+                        brood.BroilerHouse.BroilerHouseState)
+                    .Select(brood => new
+                    {
+                        brood.BroodId,
+                        brood.BroilerHouseId,
+                        brood.BroodBirdInitialNum
+                    })
+                    .FirstOrDefaultAsync();
 
             if (brood == null)
             {
                 return null;
             }
 
-            var incomeConcentrate = await _context.IncomeConcentrates
-                .AsNoTracking()
-                .Where(income =>
-                    income.BroodId == broodId &&
-                    income.IncomeState)
-                .OrderByDescending(income =>
-                    income.IncomeConcentrateDate)
-                .ThenByDescending(income =>
-                    income.IncomeConcentrateId)
-                .Select(income => new
-                {
-                    income.IncomeConcentrateId,
-                    income.IncomeAccumulated
-                })
-                .FirstOrDefaultAsync();
+
+            /*
+             * UI Data | Available Income Concentrate
+             *
+             * Retrieves the most recent active Income Concentrate
+             * available on or before the selected Daily Check date.
+             *
+             * This prevents the form from displaying concentrate
+             * that entered the Brood after the operational date.
+             */
+            var incomeConcentrate =
+                await _context.IncomeConcentrates
+                    .AsNoTracking()
+                    .Where(income =>
+                        income.BroodId ==
+                            broodId &&
+                        income.IncomeState &&
+                        income.IncomeConcentrateDate <=
+                            dailyCheckDate.Date)
+                    .OrderByDescending(income =>
+                        income.IncomeConcentrateDate)
+                    .ThenByDescending(income =>
+                        income.IncomeConcentrateId)
+                    .Select(income => new
+                    {
+                        income.IncomeConcentrateId,
+                        income.IncomeAccumulated
+                    })
+                    .FirstOrDefaultAsync();
 
             if (incomeConcentrate == null)
             {
                 return null;
             }
 
-            /*
-             * Business Calculation | Current Accumulated Mortality
-             * Retrieves the mortality already registered in active
-             * Daily Checks belonging to the selected Brood.
-             */
-            var accumulatedMortality = await _context.DailyChecks
-                .AsNoTracking()
-                .Where(dailyCheck =>
-                    dailyCheck.BroodId == broodId &&
-                    dailyCheck.DailyCheckState)
-                .SumAsync(dailyCheck =>
-                    (int?)dailyCheck.TotalDailyMortality) ?? 0;
 
             /*
-             * Business Calculation | Current Accumulated Consumption
-             * Retrieves the consumption already registered in active
-             * Daily Checks belonging to the selected Brood.
+             * Business Calculation | Accumulated Mortality
+             *
+             * Retrieves mortality from active Daily Checks
+             * registered before the selected Daily Check date.
+             *
+             * Future Daily Checks must not affect the historical
+             * preview of the selected date.
              */
-            var accumulatedConsumption = await _context.DailyChecks
-                .AsNoTracking()
-                .Where(dailyCheck =>
-                    dailyCheck.BroodId == broodId &&
-                    dailyCheck.DailyCheckState)
-                .SumAsync(dailyCheck =>
-                    (decimal?)dailyCheck.ConsumptionKilos) ?? 0;
+            var accumulatedMortality =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .Where(dailyCheck =>
+                        dailyCheck.BroodId ==
+                            broodId &&
+                        dailyCheck.DailyCheckState &&
+                        dailyCheck.DailyCheckDate <
+                            dailyCheckDate.Date)
+                    .SumAsync(dailyCheck =>
+                        (int?)dailyCheck.TotalDailyMortality)
+                    ?? 0;
 
-            var dailyBirdBalance = brood.BroodBirdInitialNum - accumulatedMortality;
 
-            var concentrateBalance = incomeConcentrate.IncomeAccumulated - accumulatedConsumption;
+            /*
+             * Business Calculation | Accumulated Consumption
+             *
+             * Retrieves concentrate consumption from active
+             * Daily Checks registered before the selected date.
+             *
+             * The current Daily Check consumption is not included
+             * because it has not yet been created.
+             */
+            var accumulatedConsumption =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .Where(dailyCheck =>
+                        dailyCheck.BroodId ==
+                            broodId &&
+                        dailyCheck.DailyCheckState &&
+                        dailyCheck.DailyCheckDate <
+                            dailyCheckDate.Date)
+                    .SumAsync(dailyCheck =>
+                        (decimal?)dailyCheck.ConsumptionKilos)
+                    ?? 0;
 
+
+            /*
+             * Business Calculation | Current Bird Balance
+             */
+            var dailyBirdBalance =
+                brood.BroodBirdInitialNum -
+                accumulatedMortality;
+
+
+            /*
+             * Business Calculation | Current Concentrate Balance
+             *
+             * Calculates the concentrate available immediately
+             * before the new Daily Check is registered.
+             */
+            var concentrateBalance =
+                incomeConcentrate.IncomeAccumulated -
+                accumulatedConsumption;
+
+
+            /*
+             * ViewModel Mapping | Daily Check Form
+             */
             return new DailyCheckFormViewModel
             {
-                BroilerHouseId = brood.BroilerHouseId,
+                BroilerHouseId =
+                    brood.BroilerHouseId,
 
-                BroodId = brood.BroodId,
+                BroodId =
+                    brood.BroodId,
 
-                BroodBirdInitialNum = brood.BroodBirdInitialNum,
+                BroodBirdInitialNum =
+                    brood.BroodBirdInitialNum,
 
-                IncomeConcentrateId = incomeConcentrate.IncomeConcentrateId,
+                IncomeConcentrateId =
+                    incomeConcentrate.IncomeConcentrateId,
 
-                IncomeAccumulated = incomeConcentrate.IncomeAccumulated,
+                IncomeAccumulated =
+                    incomeConcentrate.IncomeAccumulated,
 
-                AccumulatedMortality = accumulatedMortality,
+                AccumulatedMortality =
+                    accumulatedMortality,
 
-                DailyBirdBalance = dailyBirdBalance,
+                DailyBirdBalance =
+                    dailyBirdBalance,
 
-                AccumulatedConsumption = accumulatedConsumption,
+                AccumulatedConsumption =
+                    accumulatedConsumption,
 
-                ConcentrateBalance = concentrateBalance
+                ConcentrateBalance =
+                    concentrateBalance
             };
         }
 
         /*
- * Business Operation | Create Daily Check
- * Validates the selected Brood, Broiler House, Income Concentrate,
- * week and day before creating a new Daily Check record.
- *
- * User-entered values and relationships are assigned by this method.
- * All calculated values are generated by RecalculateDailyChecksAsync.
- */
+         * Business Operation | Create Daily Check
+         * Validates the selected Brood, Broiler House, Income Concentrate,
+         * week and day before creating a new Daily Check record.
+         *
+         * User-entered values and relationships are assigned by this method.
+         * All calculated values are generated by RecalculateDailyChecksAsync.
+         */
         public async Task CreateAsync(DailyCheckFormViewModel model)
         {
             /*
@@ -770,29 +844,37 @@ namespace DB_GranjaLaFlor.Services
 
             /*
              * Business Validation | Income Concentrate Availability
-             * Retrieves the latest active Income Concentrate associated
-             * with the selected Brood.
+             *
+             * Retrieves the most recent active Income Concentrate
+             * available on or before the Daily Check date.
+             *
+             * A Daily Check must not use concentrate that entered
+             * the Brood after the date of the operational control.
              */
-            var incomeConcentrate = await _context.IncomeConcentrates
-                .AsNoTracking()
-                .Where(income =>
-                    income.BroodId == model.BroodId &&
-                    income.IncomeState)
-                .OrderByDescending(income =>
-                    income.IncomeConcentrateDate)
-                .ThenByDescending(income =>
-                    income.IncomeConcentrateId)
-                .Select(income => new
-                {
-                    income.IncomeConcentrateId
-                })
-                .FirstOrDefaultAsync();
+            var incomeConcentrate =
+                await _context.IncomeConcentrates
+                    .AsNoTracking()
+                    .Where(income =>
+                        income.BroodId ==
+                            model.BroodId &&
+                        income.IncomeState &&
+                        income.IncomeConcentrateDate <=
+                            model.DailyCheckDate.Date)
+                    .OrderByDescending(income =>
+                        income.IncomeConcentrateDate)
+                    .ThenByDescending(income =>
+                        income.IncomeConcentrateId)
+                    .Select(income => new
+                    {
+                        income.IncomeConcentrateId
+                    })
+                    .FirstOrDefaultAsync();
 
             if (incomeConcentrate == null)
             {
                 throw new InvalidOperationException(
-                    "La camada seleccionada no tiene ingresos " +
-                    "de concentrado activos.");
+                    "No existe un ingreso de concentrado disponible " +
+                    "para la fecha del control diario seleccionado.");
             }
 
             /*
@@ -886,58 +968,137 @@ namespace DB_GranjaLaFlor.Services
 
         /*
          * Business Calculation | Recalculate Daily Checks
-         * Recalculates mortality, bird balance, consumption and concentrate
-         * balance for every active Daily Check belonging to the specified Brood.
          *
-         * Records are processed chronologically so each accumulated value
-         * represents the operational status at the time of the Daily Check.
+         * Recalculates mortality, bird balance, consumption and
+         * concentrate balance for every active Daily Check
+         * belonging to the specified Brood.
+         *
+         * The method also verifies the Income Concentrate associated
+         * with each Daily Check according to its operational date.
+         *
+         * The method is public because other operational Services,
+         * such as IncomeConcentrateService, may modify information
+         * used by Daily Check calculated values.
          */
-        private async Task RecalculateDailyChecksAsync(int broodId)
+        public async Task RecalculateDailyChecksAsync(
+            int broodId)
         {
             /*
-             * Retrieves tracked Daily Check entities because their calculated
-             * properties are updated and saved by this method.
+             * Database Query | Active Income Concentrates
+             *
+             * Retrieves all active Income Concentrates associated
+             * with the Brood in chronological order.
+             *
+             * These records are used to determine which concentrate
+             * was actually available on each Daily Check date.
              */
-            var dailyChecks = await _context.DailyChecks
-                .Include(dailyCheck =>
-                    dailyCheck.Brood)
-                .Include(dailyCheck =>
-                    dailyCheck.IncomeConcentrate)
-                .Where(dailyCheck =>
-                    dailyCheck.BroodId == broodId &&
-                    dailyCheck.DailyCheckState)
-                .OrderBy(dailyCheck =>
-                    dailyCheck.DailyCheckDate)
-                .ThenBy(dailyCheck =>
-                    dailyCheck.DailyCheckWeek)
-                .ThenBy(dailyCheck =>
-                    dailyCheck.DailyCheckDay)
-                .ThenBy(dailyCheck =>
-                    dailyCheck.DailyCheckId)
-                .ToListAsync();
+            var incomeConcentrates =
+                await _context.IncomeConcentrates
+                    .AsNoTracking()
+                    .Where(income =>
+                        income.BroodId ==
+                            broodId &&
+                        income.IncomeState)
+                    .OrderBy(income =>
+                        income.IncomeConcentrateDate)
+                    .ThenBy(income =>
+                        income.IncomeConcentrateId)
+                    .Select(income => new
+                    {
+                        income.IncomeConcentrateId,
+                        income.IncomeConcentrateDate,
+                        income.IncomeAccumulated
+                    })
+                    .ToListAsync();
+
 
             /*
-             * Running totals used while processing the active Daily Checks
-             * associated with the selected Brood.
+             * Database Query | Active Daily Checks
+             *
+             * Retrieves tracked Daily Check entities because their
+             * calculated values and Income Concentrate relationship
+             * may be updated by this method.
              */
-            var accumulatedMortality = 0;
-            decimal accumulatedConsumption = 0;
+            var dailyChecks =
+                await _context.DailyChecks
+                    .Include(dailyCheck =>
+                        dailyCheck.Brood)
+                    .Where(dailyCheck =>
+                        dailyCheck.BroodId ==
+                            broodId &&
+                        dailyCheck.DailyCheckState)
+                    .OrderBy(dailyCheck =>
+                        dailyCheck.DailyCheckDate)
+                    .ThenBy(dailyCheck =>
+                        dailyCheck.DailyCheckWeek)
+                    .ThenBy(dailyCheck =>
+                        dailyCheck.DailyCheckDay)
+                    .ThenBy(dailyCheck =>
+                        dailyCheck.DailyCheckId)
+                    .ToListAsync();
+
+
+            /*
+             * Running Totals | Daily Checks
+             */
+            var accumulatedMortality =
+                0;
+
+            decimal accumulatedConsumption =
+                0;
+
 
             foreach (var dailyCheck in dailyChecks)
             {
                 /*
+                 * Business Validation | Income Concentrate by Date
+                 *
+                 * Determines the most recent active Income Concentrate
+                 * available on or before the current Daily Check date.
+                 *
+                 * A Daily Check must never use concentrate that entered
+                 * the Brood after its operational date.
+                 */
+                var availableIncome =
+                    incomeConcentrates
+                        .Where(income =>
+                            income.IncomeConcentrateDate <=
+                                dailyCheck.DailyCheckDate.Date)
+                        .OrderByDescending(income =>
+                            income.IncomeConcentrateDate)
+                        .ThenByDescending(income =>
+                            income.IncomeConcentrateId)
+                        .FirstOrDefault();
+
+                if (availableIncome == null)
+                {
+                    throw new InvalidOperationException(
+                        "No existe un ingreso de concentrado disponible " +
+                        "para la fecha de uno de los controles diarios.");
+                }
+
+
+                /*
+                 * Relationship Update | Income Concentrate
+                 *
+                 * Updates the Foreign Key when another active
+                 * Income Concentrate has become the correct
+                 * chronological reference for this Daily Check.
+                 */
+                dailyCheck.IncomeConcentrateId =
+                    availableIncome.IncomeConcentrateId;
+
+
+                /*
                  * Business Calculation | Daily Mortality
-                 * Calculates the total mortality registered in the
-                 * current Daily Check.
                  */
                 dailyCheck.TotalDailyMortality =
                     dailyCheck.NaturalMortality +
                     dailyCheck.SelectQuantity;
 
+
                 /*
                  * Business Calculation | Accumulated Mortality
-                 * Adds the current Daily Check mortality to the running
-                 * mortality total of the Brood.
                  */
                 accumulatedMortality +=
                     dailyCheck.TotalDailyMortality;
@@ -945,10 +1106,9 @@ namespace DB_GranjaLaFlor.Services
                 dailyCheck.AccumulatedMortality =
                     accumulatedMortality;
 
+
                 /*
                  * Business Calculation | Bird Balance
-                 * Subtracts the accumulated mortality from the initial
-                 * bird quantity of the Brood.
                  */
                 dailyCheck.DailyBirdBalance =
                     dailyCheck.Brood.BroodBirdInitialNum -
@@ -961,19 +1121,20 @@ namespace DB_GranjaLaFlor.Services
                         "la cantidad inicial de aves de la camada.");
                 }
 
+
                 /*
                  * Business Calculation | Daily Consumption
-                 * Converts the consumption entered in quintals into
-                 * kilograms using the project conversion rule.
+                 *
+                 * Converts quintals into kilograms using the
+                 * project's standard conversion factor.
                  */
                 dailyCheck.ConsumptionKilos =
                     dailyCheck.ConsumptionQuintals *
                     KilosPerQuintal;
 
+
                 /*
                  * Business Calculation | Accumulated Consumption
-                 * Adds the current Daily Check consumption to the
-                 * running consumption total of the Brood.
                  */
                 accumulatedConsumption +=
                     dailyCheck.ConsumptionKilos;
@@ -981,13 +1142,15 @@ namespace DB_GranjaLaFlor.Services
                 dailyCheck.AccumulatedConsumption =
                     accumulatedConsumption;
 
+
                 /*
                  * Business Calculation | Concentrate Balance
-                 * Subtracts the accumulated consumption from the accumulated
-                 * concentrate associated with the current Daily Check.
+                 *
+                 * Uses the accumulated concentrate that was available
+                 * according to the current Daily Check date.
                  */
                 dailyCheck.ConcentrateBalance =
-                    dailyCheck.IncomeConcentrate.IncomeAccumulated -
+                    availableIncome.IncomeAccumulated -
                     accumulatedConsumption;
 
                 if (dailyCheck.ConcentrateBalance < 0)
@@ -998,10 +1161,12 @@ namespace DB_GranjaLaFlor.Services
                 }
             }
 
+
             /*
              * Database Operation | Save Recalculated Values
-             * Persists every calculated value generated for the
-             * active Daily Checks of the selected Brood.
+             *
+             * Persists calculated values and any IncomeConcentrateId
+             * reassignment required by the chronological relationship.
              */
             await _context.SaveChangesAsync();
         }
@@ -1242,8 +1407,11 @@ namespace DB_GranjaLaFlor.Services
                 await _context.IncomeConcentrates
                     .AsNoTracking()
                     .Where(income =>
-                        income.BroodId == model.BroodId &&
-                        income.IncomeState)
+                        income.BroodId ==
+                            model.BroodId &&
+                        income.IncomeState &&
+                        income.IncomeConcentrateDate <=
+                            model.DailyCheckDate.Date)
                     .OrderByDescending(income =>
                         income.IncomeConcentrateDate)
                     .ThenByDescending(income =>
@@ -1257,8 +1425,8 @@ namespace DB_GranjaLaFlor.Services
             if (incomeConcentrate == null)
             {
                 throw new InvalidOperationException(
-                    "La camada seleccionada no tiene ingresos " +
-                    "de concentrado activos.");
+                    "No existe un ingreso de concentrado disponible " +
+                    "para la fecha del control diario seleccionado.");
             }
 
             /*

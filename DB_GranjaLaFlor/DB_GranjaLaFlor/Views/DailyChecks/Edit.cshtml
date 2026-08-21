@@ -343,13 +343,31 @@
     </div>
 </div>
 
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
+            /*
+             * Business Constant | Quintal Conversion
+             *
+             * One quintal is equivalent to 46 kilograms.
+             * This value is used only for the Edit form preview.
+             *
+             * The Service layer recalculates the official values
+             * before saving the Daily Check.
+             */
             const kilosPerQuintal = 46;
+
+
+            /*
+             * Form Controls
+             */
+            const dailyCheckDateInput =
+                document.getElementById("DailyCheckDate");
 
             const broilerHouseSelect =
                 document.getElementById("BroilerHouseId");
@@ -396,77 +414,136 @@
             const dynamicMessage =
                 document.getElementById("dynamicMessage");
 
+
             /*
-             * Stores the values that existed before the current
-             * Daily Check being edited.
+             * Original Daily Check Information
              *
-             * The selected Daily Check values are subtracted from the
-             * accumulated values returned by the Service so the preview
-             * does not count the edited record twice.
+             * Stores the original Brood and date of the record
+             * being edited.
+             *
+             * These values are required to determine whether the
+             * current Daily Check is already included in the
+             * accumulated values returned by the Service.
+             */
+            const originalBroodId =
+                '@Model.BroodId';
+
+            const originalDailyCheckDate =
+                '@Model.DailyCheckDate.ToString("yyyy-MM-dd")';
+
+            const currentDailyMortality =
+                @Model.TotalDailyMortality;
+
+            const currentConsumptionKilos =
+                @Model.ConsumptionKilos.ToString(
+                    System.Globalization.CultureInfo.InvariantCulture);
+
+
+            /*
+             * Running Values | Edit Preview
+             *
+             * Stores the historical values that existed before
+             * the Daily Check currently being edited.
              */
             let previousAccumulatedMortality = 0;
             let previousAccumulatedConsumption = 0;
             let availableIncomeAccumulated = 0;
             let initialBirdQuantity = 0;
 
+
             /*
+             * Utility | Numeric Value
+             *
              * Converts the value of a form field into a valid number.
              * Empty or invalid values are interpreted as zero.
              */
             function getNumericValue(input) {
+
                 const normalizedValue =
-                    input.value.toString().replace(",", ".");
+                    input.value
+                        .toString()
+                        .replace(",", ".");
 
                 const value =
-                    Number.parseFloat(normalizedValue);
+                    Number.parseFloat(
+                        normalizedValue);
 
                 return Number.isFinite(value)
                     ? value
                     : 0;
             }
 
+
             /*
+             * Utility | Decimal Format
+             *
              * Displays decimal values using two decimal places.
              */
             function formatDecimal(value) {
-                return Number(value).toFixed(2);
+
+                return Number(value)
+                    .toFixed(2);
             }
 
+
             /*
-             * Displays an error message generated while loading
-             * Brood or Broiler House information.
+             * UI Message | Dynamic Error
              */
             function showDynamicMessage(message) {
-                dynamicMessage.textContent = message;
-                dynamicMessage.classList.remove("d-none");
+
+                dynamicMessage.textContent =
+                    message;
+
+                dynamicMessage.classList
+                    .remove("d-none");
             }
 
+
             /*
-             * Removes the current dynamic error message.
+             * UI Message | Clear
              */
             function clearDynamicMessage() {
-                dynamicMessage.textContent = "";
-                dynamicMessage.classList.add("d-none");
+
+                dynamicMessage.textContent =
+                    "";
+
+                dynamicMessage.classList
+                    .add("d-none");
             }
 
+
             /*
-             * Clears all information and calculated values associated
-             * with the previously selected Brood.
+             * UI Reset | Brood Information
+             *
+             * Clears only the calculated and Brood-related values.
+             *
+             * User-editable values such as Natural Mortality,
+             * Select Quantity and Consumption Quintals are preserved.
              */
             function resetBroodInformation() {
+
                 previousAccumulatedMortality = 0;
                 previousAccumulatedConsumption = 0;
                 availableIncomeAccumulated = 0;
                 initialBirdQuantity = 0;
 
-                broodBirdInitialNumInput.value = 0;
-                incomeConcentrateIdInput.value = 0;
+                broodBirdInitialNumInput.value =
+                    0;
+
+                incomeConcentrateIdInput.value =
+                    0;
+
                 incomeAccumulatedInput.value =
                     formatDecimal(0);
 
-                totalDailyMortalityInput.value = 0;
-                accumulatedMortalityInput.value = 0;
-                dailyBirdBalanceInput.value = 0;
+                totalDailyMortalityInput.value =
+                    0;
+
+                accumulatedMortalityInput.value =
+                    0;
+
+                dailyBirdBalanceInput.value =
+                    0;
 
                 consumptionKilosInput.value =
                     formatDecimal(0);
@@ -478,16 +555,23 @@
                     formatDecimal(0);
             }
 
+
             /*
-             * Recalculates the mortality values displayed in the form.
-             * The Service recalculates these values again before saving.
+             * UI Calculation | Mortality Preview
+             *
+             * Recalculates the Daily Check mortality values using
+             * the historical accumulated mortality returned by
+             * the Service and the new values entered by the user.
              */
             function calculateMortality() {
+
                 const naturalMortality =
-                    getNumericValue(naturalMortalityInput);
+                    getNumericValue(
+                        naturalMortalityInput);
 
                 const selectQuantity =
-                    getNumericValue(selectQuantityInput);
+                    getNumericValue(
+                        selectQuantityInput);
 
                 const totalDailyMortality =
                     naturalMortality +
@@ -501,26 +585,32 @@
                     initialBirdQuantity -
                     accumulatedMortality;
 
+
                 totalDailyMortalityInput.value =
-                    Math.trunc(totalDailyMortality);
+                    Math.trunc(
+                        totalDailyMortality);
 
                 accumulatedMortalityInput.value =
-                    Math.trunc(accumulatedMortality);
+                    Math.trunc(
+                        accumulatedMortality);
 
                 dailyBirdBalanceInput.value =
-                    Math.trunc(dailyBirdBalance);
+                    Math.trunc(
+                        dailyBirdBalance);
             }
 
+
             /*
-             * Recalculates the consumption and concentrate values
-             * displayed in the form.
+             * UI Calculation | Consumption Preview
              *
-             * One quintal is equivalent to 46 kilograms according
-             * to the project business rule.
+             * Converts quintals into kilograms and calculates
+             * accumulated consumption and available concentrate.
              */
             function calculateConsumption() {
+
                 const consumptionQuintals =
-                    getNumericValue(consumptionQuintalsInput);
+                    getNumericValue(
+                        consumptionQuintalsInput);
 
                 const consumptionKilos =
                     consumptionQuintals *
@@ -534,22 +624,29 @@
                     availableIncomeAccumulated -
                     accumulatedConsumption;
 
+
                 consumptionKilosInput.value =
-                    formatDecimal(consumptionKilos);
+                    formatDecimal(
+                        consumptionKilos);
 
                 accumulatedConsumptionInput.value =
-                    formatDecimal(accumulatedConsumption);
+                    formatDecimal(
+                        accumulatedConsumption);
 
                 concentrateBalanceInput.value =
-                    formatDecimal(concentrateBalance);
+                    formatDecimal(
+                        concentrateBalance);
             }
 
+
             /*
-             * Loads the active Broods associated with the selected
-             * Broiler House.
+             * UI Data | Broods by Broiler House
              *
-             * The current Brood remains selected when the Edit form
-             * is initially loaded or returned after a validation error.
+             * Loads the active Broods associated with the
+             * selected Broiler House.
+             *
+             * The original Brood remains selected when the
+             * Edit form is initially loaded.
              */
             async function loadBroodsByBroilerHouse(
                 broilerHouseId,
@@ -560,27 +657,35 @@
                     'Seleccione una camada' +
                     '</option>';
 
-                broodSelect.disabled = true;
+                broodSelect.disabled =
+                    true;
 
                 resetBroodInformation();
                 clearDynamicMessage();
+
 
                 if (!broilerHouseId) {
                     return;
                 }
 
+
                 try {
+
                     const url =
                         '@Url.Action(
-                    "GetBroodsByBroilerHouse",
-                    "DailyChecks")' +
+                            "GetBroodsByBroilerHouse",
+                            "DailyChecks")' +
                         '?broilerHouseId=' +
                         encodeURIComponent(
                             broilerHouseId);
 
-                    const response = await fetch(url);
+
+                    const response =
+                        await fetch(url);
+
 
                     if (!response.ok) {
+
                         const errorData =
                             await response.json();
 
@@ -589,33 +694,45 @@
                             "No se pudieron cargar las camadas.");
                     }
 
+
                     const broodOptions =
                         await response.json();
 
-                    broodOptions.forEach(function (option) {
-                        const broodOption =
-                            document.createElement("option");
 
-                        broodOption.value =
-                            option.value;
+                    broodOptions.forEach(
+                        function (option) {
 
-                        broodOption.textContent =
-                            option.text;
+                            const broodOption =
+                                document.createElement(
+                                    "option");
 
-                        if (option.value.toString() ===
-                            selectedBroodId.toString()) {
+                            broodOption.value =
+                                option.value;
 
-                            broodOption.selected = true;
-                        }
+                            broodOption.textContent =
+                                option.text;
 
-                        broodSelect.appendChild(
-                            broodOption);
-                    });
+
+                            if (
+                                option.value.toString() ===
+                                selectedBroodId.toString()
+                            ) {
+                                broodOption.selected =
+                                    true;
+                            }
+
+
+                            broodSelect.appendChild(
+                                broodOption);
+                        });
+
 
                     broodSelect.disabled =
                         broodOptions.length === 0;
 
+
                     if (broodOptions.length === 0) {
+
                         showDynamicMessage(
                             "La pollera seleccionada no tiene " +
                             "camadas disponibles con ingresos de " +
@@ -623,47 +740,89 @@
                     }
                 }
                 catch (error) {
-                    showDynamicMessage(error.message);
+
+                    showDynamicMessage(
+                        error.message);
                 }
             }
 
+
             /*
-             * Loads the current bird, mortality, consumption and
-             * concentrate information for the selected Brood.
+             * UI Data | Selected Brood Information
              *
-             * When the selected Brood contains the Daily Check being
-             * edited, its current values are excluded from the base
-             * accumulated values used by the preview.
+             * Retrieves the historical information required
+             * to calculate the Edit form preview according to:
+             *
+             * - Broiler House
+             * - Brood
+             * - Daily Check date
+             *
+             * The selected date is required because the Service
+             * determines which Income Concentrate was available
+             * on or before that operational date.
              */
             async function loadBroodInformation() {
+
                 const broilerHouseId =
                     broilerHouseSelect.value;
 
                 const broodId =
                     broodSelect.value;
 
+                const dailyCheckDate =
+                    dailyCheckDateInput.value;
+
+
                 resetBroodInformation();
                 clearDynamicMessage();
 
-                if (!broilerHouseId || !broodId) {
+
+                /*
+                 * Request Validation
+                 *
+                 * All three values are required before requesting
+                 * the operational information from the Controller.
+                 */
+                if (
+                    !broilerHouseId ||
+                    !broodId ||
+                    !dailyCheckDate
+                ) {
                     return;
                 }
 
+
                 try {
+
+                    /*
+                     * GET:
+                     *
+                     * DailyChecks/GetBroodInformation
+                     * ?broilerHouseId=1
+                     * &broodId=3
+                     * &dailyCheckDate=2026-08-20
+                     */
                     const url =
                         '@Url.Action(
-                    "GetBroodInformation",
-                    "DailyChecks")' +
+                            "GetBroodInformation",
+                            "DailyChecks")' +
                         '?broilerHouseId=' +
                         encodeURIComponent(
                             broilerHouseId) +
                         '&broodId=' +
                         encodeURIComponent(
-                            broodId);
+                            broodId) +
+                        '&dailyCheckDate=' +
+                        encodeURIComponent(
+                            dailyCheckDate);
 
-                    const response = await fetch(url);
+
+                    const response =
+                        await fetch(url);
+
 
                     if (!response.ok) {
+
                         const errorData =
                             await response.json();
 
@@ -673,45 +832,71 @@
                             "de la camada.");
                     }
 
+
                     const broodInformation =
                         await response.json();
 
+
+                    /*
+                     * Brood Information
+                     */
                     initialBirdQuantity =
                         Number(
                             broodInformation
-                                .broodBirdInitialNum) || 0;
+                                .broodBirdInitialNum)
+                        || 0;
+
 
                     availableIncomeAccumulated =
                         Number(
                             broodInformation
-                                .incomeAccumulated) || 0;
+                                .incomeAccumulated)
+                        || 0;
 
-                    const currentBroodId =
-                        '@Model.BroodId';
 
-                    const currentDailyMortality =
-        @Model.TotalDailyMortality;
-
-                    const currentConsumptionKilos =
-        @Model.ConsumptionKilos.ToString(
-                     System.Globalization.CultureInfo.InvariantCulture);
-
+                    /*
+                     * Historical Accumulated Values
+                     *
+                     * GetBroodInformationAsync() returns active
+                     * Daily Checks registered before the selected date.
+                     */
                     const returnedAccumulatedMortality =
                         Number(
                             broodInformation
-                                .accumulatedMortality) || 0;
+                                .accumulatedMortality)
+                        || 0;
+
 
                     const returnedAccumulatedConsumption =
                         Number(
                             broodInformation
-                                .accumulatedConsumption) || 0;
+                                .accumulatedConsumption)
+                        || 0;
+
 
                     /*
-                     * Excludes the current record only when it remains
-                     * associated with its original Brood.
+                     * Edit Adjustment | Current Record
+                     *
+                     * Normally the Service already excludes the current
+                     * Daily Check because it retrieves records before
+                     * the selected date.
+                     *
+                     * However, if this Daily Check is moved to a later
+                     * date while remaining in the same Brood, the
+                     * persisted original record becomes part of the
+                     * historical records returned by the Service.
+                     *
+                     * In that specific scenario its original values
+                     * must be removed to prevent double counting.
                      */
-                    if (broodId.toString() ===
-                        currentBroodId.toString()) {
+                    const currentRecordIsIncluded =
+                        broodId.toString() ===
+                            originalBroodId.toString() &&
+                        dailyCheckDate >
+                            originalDailyCheckDate;
+
+
+                    if (currentRecordIsIncluded) {
 
                         previousAccumulatedMortality =
                             returnedAccumulatedMortality -
@@ -722,6 +907,7 @@
                             currentConsumptionKilos;
                     }
                     else {
+
                         previousAccumulatedMortality =
                             returnedAccumulatedMortality;
 
@@ -729,37 +915,96 @@
                             returnedAccumulatedConsumption;
                     }
 
+
+                    /*
+                     * Defensive Validation
+                     *
+                     * Accumulated base values should never be negative.
+                     */
+                    previousAccumulatedMortality =
+                        Math.max(
+                            0,
+                            previousAccumulatedMortality);
+
+                    previousAccumulatedConsumption =
+                        Math.max(
+                            0,
+                            previousAccumulatedConsumption);
+
+
+                    /*
+                     * UI Mapping | Brood Information
+                     */
                     broodBirdInitialNumInput.value =
                         initialBirdQuantity;
+
 
                     incomeConcentrateIdInput.value =
                         broodInformation
                             .incomeConcentrateId;
 
+
                     incomeAccumulatedInput.value =
                         formatDecimal(
                             availableIncomeAccumulated);
 
+
+                    /*
+                     * UI Calculation | Current Edited Values
+                     *
+                     * Recalculates the preview using the values
+                     * currently entered in the Edit form.
+                     */
                     calculateMortality();
                     calculateConsumption();
                 }
                 catch (error) {
+
                     resetBroodInformation();
-                    showDynamicMessage(error.message);
+
+                    showDynamicMessage(
+                        error.message);
                 }
             }
 
+
+            /*
+             * Event | Broiler House Change
+             *
+             * Reloads the Broods associated with the newly
+             * selected Broiler House.
+             */
             broilerHouseSelect.addEventListener(
                 "change",
                 async function () {
+
                     await loadBroodsByBroilerHouse(
                         broilerHouseSelect.value);
                 });
 
+
+            /*
+             * Event | Brood Change
+             */
             broodSelect.addEventListener(
                 "change",
                 loadBroodInformation);
 
+
+            /*
+             * Event | Daily Check Date Change
+             *
+             * Changing the date may modify the Income Concentrate
+             * and all historical accumulated values.
+             */
+            dailyCheckDateInput.addEventListener(
+                "change",
+                loadBroodInformation);
+
+
+            /*
+             * Event | Mortality Preview
+             */
             naturalMortalityInput.addEventListener(
                 "input",
                 calculateMortality);
@@ -768,14 +1013,24 @@
                 "input",
                 calculateMortality);
 
+
+            /*
+             * Event | Consumption Preview
+             */
             consumptionQuintalsInput.addEventListener(
                 "input",
                 calculateConsumption);
 
+
             /*
-             * Restores the selected Broiler House and Brood when
-             * the Edit form is initially loaded or returned after
-             * a validation error.
+             * Form Initialization | Edit
+             *
+             * Restores the Broiler House and Brood associated
+             * with the existing Daily Check.
+             *
+             * Once the Brood options are loaded, the historical
+             * information is requested using the current Daily
+             * Check date.
              */
             const initialBroilerHouseId =
                 '@Model.BroilerHouseId';
@@ -783,23 +1038,30 @@
             const initialBroodId =
                 '@Model.BroodId';
 
-            if (initialBroilerHouseId &&
-                initialBroilerHouseId !== "0") {
+
+            if (
+                initialBroilerHouseId &&
+                initialBroilerHouseId !== "0"
+            ) {
 
                 loadBroodsByBroilerHouse(
                     initialBroilerHouseId,
                     initialBroodId)
                     .then(function () {
-                        if (initialBroodId &&
-                            initialBroodId !== "0") {
 
+                        if (
+                            initialBroodId &&
+                            initialBroodId !== "0"
+                        ) {
                             loadBroodInformation();
                         }
                     });
             }
             else {
+
                 resetBroodInformation();
             }
         });
     </script>
 }
+

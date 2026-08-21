@@ -215,7 +215,9 @@ namespace DB_GranjaLaFlor.Controllers
             {
                 _logger.LogWarning(
                     ex,
-                    "Business rule validation failed while creating brood. BroodName: {BroodName}",
+                    "Business rule validation failed while updating Brood. " +
+                    "BroodId: {BroodId}, BroodName: {BroodName}",
+                    model.BroodId,
                     model.BroodName);
 
                 ModelState.AddModelError(

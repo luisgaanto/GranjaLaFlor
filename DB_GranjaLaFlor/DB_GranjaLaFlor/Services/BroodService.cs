@@ -39,7 +39,11 @@ namespace DB_GranjaLaFlor.Services
                 .AsNoTracking()
                 .Include(brood => brood.BroilerHouse)
                 .Where(brood => brood.BroodState)
-                .OrderBy(brood => brood.BroodDate)
+                //Orders Broods from newest to oldest
+                .OrderByDescending(brood =>
+                    brood.BroodDate)
+                .ThenByDescending(brood =>
+                    brood.BroodId)
                 .Select(brood => new BroodListViewModel
                 {
                     BroodId = brood.BroodId,
@@ -92,33 +96,120 @@ namespace DB_GranjaLaFlor.Services
                 .ToListAsync();
         }
 
+
+        /*
+         * Business Operation | Create Brood
+         *
+         * Creates a new Brood after validating its initial bird
+         * population, Broiler House availability and operational
+         * uniqueness.
+         */
         public async Task CreateAsync(BroodFormViewModel model)
         {
             /*
-             * Business Rule | Initial Bird Count: a Brood must start with at least one bird. Services contain business logic, 
-             * while Controllers only coordinate HTTP requests. Reference: https://learn.microsoft.com/aspnet/core/mvc/overview
-            */
+              * Business Rule | Initial Bird Count: a Brood must start with at least one bird. Services contain business logic, 
+              * while Controllers only coordinate HTTP requests. Reference: https://learn.microsoft.com/aspnet/core/mvc/overview
+             */
             if (model.BroodBirdInitialNum <= 0)
             {
                 throw new InvalidOperationException(
                     "La cantidad inicial de aves debe ser mayor que cero.");
             }
 
-            var brood = new Brood
-            {
-                BroodName = NormalizeText(model.BroodName),
-                BroodDate = DateTime.Today,
-                BroodBirdInitialNum = model.BroodBirdInitialNum,
-                BroodDescription = string.IsNullOrWhiteSpace(model.BroodDescription)
-                    ? null
-                    : NormalizeText(model.BroodDescription),
-                BroodState = true,
-                BroilerHouseId = model.BroilerHouseId
-            };
 
-            _context.Broods.Add(brood);
+            /*
+             * Business Validation | Broiler House
+             *
+             * Confirms that the selected Broiler House exists
+             * and is currently active.
+             */
+            var broilerHouseExists =
+                await _context.BroilerHouses
+                    .AsNoTracking()
+                    .AnyAsync(
+                        broilerHouse =>
+                            broilerHouse.BroilerHouseId ==
+                                model.BroilerHouseId &&
+                            broilerHouse.BroilerHouseState);
+
+            if (!broilerHouseExists)
+            {
+                throw new InvalidOperationException(
+                    "La pollera seleccionada no existe o está inactiva.");
+            }
+
+
+            /*
+             * Business Validation | Duplicate Active Brood
+             *
+             * Prevents more than one active Brood from using the
+             * same Brood number inside the same Broiler House.
+             *
+             * BroodName is obtained from the controlled dropdown
+             * and therefore does not require text normalization.
+             */
+            var duplicateExists =
+                await _context.Broods
+                    .AsNoTracking()
+                    .AnyAsync(
+                        brood =>
+                            brood.BroodName ==
+                                model.BroodName &&
+                            brood.BroilerHouseId ==
+                                model.BroilerHouseId &&
+                            brood.BroodState);
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException(
+                    "Ya existe una camada activa con el mismo número " +
+                    "en la pollera seleccionada.");
+            }
+
+
+            /*
+             * Entity Mapping | Brood
+             *
+             * Creates a new Brood entity using the information
+             * validated by the Service layer.
+             */
+            var brood =
+                new Brood
+                {
+                    BroodName =
+                        model.BroodName,
+
+                    BroodDate =
+                        DateTime.Today,
+
+                    BroodBirdInitialNum =
+                        model.BroodBirdInitialNum,
+
+                    BroodDescription =
+                        string.IsNullOrWhiteSpace(
+                            model.BroodDescription)
+                            ? null
+                            : NormalizeText(
+                                model.BroodDescription),
+
+                    BroodState =
+                        true,
+
+                    BroilerHouseId =
+                        model.BroilerHouseId
+                };
+
+
+            /*
+             * Database Operation | Create Brood
+             */
+            _context.Broods.Add(
+                brood);
+
             await _context.SaveChangesAsync();
         }
+
+
 
         /*
          * UI Data | Returns the available Brood names used to populate
@@ -152,36 +243,212 @@ namespace DB_GranjaLaFlor.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task UpdateAsync(BroodFormViewModel model)
-        {
 
+        /*
+         * Business Operation | Update Brood
+         *
+         * Updates an active Brood only when it has not yet been
+         * referenced by operational production information.
+         *
+         * Once operational records exist, the Brood becomes part
+         * of the production history and cannot be modified.
+         */
+        public async Task UpdateAsync(
+            BroodFormViewModel model)
+        {
             /*
-             * Business Rule | Initial Bird Count: a Brood must start with at least one bird. Services contain business logic, 
-             * while Controllers only coordinate HTTP requests. Reference: https://learn.microsoft.com/aspnet/core/mvc/overview
-            */
+               * Business Rule | Initial Bird Count: a Brood must start with at least one bird. Services contain business logic, 
+               * while Controllers only coordinate HTTP requests. Reference: https://learn.microsoft.com/aspnet/core/mvc/overview
+              */
             if (model.BroodBirdInitialNum <= 0)
             {
                 throw new InvalidOperationException(
                     "La cantidad inicial de aves debe ser mayor que cero.");
             }
 
-            var existingBrood = await _context.Broods
-                .FirstOrDefaultAsync(brood => brood.BroodId == model.BroodId);
+
+            /*
+             * Business Validation | Existing Brood
+             *
+             * Confirms that the selected Brood exists.
+             */
+            var existingBrood =
+                await _context.Broods
+                    .FirstOrDefaultAsync(
+                        brood =>
+                            brood.BroodId ==
+                                model.BroodId);
 
             if (existingBrood == null)
             {
-                throw new InvalidOperationException("Camada no encontrada.");
+                throw new InvalidOperationException(
+                    "Camada no encontrada.");
             }
 
-            existingBrood.BroodName = NormalizeText(model.BroodName);
-            existingBrood.BroodBirdInitialNum = model.BroodBirdInitialNum;
-            existingBrood.BroodDescription = string.IsNullOrWhiteSpace(model.BroodDescription)
-                ? null
-                : NormalizeText(model.BroodDescription);
-            existingBrood.BroilerHouseId = model.BroilerHouseId;
 
+            /*
+             * Business Validation | Brood State
+             *
+             * Only active Broods can be edited.
+             */
+            if (!existingBrood.BroodState)
+            {
+                throw new InvalidOperationException(
+                    "La camada seleccionada se encuentra inactiva.");
+            }
+
+
+            /*
+             * Business Validation | Income Concentrate Dependency
+             *
+             * Any Income Concentrate reference makes the Brood part
+             * of the operational production history.
+             *
+             * State is intentionally not evaluated because inactive
+             * records still preserve their historical relationship.
+             */
+            var hasIncomeConcentrates =
+                await _context.IncomeConcentrates
+                    .AsNoTracking()
+                    .AnyAsync(
+                        income =>
+                            income.BroodId ==
+                                existingBrood.BroodId);
+
+
+            /*
+             * Business Validation | Daily Check Dependency
+             *
+             * Any Daily Check reference prevents the Brood from
+             * being modified, including inactive historical records.
+             */
+            var hasDailyChecks =
+                await _context.DailyChecks
+                    .AsNoTracking()
+                    .AnyAsync(
+                        dailyCheck =>
+                            dailyCheck.BroodId ==
+                                existingBrood.BroodId);
+
+
+            /*
+             * Business Validation | Weekly Check Dependency
+             *
+             * Existing Weekly Check records preserve calculations
+             * generated from the Brood operational information.
+             */
+            var hasWeeklyChecks =
+                await _context.WeeklyChecks
+                    .AsNoTracking()
+                    .AnyAsync(
+                        weeklyCheck =>
+                            weeklyCheck.BroodId ==
+                                existingBrood.BroodId);
+
+
+            /*
+             * Business Rule | Operational Brood Protection
+             *
+             * Once any operational information references the Brood,
+             * the complete Brood record becomes read-only.
+             *
+             * This protects:
+             *
+             * - Brood number
+             * - Broiler House
+             * - Initial bird quantity
+             * - Historical operational calculations
+             */
+            if (hasIncomeConcentrates ||
+                hasDailyChecks ||
+                hasWeeklyChecks)
+            {
+                throw new InvalidOperationException(
+                    "La camada no puede ser modificada porque contiene " +
+                    "información operativa asociada.");
+            }
+
+
+            /*
+             * Business Validation | Broiler House
+             *
+             * Confirms that the selected Broiler House exists
+             * and is currently active.
+             */
+            var broilerHouseExists =
+                await _context.BroilerHouses
+                    .AsNoTracking()
+                    .AnyAsync(
+                        broilerHouse =>
+                            broilerHouse.BroilerHouseId ==
+                                model.BroilerHouseId &&
+                            broilerHouse.BroilerHouseState);
+
+            if (!broilerHouseExists)
+            {
+                throw new InvalidOperationException(
+                    "La pollera seleccionada no existe o está inactiva.");
+            }
+
+
+            /*
+             * Business Validation | Duplicate Active Brood
+             *
+             * Prevents the update from creating another active
+             * Brood with the same number inside the same Broiler House.
+             *
+             * The current Brood is excluded from the validation.
+             */
+            var duplicateExists =
+                await _context.Broods
+                    .AsNoTracking()
+                    .AnyAsync(
+                        brood =>
+                            brood.BroodId !=
+                                model.BroodId &&
+                            brood.BroodName ==
+                                model.BroodName &&
+                            brood.BroilerHouseId ==
+                                model.BroilerHouseId &&
+                            brood.BroodState);
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException(
+                    "Ya existe una camada activa con el mismo número " +
+                    "en la pollera seleccionada.");
+            }
+
+
+            /*
+             * Entity Update | Brood
+             *
+             * Updates the Brood only when no operational
+             * dependencies have been found.
+             */
+            existingBrood.BroodName =
+                model.BroodName;
+
+            existingBrood.BroodBirdInitialNum =
+                model.BroodBirdInitialNum;
+
+            existingBrood.BroodDescription =
+                string.IsNullOrWhiteSpace(
+                    model.BroodDescription)
+                    ? null
+                    : NormalizeText(
+                        model.BroodDescription);
+
+            existingBrood.BroilerHouseId =
+                model.BroilerHouseId;
+
+
+            /*
+             * Database Operation | Save Changes
+             */
             await _context.SaveChangesAsync();
         }
+
 
         /*
  * Business Operation | Soft Delete Brood
